@@ -141,6 +141,63 @@ const routes = [
             component: () => import('../views/systemSettings/videoAccessManagement')
           }
         ]
+      },
+      {
+        path: '/backgroundManagement',
+        name: 'backgroundManagement',
+        component: () => import('../views/backgroundManagement'),
+        children: [
+          {
+            path: '/backgroundManagement/institutionManagement',
+            name: 'institutionManagement',
+            component: () => import('../views/backgroundManagement/institutionManagement')
+          },
+          {
+            path: '/backgroundManagement/userManagement',
+            name: 'userManagement',
+            component: () => import('../views/backgroundManagement/userManagement')
+          },
+          {
+            path: '/backgroundManagement/roleManagement',
+            name: 'roleManagement',
+            component: () => import('../views/backgroundManagement/roleManagement')
+          },
+          {
+            path: '/backgroundManagement/permissionManagement',
+            name: 'permissionManagement',
+            component: () => import('../views/backgroundManagement/permissionManagement')
+          },
+          {
+            path: '/backgroundManagement/dataDictionary',
+            name: 'dataDictionary',
+            component: () => import('../views/backgroundManagement/dataDictionary')
+          },
+          {
+            path: '/backgroundManagement/pointResource',
+            name: 'pointResource',
+            component: () => import('../views/backgroundManagement/pointResource')
+          },
+          {
+            path: '/backgroundManagement/lineResource',
+            name: 'lineResource',
+            component: () => import('../views/backgroundManagement/lineResource')
+          },
+          {
+            path: '/backgroundManagement/surfaceResource',
+            name: 'surfaceResource',
+            component: () => import('../views/backgroundManagement/surfaceResource')
+          },
+          {
+            path: '/backgroundManagement/videoData',
+            name: 'videoData',
+            component: () => import('../views/backgroundManagement/videoData')
+          },
+          {
+            path: '/backgroundManagement/iconLibrary',
+            name: 'iconLibrary',
+            component: () => import('../views/backgroundManagement/iconLibrary')
+          }
+        ]
       }
     ]
   }

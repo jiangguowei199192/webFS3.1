@@ -382,7 +382,7 @@ export default {
           this.$router.push({ path: '/battleReview' })
         } else if (index === 5) {
           this.$router.push({ path: '/digitalEquipment' })
-        } else if (index === 6) this.$router.push({ path: '/systemSettings' })
+        } else if (index === 6) this.$router.push({ path: '/backgroundManagement' })
         this.isActive = index
       }
     },
