@@ -1,7 +1,10 @@
 <template>
   <div>
     <div class="header">
+      <!-- <div style="width:63px"><hr class="line1"></div> -->
+      <hr class="line1">
       <div class="headerText">{{itemData.headerTitle}}</div>
+      <hr class="line2">
     </div>
     <div class="item" v-for="item in itemData.info" :key="item.id" @click="itemClicked(item.id)">
       <img :src="item.selected ? item.selectedImgPath : item.normalImgPath" class="itemImg">
@@ -33,16 +36,30 @@ export default {
 
 <style lang="scss" scoped>
   .header {
-    height: 22px;
     margin-top: 26px;
     text-align: center;
-    background: url('../../../assets/images/Setting/setting-header.png') no-repeat center;
+    .line1 {
+      width: 63px;
+      height: 1px;
+      color: #1EB0FC;
+      background-color: #1EB0FC;
+      border-width: 0;
+      display: inline-block;
+    }
     .headerText {
-      width: 57px;
+      width: 83px;
       font-size: 14px;
       font-style: italic;
       color: #ffffff;
-      margin-left: 131px;
+      display: inline-block;
+    }
+    .line2 {
+      width: 84px;
+      height: 1px;
+      color: #1EB0FC;
+      background-color: #1EB0FC;
+      border-width: 0;
+      display: inline-block;
     }
   }
   .item {
@@ -50,15 +67,15 @@ export default {
     margin-top: 16px;
     cursor: pointer;
     .itemImg {
-      width:24px;
-      height:24px;
+      width:20px;
+      height:20px;
       margin: 8px 0px 0px 31px;
     }
     .itemSpan {
       margin-left: 20px;
       line-height: 40px;
       vertical-align: top;
-      font-size: 18px;
+      font-size: 14px;
       color: #85cfe8;
     }
     .itemSpanNormal {

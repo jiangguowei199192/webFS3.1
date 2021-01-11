@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import SettingLeftItem from './components/SettingLeftItem.vue'
+import SettingLeftItem from './components/leftMenuItem.vue'
 // import { loginApi } from '@/api/login'
 
 export default {
