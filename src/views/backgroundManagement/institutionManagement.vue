@@ -1,13 +1,408 @@
 <template>
   <div>
-    <div class="title-div">基础数据 / 机构管理</div>
-    <div class="left-div"></div>
-    <div class="right-div"></div>
+    <div class="title">基础数据 / 机构管理</div>
+    <div class="left-div">
+      <div class="left-title">组织机构树</div>
+      <el-input
+        class="institution-search-input"
+        suffix-icon="el-icon-search"
+        v-model="institutionSearch"
+        placeholder=""
+        @change="institutionSearchChange"
+      ></el-input>
+      <el-tree
+        :data="deptTree"
+        :props="deptTreeProps"
+        default-expand-all
+        @node-click="deptTreeClick"
+        :expand-on-click-node="false"
+        node-key="deptCode"
+        :current-node-key="selectedDept.deptCode"
+        v-if="selectedDept.deptCode"
+        class="dept-tree"
+      >
+        <span
+          class="custom-tree-node"
+          slot-scope="{ node, data }"
+          style="width: 100%"
+        >
+          <span class="nodeTitleSty" :title="node.label">{{ node.label }}</span>
+          <div class="dept-btn" v-show="data.showSetting"></div>
+        </span>
+      </el-tree>
+    </div>
+    <div class="right-div">
+      <div class="right-title">人员列表</div>
+      <div class="search-tool">
+        <el-input
+          class="people-search-input"
+          v-model="peopleSearch"
+          placeholder="请输入人员姓名/身份证号进行搜索"
+        ></el-input>
+        <div class="people-search-btn" @click="peopleSearchClick">
+          <img :src="peopleSearchIcon" class="people-search-icon" />
+          <span class="people-search-text">搜索</span>
+        </div>
+        <div class="people-reset-btn" @click="peopleResetClick">
+          <img :src="peopleResetIcon" class="people-reset-icon" />
+          <span class="people-reset-text">重置</span>
+        </div>
+      </div>
+      <div class="operate-table-tool">
+        <span class="selected-count"
+          >已选<span style="color: #1eb0fc">0</span>项</span
+        >
+        <div class="clean-btn">清空</div>
+        <div class="delete-btn">批量删除</div>
+        <div class="add-btn">添加</div>
+      </div>
+      <el-table
+        :data="peopleList"
+        empty-text="暂无数据"
+        height="630"
+        @row-click="clickTableRow"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection"></el-table-column>
+        <el-table-column
+          label="姓名"
+          prop="name"
+          align="center"
+          :show-overflow-tooltip="true"
+        ></el-table-column>
+        <el-table-column
+          label="所属机构"
+          prop="institution"
+          align="center"
+          :show-overflow-tooltip="true"
+        ></el-table-column>
+        <el-table-column
+          label="联系方式"
+          prop="phone"
+          align="center"
+          :show-overflow-tooltip="true"
+        ></el-table-column>
+        <el-table-column
+          label="排序"
+          prop="num"
+          align="center"
+        ></el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <div class="table-btn" @click="editPeopleClick(scope.row)">
+              修改
+            </div>
+            <div
+              class="table-btn table-btn-see"
+              @click="seePeopleClick(scope.row)"
+            >
+              查看
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="text-align: center">
+        <el-pagination
+          class="tablePagination"
+          popper-class="pageSelect"
+          :total="pageTotal"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="currentPageChange"
+        ></el-pagination>
+      </div>
+    </div>
   </div>
 </template>
 
+<script>
+export default {
+  data () {
+    return {
+      peopleSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
+      peopleResetIcon: require('../../assets/images/backgroundManagement/resetIcon.png'),
+
+      institutionSearch: '',
+      deptTree: [
+        {
+          deptName: '湖北省应急管理厅',
+          deptCode: '1',
+          showSetting: true,
+          children: [
+            {
+              deptName: '孝感市应急管理局',
+              deptCode: '1-1',
+              showSetting: false,
+              children: []
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false,
+                  children: []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      deptTreeProps: {
+        children: 'children',
+        label: 'deptName',
+        value: 'deptCode'
+      },
+      selectedDept: '',
+      peopleSearch: '',
+      peopleList: [
+        {
+          name: '宋运辉',
+          institution: '东海化工',
+          phone: '13687909090',
+          num: 1
+        }
+      ],
+      pageTotal: 100,
+      pageSize: 0,
+      currentPage: 1
+    }
+  },
+  created () {
+    this.selectedDept = this.deptTree[0]
+  },
+  methods: {
+    // 搜索机构时触发
+    institutionSearchChange () {},
+    // 点击机构时触发
+    deptTreeClick (item) {
+      if (item === this.selectedDept) {
+        // console.log('选择的机构与上一次相同')
+        return
+      }
+      this.selectedDept.showSetting = false
+      item.showSetting = true
+      this.selectedDept = item
+    },
+    // 搜索人员时触发
+    peopleSearchClick () {},
+    // 重置时触发
+    peopleResetClick () {},
+    // 点击表格某一行时触发
+    clickTableRow () {},
+    // 多选时触发
+    handleSelectionChange () {},
+    // 修改时触发
+    editPeopleClick () {},
+    // 查看时触发
+    seePeopleClick () {},
+    // 切换分页时触发
+    currentPageChange () {}
+  }
+}
+</script>
+
 <style lang="scss" scoped>
-.title-div {
+.title {
   height: 54px;
   font-size: 16px;
   line-height: 54px;
@@ -16,15 +411,236 @@
 }
 .left-div {
   float: left;
-  width: 300px;
+  width: 280px;
   height: 814px;
   background-color: #183157;
   margin-left: 30px;
+  padding: 0 10px;
+  .left-title {
+    color: #ffffff;
+    font-size: 16px;
+    height: 42px;
+    line-height: 42px;
+  }
+  .institution-search-input {
+    width: 278px;
+    margin-top: 4px;
+    /deep/.el-input__inner {
+      background: #09546d;
+      border-color: #1eb0fc;
+      border-radius: 0;
+      color: white;
+    }
+    /deep/.el-icon-search {
+      color: #c5f3ff;
+    }
+  }
+  .dept-tree {
+    height: 646px;
+    overflow: auto;
+    margin-top: 15px;
+    background-color: transparent;
+    color: #ffffff;
+    /deep/.el-tree-node {
+      .el-tree-node__content {
+        display: block !important;
+        height: 30px;
+        line-height: 30px;
+        border: 1px solid transparent;
+      }
+      // .el-tree-node__children {
+      //   overflow: visible !important;
+      // }
+      .el-tree-node__content:hover,
+      .el-tree-node:focus > .el-tree-node__content {
+        color: #fff;
+        background-color: transparent;
+      }
+      // .el-tree-node__expand-icon {
+      //   color: transparent;
+      //   pointer-events: none;
+      // }
+    }
+  }
+}
+.dept-btn {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: middle;
+  background: orange;
 }
 .right-div {
   height: 814px;
   background-color: #183157;
   margin-left: 360px;
   margin-right: 30px;
+  padding: 0 14px;
+  .right-title {
+    color: #ffffff;
+    font-size: 16px;
+    height: 42px;
+    line-height: 42px;
+  }
+  .search-tool {
+    height: 34px;
+    margin-top: 4px;
+    .people-search-input {
+      width: 450px;
+      vertical-align: top;
+      /deep/.el-input__inner {
+        background: #09546d;
+        border-color: #1eb0fc;
+        border-radius: 0;
+        color: white;
+      }
+    }
+    .people-search-btn {
+      width: 80px;
+      height: 34px;
+      display: inline-block;
+      margin-left: 10px;
+      background: -webkit-linear-gradient(top, #086384, #0b779e);
+      font-size: 16px;
+      line-height: 34px;
+      color: #c5f3ff;
+      text-align: center;
+      vertical-align: top;
+      cursor: pointer;
+      .people-search-icon {
+        margin-top: 5px;
+      }
+      .people-search-text {
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 5px;
+      }
+    }
+    .people-reset-btn {
+      width: 80px;
+      height: 34px;
+      display: inline-block;
+      margin-left: 10px;
+      background: -webkit-linear-gradient(top, #086384, #0b779e);
+      font-size: 16px;
+      line-height: 34px;
+      color: #c5f3ff;
+      text-align: center;
+      cursor: pointer;
+      .people-reset-icon {
+        margin-top: 8px;
+      }
+      .people-reset-text {
+        display: inline-block;
+        vertical-align: top;
+        margin-left: 5px;
+      }
+    }
+  }
+  .operate-table-tool {
+    height: 53px;
+    .selected-count {
+      display: inline-block;
+      margin-top: 18px;
+      margin-left: 10px;
+    }
+    .clean-btn {
+      width: 32px;
+      height: 20px;
+      margin-top: 18px;
+      margin-left: 30px;
+      display: inline-block;
+      color: #1d9fe5;
+      font-size: 16px;
+      border-bottom: solid 1px #1d9fe5;
+      cursor: pointer;
+    }
+    .delete-btn {
+      float: right;
+      width: 96px;
+      height: 30px;
+      margin-top: 10px;
+      background-color: #ff0000;
+      color: #ffffff;
+      text-align: center;
+      line-height: 30px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .add-btn {
+      float: right;
+      margin-right: 12px;
+      margin-top: 10px;
+      width: 54px;
+      height: 30px;
+      background-color: #1eb0fc;
+      color: #ffffff;
+      text-align: center;
+      line-height: 30px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  }
+}
+.el-table {
+  color: #c5f3ff;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  /* 表格表头样式 */
+  /deep/.el-table__header-wrapper th {
+    color: #c5f3ff;
+    font-size: 16px;
+    height: 40px;
+    padding: 0;
+    background-color: rgba($color: #0b779e, $alpha: 0.66);
+  }
+  /* 表格每行高度*/
+  /deep/.el-table__body td {
+    height: 38px;
+    padding: 0;
+  }
+  /* 每行的背景颜色 */
+  /deep/.el-table__body td {
+    background-color: transparent;
+  }
+  /* 所有单元格颜色、无边框 */
+  /deep/td,
+  /deep/tr,
+  /deep/th {
+    border: none;
+    background-color: transparent;
+  }
+  /* 复选框样式 */
+  /deep/.el-checkbox__inner {
+    background-color: transparent;
+    border-color: #c5f3ff;
+    border-radius: 0px;
+  }
+  // /deep/.el-checkbox__input.is-checked {
+  //   // background-color: #00cff9;
+  //   border-radius: 2px;
+  // }
+  /*鼠标移入某行时的背景色*/
+  /deep/tbody tr:hover > td {
+    background-color: transparent;
+  }
+}
+/* 去除表格底部线条 */
+.el-table::before {
+  height: 0px;
+}
+.table-btn {
+  width: 46px;
+  height: 26px;
+  background-color: #0b779e;
+  color: #fefefe;
+  font-size: 14px;
+  line-height: 26px;
+  display: inline-block;
+  cursor: pointer;
+}
+.table-btn-see {
+  margin-left: 18px;
 }
 </style>
