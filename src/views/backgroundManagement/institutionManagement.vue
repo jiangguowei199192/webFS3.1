@@ -223,6 +223,52 @@
         </div>
       </div>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="showPeopleInfo"
+      :close-on-click-modal="clickfalse"
+      width="540px"
+      class="add-people-dlg"
+    >
+      <div class="add-people-header">
+        <div class="header-icon"></div>
+        <div class="header-text">查看人员信息</div>
+      </div>
+      <el-form
+        :model="peopleInfoForm"
+        :inline="true"
+        label-width="80px"
+        class="add-people-form"
+      >
+        <el-form-item label="姓名:" prop="name">
+          <div class="subtext1">{{peopleInfoForm.name}}</div>
+        </el-form-item>
+        <el-form-item label="性别:" prop="six">
+          <div class="subtext1">{{peopleInfoForm.six}}</div>
+        </el-form-item>
+        <el-form-item label="身份证号:" prop="idcard">
+          <div class="subtext1">{{peopleInfoForm.idcard}}</div>
+        </el-form-item>
+        <el-form-item label="联系方式:" prop="phone">
+          <div class="subtext1">{{peopleInfoForm.phone}}</div>
+        </el-form-item>
+        <el-form-item label="所属机构:" prop="dept">
+          <div class="subtext1">{{peopleInfoForm.dept}}</div>
+        </el-form-item>
+        <el-form-item label="办公电话:" prop="telphone">
+          <div class="subtext1">{{peopleInfoForm.telphone}}</div>
+        </el-form-item>
+        <el-form-item label="排序:" prop="num">
+          <div class="subtext1">{{peopleInfoForm.num}}</div>
+        </el-form-item>
+        <el-form-item label="备注:" prop="note">
+          <div class="subtext1 subtext2">{{peopleInfoForm.note}}</div>
+        </el-form-item>
+      </el-form>
+      <div class="confirm-tool">
+        <div class="confirm-btn" @click="seePeopleConfirmClick">确定</div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -305,7 +351,18 @@ export default {
           label: '女'
         }
       ],
-      showDeleteTip: false
+      showDeleteTip: false,
+      showPeopleInfo: false,
+      peopleInfoForm: {
+        name: '宋运辉',
+        six: '男',
+        idcard: '000000000000000000',
+        phone: '00000000000',
+        dept: '东海化工',
+        telphone: '02700000000',
+        num: '02',
+        note: '东海化工常务副厂长'
+      }
     }
   },
   created () {
@@ -347,7 +404,14 @@ export default {
     },
 
     // 查看时触发
-    seePeopleClick () {},
+    seePeopleClick () {
+      this.showPeopleInfo = true
+    },
+
+    // 查看确定时触发
+    seePeopleConfirmClick () {
+      this.showPeopleInfo = false
+    },
 
     // 切换分页时触发
     currentPageChange () {},
@@ -632,6 +696,7 @@ export default {
 .table-btn-see {
   margin-left: 18px;
 }
+
 .add-people-dlg.el-dialog__wrapper {
   /deep/.el-dialog {
     .el-dialog__header {
@@ -641,7 +706,6 @@ export default {
       padding: 0px 20px;
       width: 100%;
       border: 1px solid #1eb0fc;
-      // height: 345px;
       background-color: #121e3a;
 
       .add-people-header {
@@ -694,6 +758,16 @@ export default {
         color: #fff;
         font-size: 12px;
         margin-top: 8px;
+      }
+      .subtext1 {
+        // background: orange;
+        color: #fff;
+        font-size: 12px;
+        width: 180px;
+      }
+      .subtext2 {
+        // width: 450px;
+        // line-height: 20px;
       }
     }
     .confirm-tool {
