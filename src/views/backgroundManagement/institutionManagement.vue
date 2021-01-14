@@ -30,7 +30,7 @@
           <div class="dept-btn" v-show="data.showSetting"></div>
         </span> -->
       </el-tree>
-      <div class="add-institution-btn" @click="addClick">╋ 新增机构</div>
+      <div class="add-institution-btn" @click="addDeptClick">╋ 新增机构</div>
     </div>
     <div class="right-div">
       <div class="right-title">人员列表</div>
@@ -241,32 +241,56 @@
         class="add-people-form"
       >
         <el-form-item label="姓名:" prop="name">
-          <div class="subtext1">{{peopleInfoForm.name}}</div>
+          <div class="subtext1">{{ peopleInfoForm.name }}</div>
         </el-form-item>
         <el-form-item label="性别:" prop="six">
-          <div class="subtext1">{{peopleInfoForm.six}}</div>
+          <div class="subtext1">{{ peopleInfoForm.six }}</div>
         </el-form-item>
         <el-form-item label="身份证号:" prop="idcard">
-          <div class="subtext1">{{peopleInfoForm.idcard}}</div>
+          <div class="subtext1">{{ peopleInfoForm.idcard }}</div>
         </el-form-item>
         <el-form-item label="联系方式:" prop="phone">
-          <div class="subtext1">{{peopleInfoForm.phone}}</div>
+          <div class="subtext1">{{ peopleInfoForm.phone }}</div>
         </el-form-item>
         <el-form-item label="所属机构:" prop="dept">
-          <div class="subtext1">{{peopleInfoForm.dept}}</div>
+          <div class="subtext1">{{ peopleInfoForm.dept }}</div>
         </el-form-item>
         <el-form-item label="办公电话:" prop="telphone">
-          <div class="subtext1">{{peopleInfoForm.telphone}}</div>
+          <div class="subtext1">{{ peopleInfoForm.telphone }}</div>
         </el-form-item>
         <el-form-item label="排序:" prop="num">
-          <div class="subtext1">{{peopleInfoForm.num}}</div>
+          <div class="subtext1">{{ peopleInfoForm.num }}</div>
         </el-form-item>
         <el-form-item label="备注:" prop="note">
-          <div class="subtext1 subtext2">{{peopleInfoForm.note}}</div>
+          <div class="subtext1">{{ peopleInfoForm.note }}</div>
         </el-form-item>
       </el-form>
       <div class="confirm-tool">
         <div class="confirm-btn" @click="seePeopleConfirmClick">确定</div>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="showAddDept"
+      :close-on-click-modal="clickfalse"
+      width="1080px"
+      class="add-dept-dlg"
+    >
+      <div class="add-dept-header">
+        <div class="header-icon"></div>
+        <div class="header-text">{{ addDeptTitle }}</div>
+      </div>
+      <gMap
+        ref="gduMap"
+        handleType="devMap"
+        :bShowSimpleSearchTools="false"
+        :bShowBasic="false"
+        :bShowMeasure="false"
+        :bAutoLocate="false"
+      ></gMap>
+      <div class="confirm-tool">
+        <div class="confirm-btn" @click="addDeptConfirmClick">确定</div>
+        <div class="cancel-btn" @click="addDeptCancelClick">取消</div>
       </div>
     </el-dialog>
   </div>
@@ -362,7 +386,9 @@ export default {
         telphone: '02700000000',
         num: '02',
         note: '东海化工常务副厂长'
-      }
+      },
+      showAddDept: true,
+      addDeptTitle: '新增机构'
     }
   },
   created () {
@@ -384,7 +410,19 @@ export default {
     },
 
     // 添加机构时触发
-    addClick () {},
+    addDeptClick () {
+      this.showAddDept = true
+    },
+
+    // 添加机构确定时触发
+    addDeptConfirmClick () {
+      this.showAddDept = false
+    },
+
+    // 添加机构取消时触发
+    addDeptCancelClick () {
+      this.showAddDept = false
+    },
 
     // 搜索人员时触发
     peopleSearchClick () {},
@@ -707,7 +745,6 @@ export default {
       width: 100%;
       border: 1px solid #1eb0fc;
       background-color: #121e3a;
-
       .add-people-header {
         height: 40px;
         border-bottom: 1px solid #1eb0fc;
@@ -760,14 +797,9 @@ export default {
         margin-top: 8px;
       }
       .subtext1 {
-        // background: orange;
         color: #fff;
         font-size: 12px;
         width: 180px;
-      }
-      .subtext2 {
-        // width: 450px;
-        // line-height: 20px;
       }
     }
     .confirm-tool {
@@ -814,7 +846,7 @@ export default {
       padding: 0;
       width: 100%;
       height: 155px;
-      border: 1px solid #1EB0FC;
+      border: 1px solid #1eb0fc;
       background-color: #121e3a;
       .warning-img {
         background-image: url("../../assets/images/backgroundManagement/warning.png");
@@ -865,6 +897,68 @@ export default {
         line-height: 24px;
         border: 1px solid #00cff9;
         border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.add-dept-dlg.el-dialog__wrapper {
+  /deep/.el-dialog {
+    .el-dialog__header {
+      display: none;
+    }
+    .el-dialog__body {
+      padding: 0px 20px;
+      width: 100%;
+      border: 1px solid #1eb0fc;
+      background-color: #121e3a;
+      .add-dept-header {
+        height: 40px;
+        .header-icon {
+          display: inline-block;
+          width: 22px;
+          height: 16px;
+          background-image: url("../../assets/images/fire_title.png");
+          margin-top: 15px;
+        }
+        .header-text {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 13px;
+          margin-left: 10px;
+          font-size: 14px;
+          color: #fff;
+        }
+      }
+    }
+    .confirm-tool {
+      height: 50px;
+      margin-top: 20px;
+      .confirm-btn {
+        float: right;
+        width: 66px;
+        height: 30px;
+        background-color: #1eb0fc;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+      }
+      .cancel-btn {
+        float: right;
+        width: 66px;
+        height: 30px;
+        background-color: transparent;
+        border: 1px solid #1eb0fc;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 20px;
         cursor: pointer;
       }
     }
