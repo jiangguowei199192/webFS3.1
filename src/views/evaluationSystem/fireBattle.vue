@@ -26,7 +26,7 @@
         v-for="(item,index) in combatEvents"
         :key="index"
         :class="{active:activeIndex==index}"
-        @click="changeEvent(index)"
+        @click="changeEvent(index,true)"
       >
         <span :style="{background: 'url('+ serverUrl + item.icon +')'}"></span>
         <span></span>
@@ -173,6 +173,7 @@ export default {
       timeStart: 0,
       timeEnd: 0,
       curTime: '',
+      curTimeSpan: '',
       isPlay: false, // 播放战评
       detail: '', // 战评详情
       people: 0,
@@ -191,7 +192,8 @@ export default {
       videoUrl: '',
       poster: require('../../assets/images/loading.gif'),
       topicId: '', // 战评回放主题id
-      bIsFirstLonLat: true
+      bIsFirstLonLat: true,
+      needCenter: true
     }
   },
   components: {
@@ -205,6 +207,10 @@ export default {
       const dragBox = el // 获取当前元素
       dragBox.onmousedown = e => {
         me.isDrag = true
+        if (me.timeout) {
+          clearTimeout(me.timeout)
+          me.timeout = null
+        }
         // 阻止事件冒泡
         if (e.stopPropagation) e.stopPropagation()
         else e.cancelBubble = true
@@ -231,8 +237,8 @@ export default {
           document.onmousemove = null
           // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
           document.onmouseup = null
-          me.isDrag = false
           me.hideCurrentTime()
+          if (me.isPlay) { this.jumpPlayback(me.curTimeSpan) }
         }
       }
     }
@@ -255,27 +261,38 @@ export default {
       if (topic !== message.topic) return
       var info = JSON.parse(message.payloadString)
       // console.log(info)
-      info.objs.forEach(o => {
-        me.add2DObject(
-          o.objSN,
-          o.type,
-          o.lan / 1e7,
-          o.lon / 1e7,
-          o.orientation
-        )
-        if (me.show3d) {
-          me.add3DModel(
+      if (info.objs) {
+        info.objs.forEach(o => {
+          me.add2DObject(
             o.objSN,
             o.type,
             o.lan / 1e7,
             o.lon / 1e7,
-            o.orientation,
-            o.nickName
+            o.orientation
           )
-        }
-      })
+          if (me.show3d) {
+            me.add3DModel(
+              o.objSN,
+              o.type,
+              o.lan / 1e7,
+              o.lon / 1e7,
+              o.orientation,
+              o.nickName
+            )
+          }
+        })
+      }
+      if (info.serialNum === -1) {
+        // 回放完毕
+        this.isPlay = false
+        // console.log('全部回放完毕')
+      }
       // 设置时间轴指针
-      if (info.time >= me.timeStart && info.time <= me.timeEnd) {
+      if (
+        !this.isDrag &&
+        info.time >= me.timeStart &&
+        info.time <= me.timeEnd
+      ) {
         me.setTimePointer(info.time)
       }
       // 切换事件
@@ -328,7 +345,6 @@ export default {
     getAlertTopic () {
       this.$axios
         .post(battleApi.readPathByAlertId, { alertId: this.detail.fireNo })
-        // .post(battleApi.readPathByAlertId, { alertId: 20210105081733 })
         .then(res => {
           if (res.data.code === 0) {
             this.topicId = res.data.data
@@ -342,15 +358,29 @@ export default {
     /**
      *  停止战评回放
      */
-    stopPlayback (id) {
+    stopPlayback () {
+      // 查询回放工作台状态
+      // 0:工作台不存在，1.工作台正常工作。2.工作台被暂停了
       this.$axios
-        .post(battleApi.stopReadPath, { workerNO: this.topicId })
+        .post(battleApi.getWorkerStatus, { workerNO: this.topicId })
         .then(res => {
           if (res.data.code === 0) {
+            const status = res.data.data
+            if (status !== 0) {
+              this.$axios
+                .post(battleApi.stopReadPath, { workerNO: this.topicId })
+                .then(res => {
+                  if (res.data.code === 0) {
+                  }
+                })
+                .catch(error => {
+                  console.log('battleApi.stopReadPath Err : ' + error)
+                })
+            }
           }
         })
         .catch(error => {
-          console.log('battleApi.stopReadPath Err : ' + error)
+          console.log('battleApi.getWorkerStatus Err : ' + error)
         })
     },
     /**
@@ -358,7 +388,40 @@ export default {
      */
     timeBarMousemove (event) {
       const left = event.offsetX + event.target.offsetLeft
-      this.setCurrentTime(left)
+      this.setCurrentTime(left, false)
+    },
+    /**
+     *  跳转回放
+     */
+    jumpPlayback (time) {
+      this.disableTimePointerMove()
+      this.$axios
+        .post(battleApi.setProgress, {
+          workerNO: this.topicId,
+          progressTime: time
+        })
+        .then(res => {
+          if (res.data.code === 0) {
+            this.isPlay = true
+          }
+        })
+        .catch(error => {
+          console.log('battleApi.setProgress Err : ' + error)
+        })
+    },
+    /**
+     *  禁止时间轴指针移到
+     */
+    disableTimePointerMove () {
+      if (this.timeout) {
+        clearTimeout(this.timeout)
+        this.timeout = null
+      }
+      const me = this
+      this.isDrag = true
+      this.timeout = setTimeout(() => {
+        me.isDrag = false
+      }, 2000)
     },
     /**
      *  单击时间轴
@@ -369,7 +432,26 @@ export default {
       if (dom) {
         dom.style.left = left - dom.clientWidth / 2 + 'px'
       }
+      const timeSpan = this.computeTime(left)
+      if (timeSpan) {
+        this.curTimeSpan = timeSpan
+        if (this.isPlay) { this.jumpPlayback(timeSpan) }
+      }
       this.hideCurrentTime()
+    },
+    /**
+     *  根据位置计算时间
+     */
+    computeTime (left) {
+      const d = document.querySelector('#timeBar')
+      if (d) {
+        const timeSpan = Math.round(
+          ((this.timeEnd - this.timeStart) * (left - d.offsetLeft)) /
+            d.clientWidth +
+            this.timeStart
+        )
+        return timeSpan
+      } else return ''
     },
     /**
      *  隐藏时间
@@ -399,7 +481,7 @@ export default {
     /**
      *  设置当前时间
      */
-    setCurrentTime (left) {
+    setCurrentTime (left, updateTimeSpan = true) {
       if (this.hideTimeout) clearTimeout(this.hideTimeout)
       const dom = document.querySelector('#timeBar')
       if (dom) {
@@ -407,12 +489,14 @@ export default {
         else if (left > dom.offsetLeft + dom.clientWidth) {
           left = dom.offsetLeft + dom.clientWidth
         }
-        const timeSpan = Math.round(
+        const timespan = Math.round(
           ((this.timeEnd - this.timeStart) * (left - dom.offsetLeft)) /
             dom.clientWidth +
             this.timeStart
         )
-        this.curTime = timeFormat(timeSpan)
+        if (updateTimeSpan) { this.curTimeSpan = timespan }
+
+        this.curTime = timeFormat(timespan)
       }
       this.showCurTime = true
       this.$nextTick(() => {
@@ -473,17 +557,20 @@ export default {
      *  暂停/恢复回放工作台
      */
     pauseOrResumeWorker (isPlay) {
-      const url = isPlay === true ? battleApi.resumeWorker : battleApi.pauseWorker
-      this.$axios
-        .post(url, { workerNO: this.topicId })
-        .then(res => {
-          if (res.data.code === 0) {
-            this.isPlay = isPlay
-          }
-        })
-        .catch(error => {
-          console.log(url + ' Err : ' + error)
-        })
+      if (isPlay) {
+        this.jumpPlayback(this.curTimeSpan)
+      } else {
+        this.$axios
+          .post(battleApi.pauseWorker, { workerNO: this.topicId })
+          .then(res => {
+            if (res.data.code === 0) {
+              this.isPlay = isPlay
+            }
+          })
+          .catch(error => {
+            console.log('battleApi.pauseWorker Err : ' + error)
+          })
+      }
     },
     /**
      *  暂停/恢复回放战评
@@ -535,15 +622,23 @@ export default {
     /**
      * 切换事件
      */
-    changeEvent (index) {
+    changeEvent (index, jump = false) {
       this.activeIndex = index
-      this.setEventData(this.combatEvents[index])
+      const event = this.combatEvents[index]
+      this.setEventData(event)
+      // 如果需要跳转
+      if (jump) {
+        const timespan = new Date(event.eventTime).getTime()
+        this.setTimePointer(timespan)
+        this.curTimeSpan = timespan
+        if (this.isPlay) { this.jumpPlayback(timespan) }
+      }
     },
     /**
      *  更新标签位置
      */
     updateLabelPosition (id, position) {
-      const t = this.labelList.find(t => t.opts.name === id)
+      const t = this.labelList.find(t => t.options.name === id)
       if (t !== undefined) {
         t.position = position
       }
@@ -628,6 +723,10 @@ export default {
             name,
             id
           )
+          if (this.needCenter && lat > 0 && lon > 0) {
+            this.needCenter = false
+            this.viewer.mars.centerAt({ y: lat, x: lon, z: 2000, heading: 0, pitch: -90, roll: 0 })
+          }
         }
       } else {
         m.modelMatrix = matrix
