@@ -21,15 +21,16 @@
         v-if="selectedDept.deptCode"
         class="dept-tree"
       >
-        <span
+        <!-- <span
           class="custom-tree-node"
           slot-scope="{ node, data }"
           style="width: 100%"
         >
           <span class="nodeTitleSty" :title="node.label">{{ node.label }}</span>
           <div class="dept-btn" v-show="data.showSetting"></div>
-        </span>
+        </span> -->
       </el-tree>
+      <div class="add-institution-btn" @click="addClick">╋ 新增机构</div>
     </div>
     <div class="right-div">
       <div class="right-title">人员列表</div>
@@ -54,7 +55,7 @@
         >
         <div class="clean-btn">清空</div>
         <div class="delete-btn">批量删除</div>
-        <div class="add-btn">添加</div>
+        <div class="add-btn" @click="addPeopleClick">添加</div>
       </div>
       <el-table
         :data="peopleList"
@@ -113,6 +114,91 @@
         ></el-pagination>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="showAddPeople"
+      :close-on-click-modal="clickfalse"
+      width="480px"
+      class="add-people-dlg"
+    >
+      <div class="add-people-header">
+        <div class="header-icon"></div>
+        <div class="header-text">{{ addPeopleTitle }}</div>
+      </div>
+      <el-form
+        ref="addPeopleRef"
+        :model="addPeopleForm"
+        :rules="addPeopleRules"
+        :inline="true"
+        label-width="80px"
+        class="add-people-form"
+      >
+        <el-form-item label="姓名" prop="name">
+          <el-input
+            v-model="addPeopleForm.name"
+            placeholder="请输入"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="six">
+          <el-select
+            v-model="addPeopleForm.six"
+            :popper-append-to-body="false"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in sixTypes"
+              :key="item.id"
+              :label="item.label"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="身份证号" prop="idcard">
+          <el-input
+            v-model="addPeopleForm.idcard"
+            placeholder="请输入"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="联系方式" prop="phone">
+          <el-input
+            v-model="addPeopleForm.phone"
+            placeholder="请输入"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="所属机构" prop="dept">
+          <el-cascader
+            v-model="addPeopleForm.dept"
+            :options="deptTree"
+            :props="{
+              expandTrigger: 'hover',
+              label: 'deptName',
+              value: 'deptCode',
+            }"
+            :show-all-levels="false"
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item label="办公电话" prop="telphone">
+          <el-input
+            v-model="addPeopleForm.telphone"
+            placeholder="请输入"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="排序" prop="num">
+          <el-input v-model="addPeopleForm.num" placeholder="请输入"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="note">
+          <el-input
+            v-model="addPeopleForm.note"
+            placeholder="请输入"
+            type="textarea"
+            resize="none"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <div class="confirm-tool">
+        <div class="confirm-btn" @click="addPeopleConfirmClick">确定</div>
+        <div class="cancel-btn" @click="addPeopleCancelClick">取消</div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -122,6 +208,7 @@ export default {
     return {
       peopleSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
       peopleResetIcon: require('../../assets/images/backgroundManagement/resetIcon.png'),
+      clickfalse: false,
 
       institutionSearch: '',
       deptTree: [
@@ -133,8 +220,7 @@ export default {
             {
               deptName: '孝感市应急管理局',
               deptCode: '1-1',
-              showSetting: false,
-              children: []
+              showSetting: false
             },
             {
               deptName: '武汉市应急管理局',
@@ -144,203 +230,7 @@ export default {
                 {
                   deptName: '江夏区应急管理所',
                   deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
-                }
-              ]
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
+                  showSetting: false
                 }
               ]
             }
@@ -364,7 +254,33 @@ export default {
       ],
       pageTotal: 100,
       pageSize: 0,
-      currentPage: 1
+      currentPage: 1,
+      showAddPeople: false,
+      addPeopleTitle: '新增人员',
+      addPeopleForm: {
+        name: '',
+        six: '',
+        idcard: '',
+        phone: '',
+        dept: '',
+        telphone: '',
+        num: '',
+        note: ''
+      },
+      addPeopleRules: {
+        name: [{ required: true, message: '请输入' }],
+        dept: [{ required: true, message: '请选择' }]
+      },
+      sixTypes: [
+        {
+          id: 1,
+          label: '男'
+        },
+        {
+          id: 2,
+          label: '女'
+        }
+      ]
     }
   },
   created () {
@@ -373,6 +289,7 @@ export default {
   methods: {
     // 搜索机构时触发
     institutionSearchChange () {},
+
     // 点击机构时触发
     deptTreeClick (item) {
       if (item === this.selectedDept) {
@@ -383,20 +300,45 @@ export default {
       item.showSetting = true
       this.selectedDept = item
     },
+
+    // 添加机构时触发
+    addClick () {},
+
     // 搜索人员时触发
     peopleSearchClick () {},
+
     // 重置时触发
     peopleResetClick () {},
+
     // 点击表格某一行时触发
     clickTableRow () {},
+
     // 多选时触发
     handleSelectionChange () {},
+
     // 修改时触发
     editPeopleClick () {},
+
     // 查看时触发
     seePeopleClick () {},
+
     // 切换分页时触发
-    currentPageChange () {}
+    currentPageChange () {},
+
+    // 添加人员时触发
+    addPeopleClick () {
+      this.showAddPeople = true
+    },
+
+    // 添加人员确定时触发
+    addPeopleConfirmClick () {
+      this.showAddPeople = false
+    },
+
+    // 添加人员取消时触发
+    addPeopleCancelClick () {
+      this.showAddPeople = false
+    }
   }
 }
 </script>
@@ -447,20 +389,25 @@ export default {
         height: 30px;
         line-height: 30px;
         border: 1px solid transparent;
+        background-color: transparent;
       }
-      // .el-tree-node__children {
-      //   overflow: visible !important;
-      // }
       .el-tree-node__content:hover,
       .el-tree-node:focus > .el-tree-node__content {
         color: #fff;
-        background-color: transparent;
+        background-color: transparent !important;
       }
-      // .el-tree-node__expand-icon {
-      //   color: transparent;
-      //   pointer-events: none;
-      // }
     }
+  }
+  .add-institution-btn {
+    margin: 20px auto 0 auto;
+    text-align: center;
+    width: 150px;
+    height: 38px;
+    background-color: #39a4dd;
+    line-height: 38px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
   }
 }
 .dept-btn {
@@ -642,5 +589,100 @@ export default {
 }
 .table-btn-see {
   margin-left: 18px;
+}
+.add-people-dlg.el-dialog__wrapper {
+  /deep/.el-dialog {
+    .el-dialog__header {
+      display: none;
+    }
+    .el-dialog__body {
+      padding: 0px 20px;
+      width: 100%;
+      border: 1px solid #1eb0fc;
+      // height: 345px;
+      background-color: #121e3a;
+
+      .add-people-header {
+        height: 40px;
+        border-bottom: 1px solid #1eb0fc;
+        .header-icon {
+          display: inline-block;
+          width: 22px;
+          height: 16px;
+          background-image: url("../../assets/images/fire_title.png");
+          margin-top: 15px;
+        }
+        .header-text {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 13px;
+          margin-left: 10px;
+          font-size: 14px;
+          color: #fff;
+        }
+      }
+    }
+    .add-people-form {
+      margin-top: 35px;
+      .el-input__inner {
+        background-color: rgba($color: #09546d, $alpha: 0.3);
+        border-color: #1eb0fc;
+        border-radius: 0;
+        width: 150px;
+        height: 24px;
+        color: #fff;
+        font-size: 12px;
+      }
+      .el-form-item {
+        margin-top: -20px;
+      }
+      .el-form-item__label {
+        color: #fff;
+        font-size: 12px;
+      }
+      .el-form-item__error {
+        margin-top: -10px;
+      }
+      .el-textarea__inner {
+        background-color: rgba($color: #09546d, $alpha: 0.3);
+        border-color: #1eb0fc;
+        border-radius: 0;
+        width: 390px;
+        height: 78px;
+        color: #fff;
+        font-size: 12px;
+        margin-top: 8px;
+      }
+    }
+    .confirm-tool {
+      height: 50px;
+      .confirm-btn {
+        float: right;
+        width: 66px;
+        height: 30px;
+        background-color: #1eb0fc;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 30px;
+        cursor: pointer;
+      }
+      .cancel-btn {
+        float: right;
+        width: 66px;
+        height: 30px;
+        background-color: transparent;
+        border: 1px solid #1eb0fc;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 20px;
+        cursor: pointer;
+      }
+    }
+  }
 }
 </style>
