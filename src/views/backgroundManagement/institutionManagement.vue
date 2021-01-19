@@ -36,7 +36,6 @@
         :data="deptTree"
         :props="deptTreeProps"
         default-expand-all
-        :expand-on-click-node="false"
         node-key="deptCode"
         :current-node-key="selectedDept.deptCode"
         v-if="selectedDept.deptCode"
@@ -812,6 +811,24 @@ export default {
         color: #fff;
         background-color: transparent !important;
       }
+
+      // 展开折叠图标
+      .el-tree-node__expand-icon.expanded {
+        // 动画取消
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      .el-icon-caret-right:before {
+        // 收起
+        content: url("../../assets/images/backgroundManagement/deptTreeUnfold.png");
+      }
+      .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+        // 展开
+        content: url("../../assets/images/backgroundManagement/deptTreeFold.png");
+      }
+      .el-tree-node__expand-icon.is-leaf::before {
+        display: none;
+      }
     }
   }
   .add-institution-btn {
@@ -826,6 +843,7 @@ export default {
     cursor: pointer;
   }
 }
+
 .dept-btn {
   width: 18px;
   height: 18px;
