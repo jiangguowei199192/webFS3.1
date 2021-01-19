@@ -10,26 +10,39 @@
         placeholder=""
         @change="institutionSearchChange"
       ></el-input>
+      <div v-show="showDeptTreeRightMenu">
+        <ul id="menu" class="dept-tree-right-menu">
+          <li class="menu-item" @click="deptEditClick">
+            <div class="menu-div">
+              <el-image :src="deptEditIcon" class="item-icon"></el-image>
+              <span class="item-span">编辑</span>
+            </div>
+          </li>
+          <li class="menu-item" @click="deptSeeClick">
+            <div class="menu-div">
+              <el-image :src="deptSeeIcon" class="item-icon"></el-image>
+              <span class="item-span">查看</span>
+            </div>
+          </li>
+          <li class="menu-item" @click="deptDeleteClick">
+            <div class="menu-div">
+              <el-image :src="deptDeleteIcon" class="item-icon"></el-image>
+              <span class="item-span">删除</span>
+            </div>
+          </li>
+        </ul>
+      </div>
       <el-tree
         :data="deptTree"
         :props="deptTreeProps"
         default-expand-all
-        @node-click="deptTreeClick"
         :expand-on-click-node="false"
         node-key="deptCode"
         :current-node-key="selectedDept.deptCode"
         v-if="selectedDept.deptCode"
         class="dept-tree"
-      >
-        <!-- <span
-          class="custom-tree-node"
-          slot-scope="{ node, data }"
-          style="width: 100%"
-        >
-          <span class="nodeTitleSty" :title="node.label">{{ node.label }}</span>
-          <div class="dept-btn" v-show="data.showSetting"></div>
-        </span> -->
-      </el-tree>
+        @node-contextmenu="deptTreeRightCick"
+      ></el-tree>
       <div class="add-institution-btn" @click="addDeptClick">╋ 新增机构</div>
     </div>
     <div class="right-div">
@@ -452,26 +465,36 @@ export default {
       chooseIcon: require('../../assets/images/backgroundManagement/chooseIcon.png'),
       deptIconUrl:
         'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      deptEditIcon: require('../../assets/images/backgroundManagement/deptEdit.png'),
+      deptSeeIcon: require('../../assets/images/backgroundManagement/deptSee.png'),
+      deptDeleteIcon: require('../../assets/images/backgroundManagement/deptDelete.png'),
 
       institutionSearch: '',
       deptTree: [
         {
-          deptName: '湖北省应急管理厅',
+          deptName: '东海化工',
           deptCode: '1',
           showSetting: true,
           children: [
             {
-              deptName: '孝感市应急管理局',
+              deptName: '一厂',
               deptCode: '1-1',
-              showSetting: false
+              showSetting: false,
+              children: [
+                {
+                  deptName: '一车间',
+                  deptCode: '1-1-1',
+                  showSetting: false
+                }
+              ]
             },
             {
-              deptName: '武汉市应急管理局',
+              deptName: '二厂',
               deptCode: '1-2',
               showSetting: false,
               children: [
                 {
-                  deptName: '江夏区应急管理所',
+                  deptName: '一车间',
                   deptCode: '1-2-1',
                   showSetting: false
                 }
@@ -486,6 +509,7 @@ export default {
         value: 'deptCode'
       },
       selectedDept: '',
+      showDeptTreeRightMenu: false,
       peopleSearch: '',
       peopleList: [
         {
@@ -604,15 +628,20 @@ export default {
     // 搜索机构时触发
     institutionSearchChange () {},
 
-    // 点击机构时触发
-    deptTreeClick (item) {
-      if (item === this.selectedDept) {
-        // console.log('选择的机构与上一次相同')
-        return
-      }
-      this.selectedDept.showSetting = false
-      item.showSetting = true
-      this.selectedDept = item
+    // 右击机构时触发
+    deptTreeRightCick (event, data, node, obj) {
+      this.showDeptTreeRightMenu = false
+      this.showDeptTreeRightMenu = true
+      const menu = document.querySelector('#menu')
+      menu.style.left = event.clientX + 'px'
+      menu.style.top = event.clientY + 'px'
+      // 给整个document添加监听鼠标事件，点击任何位置执行closeRightMenu方法，及时将菜单关闭
+      document.addEventListener('click', this.closeRightMenu)
+    },
+    closeRightMenu () {
+      this.showDeptTreeRightMenu = false
+      // 及时关掉鼠标监听事件
+      document.removeEventListener('click', this.closeRightMenu)
     },
 
     // 添加机构时触发
@@ -708,6 +737,21 @@ export default {
     unfoldClick () {
       this.showDeptContent = true
       this.showUnfoldBtn = false
+    },
+
+    // 编辑机构
+    deptEditClick () {
+      console.log('编辑机构')
+    },
+
+    // 查看机构
+    deptSeeClick () {
+      console.log('查看机构')
+    },
+
+    // 删除机构
+    deptDeleteClick () {
+      console.log('删除机构')
     }
   }
 }
@@ -760,6 +804,8 @@ export default {
         line-height: 30px;
         border: 1px solid transparent;
         background-color: transparent;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .el-tree-node__content:hover,
       .el-tree-node:focus > .el-tree-node__content {
@@ -1344,5 +1390,37 @@ export default {
 .showUnfoldBtn-enter-active,
 .showUnfoldBtn-leave-active {
   transition: all 0.3s ease;
+}
+
+.dept-tree-right-menu {
+  z-index: 1;
+  position: absolute;
+  height: 81px;
+  width: 80px;
+  border-radius: 2px;
+  background-color: #183157;
+  border: 1px solid #00ccff;
+  overflow: hidden;
+  .menu-item {
+    cursor: pointer;
+    text-align: center;
+    padding: 0 5px;
+    .menu-div {
+      border-bottom: 1px solid rgba($color: #00ccff, $alpha: 0.8);
+      height: 27px;
+      .item-icon {
+        width: 14px;
+        height: 14px;
+        top: 3px;
+      }
+      .item-span {
+        display: inline-block;
+        margin-left: 10px;
+        font-size: 12px;
+        color: #fff;
+        line-height: 27px;
+      }
+    }
+  }
 }
 </style>
