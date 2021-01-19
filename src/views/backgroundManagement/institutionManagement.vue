@@ -277,6 +277,16 @@
           <div class="subtext1">{{ peopleInfoForm.note }}</div>
         </el-form-item>
       </el-form>
+      <div class="note">
+        <div>
+          <span>创建时间：11111111111111</span>
+          <span style="display:inline-block;margin-left:20px;">创建人：2222</span>
+        </div>
+        <div style="margin-top:10px;">
+          <span>最后修改时间：3333333333333333</span>
+          <span style="display:inline-block;margin-left:20px;">最后修改人：4444</span>
+        </div>
+      </div>
       <div class="confirm-tool">
         <div class="confirm-btn" @click="seePeopleConfirmClick">确定</div>
       </div>
@@ -1057,6 +1067,7 @@ export default {
     }
     .add-people-form {
       margin-top: 35px;
+      border-bottom: 1px solid rgba($color: #1eb0fc, $alpha: 0.6);
       .el-input__inner {
         background-color: rgba($color: #09546d, $alpha: 0.3);
         border-color: #1eb0fc;
@@ -1092,8 +1103,15 @@ export default {
         width: 180px;
       }
     }
+    .note {
+      // background: orange;
+      margin-top: 20px;
+      font-size: 12px;
+      color: rgba($color: #fff, $alpha: 0.6);
+    }
     .confirm-tool {
       height: 50px;
+      margin-top: 20px;
       .confirm-btn {
         float: right;
         width: 66px;
