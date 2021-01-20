@@ -29,11 +29,11 @@
           v-model="userSearch"
           placeholder="请输入人员姓名/身份证号进行搜索"
         ></el-input>
-        <div class="people-search-btn" @click="userSearchClick">
+        <div class="people-search-btn" @click="userUserClick">
           <img :src="userSearchIcon" class="people-search-icon" />
           <span class="people-search-text">搜索</span>
         </div>
-        <div class="people-reset-btn" @click="peopleResetClick">
+        <div class="people-reset-btn" @click="userResetClick">
           <img :src="peopleResetIcon" class="people-reset-icon" />
           <span class="people-reset-text">重置</span>
         </div>
@@ -43,14 +43,13 @@
           >已选<span style="color: #1eb0fc">0</span>项</span
         >
         <!-- <div class="clean-btn">清空</div> -->
-        <div class="delete-btn">批量删除</div>
+        <div class="delete-btn" @click="deleteUserClick">批量删除</div>
         <div class="add-btn" @click="addUserClick">添加</div>
       </div>
       <el-table
         :data="userList"
         empty-text="暂无数据"
         height="630"
-        @row-click="clickTableRow"
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection"></el-table-column>
@@ -102,12 +101,12 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
-            <div class="table-btn" @click="editPeopleClick(scope.row)">
+            <div class="table-btn" @click="editUserClick(scope.row)">
               修改
             </div>
             <div
               class="table-btn table-btn-see"
-              @click="seePeopleClick(scope.row)"
+              @click="seeUserClick(scope.row)"
             >
               查看
             </div>
@@ -132,21 +131,37 @@
         ></el-pagination>
       </div>
     </div>
+
     <AddUserDialog
       :isShow="showAddUser"
       title="新增用户"
-      @confirmClick="addPeopleConfirmClick"
-      @cancelClick="addPeopleCancelClick"
+      @confirmClick="addUserConfirmClick"
+      @cancelClick="addUserCancelClick"
     ></AddUserDialog>
+
+    <AddUserDialog
+      :isShow="showEditUser"
+      title="修改用户"
+      @confirmClick="editUserConfirmClick"
+      @cancelClick="editUserCancelClick"
+    ></AddUserDialog>
+
+    <DeleteDialog
+      :isShow="showDeleteUser"
+      @confirmClick="deleteUserConfirmClick"
+      @cancelClick="deleteUserCancelClick"
+    ></DeleteDialog>
   </div>
 </template>
 
 <script>
 import AddUserDialog from './components/addUserDialog.vue'
+import DeleteDialog from './components/deleteDialog.vue'
 
 export default {
   components: {
-    AddUserDialog
+    AddUserDialog,
+    DeleteDialog
   },
   data () {
     return {
@@ -210,7 +225,9 @@ export default {
       pageTotal: 100,
       pageSize: 0,
       currentPage: 1,
-      showAddUser: false
+      showAddUser: false,
+      showDeleteUser: false,
+      showEditUser: false
     }
   },
   created () {
@@ -219,6 +236,7 @@ export default {
   methods: {
     // 搜索机构时触发
     institutionSearchChange () {},
+
     // 点击机构时触发
     deptTreeClick (item) {
       if (item === this.selectedDept) {
@@ -229,22 +247,22 @@ export default {
       item.showSetting = true
       this.selectedDept = item
     },
-    // 添加机构时触发
-    addClick () {},
-    // 搜索人员时触发
-    userSearchClick () {},
-    // 重置时触发
-    peopleResetClick () {},
-    // 点击表格某一行时触发
-    clickTableRow () {},
+
+    // 搜索用户时触发
+    userUserClick () {},
+
+    // 重置搜索项时触发
+    userResetClick () {},
+
     // 多选时触发
     handleSelectionChange () {},
-    // 修改时触发
-    editPeopleClick () {},
-    // 查看时触发
-    seePeopleClick () {},
+
+    // 查看人员时触发
+    seeUserClick () {},
+
     // 重置密码时触发
     resetPasswordClick () {},
+
     // 切换分页时触发
     currentPageChange () {},
 
@@ -254,13 +272,43 @@ export default {
     },
 
     // 添加用户确认时触发
-    addPeopleConfirmClick () {
+    addUserConfirmClick () {
       this.showAddUser = false
     },
 
     // 添加用户取消时触发
-    addPeopleCancelClick () {
+    addUserCancelClick () {
       this.showAddUser = false
+    },
+
+    // 删除用户时触发
+    deleteUserClick () {
+      this.showDeleteUser = true
+    },
+
+    // 删除用户确认时触发
+    deleteUserConfirmClick () {
+      this.showDeleteUser = false
+    },
+
+    // 删除用户取消时触发
+    deleteUserCancelClick () {
+      this.showDeleteUser = false
+    },
+
+    // 修改用户时触发
+    editUserClick (row) {
+      this.showEditUser = true
+    },
+
+    // 修改用户确认时触发
+    editUserConfirmClick () {
+      this.showEditUser = false
+    },
+
+    // 修改用户取消时触发
+    editUserCancelClick () {
+      this.showEditUser = false
     }
   }
 }

@@ -2,7 +2,8 @@
   <div>
     <el-dialog
       :visible.sync="isShow"
-      :close-on-click-modal="clickfalse"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       width="480px"
       class="add-people-dlg"
     >
@@ -19,7 +20,7 @@
         class="add-people-form"
       >
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="addUserForm.name" placeholder="请输入"></el-input>
+          <el-input v-model="addUserForm.username" placeholder="请输入"></el-input>
         </el-form-item>
         <el-form-item label="账号" prop="account">
           <el-input
@@ -152,7 +153,6 @@ export default {
         label: 'deptName',
         value: 'deptCode'
       },
-      clickfalse: false,
       addUserForm: {
         username: '',
         account: '',
