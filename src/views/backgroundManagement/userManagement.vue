@@ -15,7 +15,6 @@
         :props="deptTreeProps"
         default-expand-all
         @node-click="deptTreeClick"
-        :expand-on-click-node="false"
         node-key="deptCode"
         :current-node-key="selectedDept.deptCode"
         v-if="selectedDept.deptCode"
@@ -27,11 +26,11 @@
       <div class="search-tool">
         <el-input
           class="people-search-input"
-          v-model="peopleSearch"
+          v-model="userSearch"
           placeholder="请输入人员姓名/身份证号进行搜索"
         ></el-input>
-        <div class="people-search-btn" @click="peopleSearchClick">
-          <img :src="peopleSearchIcon" class="people-search-icon" />
+        <div class="people-search-btn" @click="userSearchClick">
+          <img :src="userSearchIcon" class="people-search-icon" />
           <span class="people-search-text">搜索</span>
         </div>
         <div class="people-reset-btn" @click="peopleResetClick">
@@ -43,12 +42,12 @@
         <span class="selected-count"
           >已选<span style="color: #1eb0fc">0</span>项</span
         >
-        <div class="clean-btn">清空</div>
+        <!-- <div class="clean-btn">清空</div> -->
         <div class="delete-btn">批量删除</div>
-        <div class="add-btn">添加</div>
+        <div class="add-btn" @click="addUserClick">添加</div>
       </div>
       <el-table
-        :data="peopleList"
+        :data="userList"
         empty-text="暂无数据"
         height="630"
         @row-click="clickTableRow"
@@ -90,11 +89,17 @@
           prop="num"
           align="center"
         ></el-table-column>
-        <el-table-column
-          label="账号状态"
-          prop=""
-          align="center"
-        ></el-table-column>
+        <el-table-column label="账号状态" prop="" align="center">
+          <template slot-scope="scope">
+            <div>
+              <el-switch
+                v-model="scope.row.enable"
+                active-color="#1EB0FC"
+                inactive-color="#aeaeae"
+              ></el-switch>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
             <div class="table-btn" @click="editPeopleClick(scope.row)">
@@ -127,14 +132,25 @@
         ></el-pagination>
       </div>
     </div>
+    <AddUserDialog
+      :isShow="showAddUser"
+      title="新增用户"
+      @confirmClick="addPeopleConfirmClick"
+      @cancelClick="addPeopleCancelClick"
+    ></AddUserDialog>
   </div>
 </template>
 
 <script>
+import AddUserDialog from './components/addUserDialog.vue'
+
 export default {
+  components: {
+    AddUserDialog
+  },
   data () {
     return {
-      peopleSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
+      userSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
       peopleResetIcon: require('../../assets/images/backgroundManagement/resetIcon.png'),
 
       institutionSearch: '',
@@ -147,8 +163,7 @@ export default {
             {
               deptName: '孝感市应急管理局',
               deptCode: '1-1',
-              showSetting: false,
-              children: []
+              showSetting: false
             },
             {
               deptName: '武汉市应急管理局',
@@ -158,8 +173,7 @@ export default {
                 {
                   deptName: '江夏区应急管理所',
                   deptCode: '1-2-1',
-                  showSetting: false,
-                  children: []
+                  showSetting: false
                 }
               ]
             }
@@ -172,21 +186,31 @@ export default {
         value: 'deptCode'
       },
       selectedDept: '',
-      peopleSearch: '',
-      peopleList: [
+      userSearch: '',
+      userList: [
         {
-          username: '小辉',
+          username: 'syh',
           account: 'songyunhui',
           phone: '13687909090',
           roleCount: 3,
           bindPeople: '宋运辉',
           num: 2,
           enable: true
+        },
+        {
+          username: 'ldb',
+          account: 'leidongbao',
+          phone: '13687909090',
+          roleCount: 2,
+          bindPeople: '雷东宝',
+          num: 3,
+          enable: false
         }
       ],
       pageTotal: 100,
       pageSize: 0,
-      currentPage: 1
+      currentPage: 1,
+      showAddUser: false
     }
   },
   created () {
@@ -208,7 +232,7 @@ export default {
     // 添加机构时触发
     addClick () {},
     // 搜索人员时触发
-    peopleSearchClick () {},
+    userSearchClick () {},
     // 重置时触发
     peopleResetClick () {},
     // 点击表格某一行时触发
@@ -222,7 +246,22 @@ export default {
     // 重置密码时触发
     resetPasswordClick () {},
     // 切换分页时触发
-    currentPageChange () {}
+    currentPageChange () {},
+
+    // 添加用户时触发
+    addUserClick () {
+      this.showAddUser = true
+    },
+
+    // 添加用户确认时触发
+    addPeopleConfirmClick () {
+      this.showAddUser = false
+    },
+
+    // 添加用户取消时触发
+    addPeopleCancelClick () {
+      this.showAddUser = false
+    }
   }
 }
 </script>
@@ -282,6 +321,24 @@ export default {
       .el-tree-node:focus > .el-tree-node__content {
         color: #fff;
         background-color: transparent !important;
+      }
+
+      // 展开折叠图标
+      .el-tree-node__expand-icon.expanded {
+        // 动画取消
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+      }
+      .el-icon-caret-right:before {
+        // 收起
+        content: url("../../assets/images/backgroundManagement/deptTreeUnfold.png");
+      }
+      .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+        // 展开
+        content: url("../../assets/images/backgroundManagement/deptTreeFold.png");
+      }
+      .el-tree-node__expand-icon.is-leaf::before {
+        display: none;
       }
     }
   }
@@ -367,17 +424,17 @@ export default {
       margin-top: 18px;
       margin-left: 10px;
     }
-    .clean-btn {
-      width: 32px;
-      height: 20px;
-      margin-top: 18px;
-      margin-left: 30px;
-      display: inline-block;
-      color: #1d9fe5;
-      font-size: 16px;
-      border-bottom: solid 1px #1d9fe5;
-      cursor: pointer;
-    }
+    // .clean-btn {
+    //   width: 32px;
+    //   height: 20px;
+    //   margin-top: 18px;
+    //   margin-left: 30px;
+    //   display: inline-block;
+    //   color: #1d9fe5;
+    //   font-size: 16px;
+    //   border-bottom: solid 1px #1d9fe5;
+    //   cursor: pointer;
+    // }
     .delete-btn {
       float: right;
       width: 96px;

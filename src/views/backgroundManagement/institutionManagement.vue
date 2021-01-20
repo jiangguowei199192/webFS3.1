@@ -65,7 +65,7 @@
         <span class="selected-count"
           >已选<span style="color: #1eb0fc">0</span>项</span
         >
-        <div class="clean-btn">清空</div>
+        <!-- <div class="clean-btn">清空</div> -->
         <div class="delete-btn" @click="deletePeopleClick">批量删除</div>
         <div class="add-btn" @click="addPeopleClick">添加</div>
       </div>
@@ -935,17 +935,17 @@ export default {
       margin-top: 18px;
       margin-left: 10px;
     }
-    .clean-btn {
-      width: 32px;
-      height: 20px;
-      margin-top: 18px;
-      margin-left: 30px;
-      display: inline-block;
-      color: #1d9fe5;
-      font-size: 16px;
-      border-bottom: solid 1px #1d9fe5;
-      cursor: pointer;
-    }
+    // .clean-btn {
+    //   width: 32px;
+    //   height: 20px;
+    //   margin-top: 18px;
+    //   margin-left: 30px;
+    //   display: inline-block;
+    //   color: #1d9fe5;
+    //   font-size: 16px;
+    //   border-bottom: solid 1px #1d9fe5;
+    //   cursor: pointer;
+    // }
     .delete-btn {
       float: right;
       width: 96px;
@@ -1104,7 +1104,6 @@ export default {
       }
     }
     .note {
-      // background: orange;
       margin-top: 20px;
       font-size: 12px;
       color: rgba($color: #fff, $alpha: 0.6);
