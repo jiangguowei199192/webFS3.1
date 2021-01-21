@@ -386,6 +386,15 @@
       @confirmClick="addPeopleConfirmClick"
       @cancelClick="addPeopleCancelClick"
     ></AddPeopleDialog>
+
+    <AddPeopleDialog
+      :isShow.sync="showEditPeople"
+      title="修改人员"
+      :deptTree="deptTree"
+      @close="showEditPeople=false"
+      @confirmClick="editPeopleConfirmClick"
+      @cancelClick="editPeopleCancelClick"
+    ></AddPeopleDialog>
   </div>
 </template>
 
@@ -463,6 +472,7 @@ export default {
       pageSize: 0,
       currentPage: 1,
       showAddPeople: false,
+      showEditPeople: false,
 
       showDeleteTip: false,
       showPeopleInfo: false,
@@ -587,11 +597,6 @@ export default {
     // 多选时触发
     handleSelectionChange () {},
 
-    // 修改时触发
-    editPeopleClick () {
-      this.showAddPeople = true
-    },
-
     // 查看时触发
     seePeopleClick () {
       this.showPeopleInfo = true
@@ -618,6 +623,21 @@ export default {
     // 添加人员取消时触发
     addPeopleCancelClick () {
       this.showAddPeople = false
+    },
+
+    // 编辑人员时触发
+    editPeopleClick () {
+      this.showEditPeople = true
+    },
+
+    // 编辑人员确定时触发
+    editPeopleConfirmClick () {
+      this.showEditPeople = false
+    },
+
+    // 编辑人员取消时触发
+    editPeopleCancelClick () {
+      this.showEditPeople = false
     },
 
     // 删除人员时触发
