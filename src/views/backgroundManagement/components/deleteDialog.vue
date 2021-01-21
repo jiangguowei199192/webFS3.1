@@ -1,29 +1,27 @@
 <template>
-  <div>
-    <el-dialog
-      :visible.sync="isShow"
-      append-to-body
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      width="328px"
-      class="delete-tip-dial"
-    >
-      <div>
-        <div style="margin-top: 47px; height: 14px">
-          <div class="warning-img"></div>
-          <div class="title1">您确认删除这些数据吗？</div>
-        </div>
-        <div class="title2">
-          <span style="color: #ff0000">删除后无法撤销，</span>
-          <span style="color: #ffffff">您还要继续吗？</span>
-        </div>
-        <div style="margin-top: 21px">
-          <div class="confirm-btn" @click="confirmClick">确定</div>
-          <div class="cancel-btn" @click="cancelClick">取消</div>
-        </div>
+  <el-dialog
+    :visible="isShow"
+    append-to-body
+    :close-on-click-modal="false"
+    @close="$emit('close')"
+    width="328px"
+    class="delete-tip-dial"
+  >
+    <div>
+      <div style="margin-top: 47px; height: 14px">
+        <div class="warning-img"></div>
+        <div class="title1">您确认删除这些数据吗？</div>
       </div>
-    </el-dialog>
-  </div>
+      <div class="title2">
+        <span style="color: #ff0000">删除后无法撤销，</span>
+        <span style="color: #ffffff">您还要继续吗？</span>
+      </div>
+      <div style="margin-top: 21px">
+        <div class="confirm-btn" @click="confirmClick">确定</div>
+        <div class="cancel-btn" @click="cancelClick">取消</div>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -35,9 +33,7 @@ export default {
     }
   },
   data () {
-    return {
-
-    }
+    return {}
   },
   methods: {
     confirmClick () {

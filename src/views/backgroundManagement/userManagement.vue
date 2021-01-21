@@ -133,21 +133,24 @@
     </div>
 
     <AddUserDialog
-      :isShow="showAddUser"
+      :isShow.sync="showAddUser"
       title="新增用户"
+      @close="showAddUser=false"
       @confirmClick="addUserConfirmClick"
       @cancelClick="addUserCancelClick"
     ></AddUserDialog>
 
     <AddUserDialog
-      :isShow="showEditUser"
+      :isShow.sync="showEditUser"
       title="修改用户"
+      @close="showEditUser=false"
       @confirmClick="editUserConfirmClick"
       @cancelClick="editUserCancelClick"
     ></AddUserDialog>
 
     <DeleteDialog
-      :isShow="showDeleteUser"
+      :isShow.sync="showDeleteUser"
+      @close="showDeleteUser=false"
       @confirmClick="deleteUserConfirmClick"
       @cancelClick="deleteUserCancelClick"
     ></DeleteDialog>

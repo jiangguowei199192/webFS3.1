@@ -127,353 +127,64 @@
       </div>
     </div>
 
-    <el-dialog
-      :visible.sync="showAddPeople"
-      :close-on-click-modal="clickfalse"
-      width="480px"
-      class="add-people-dlg"
-    >
-      <div class="add-people-header">
-        <div class="header-icon"></div>
-        <div class="header-text">{{ addPeopleTitle }}</div>
-      </div>
-      <el-form
-        ref="addPeopleRef"
-        :model="addPeopleForm"
-        :rules="addPeopleRules"
-        :inline="true"
-        label-width="80px"
-        class="add-people-form"
-      >
-        <el-form-item label="姓名" prop="name">
-          <el-input
-            v-model="addPeopleForm.name"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="性别" prop="six">
-          <el-select
-            v-model="addPeopleForm.six"
-            :popper-append-to-body="false"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in sixTypes"
-              :key="item.id"
-              :label="item.label"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="身份证号" prop="idcard">
-          <el-input
-            v-model="addPeopleForm.idcard"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="联系方式" prop="phone">
-          <el-input
-            v-model="addPeopleForm.phone"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="所属机构" prop="dept">
-          <el-cascader
-            v-model="addPeopleForm.dept"
-            :options="deptTree"
-            :props="{
-              expandTrigger: 'hover',
-              label: 'deptName',
-              value: 'deptCode',
-            }"
-            :show-all-levels="false"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item label="办公电话" prop="telphone">
-          <el-input
-            v-model="addPeopleForm.telphone"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="排序" prop="num">
-          <el-input v-model="addPeopleForm.num" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="备注" prop="note">
-          <el-input
-            v-model="addPeopleForm.note"
-            placeholder="请输入"
-            type="textarea"
-            resize="none"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div class="confirm-tool">
-        <div class="confirm-btn" @click="addPeopleConfirmClick">确定</div>
-        <div class="cancel-btn" @click="addPeopleCancelClick">取消</div>
-      </div>
-    </el-dialog>
+    <AddPeopleDialog
+      :isShow.sync="showAddPeople"
+      title="新增人员"
+      :deptTree="deptTree"
+      @close="showAddPeople=false"
+      @confirmClick="addPeopleConfirmClick"
+      @cancelClick="addPeopleCancelClick"
+    ></AddPeopleDialog>
 
-    <el-dialog
-      :visible.sync="showDeleteTip"
-      append-to-body
-      :close-on-click-modal="false"
-      width="328px"
-      class="delete-tip-dial"
-    >
-      <div>
-        <div style="margin-top: 47px; height: 14px">
-          <div class="warning-img"></div>
-          <div class="title1">您确认删除这些数据吗？</div>
-        </div>
-        <div class="title2">
-          <span style="color: #ff0000">删除后无法撤销，</span>
-          <span style="color: #ffffff">您还要继续吗？</span>
-        </div>
-        <div style="margin-top: 21px">
-          <div class="confirm-btn" @click="deleteTipConfirmClick">确定</div>
-          <div class="cancel-btn" @click="deleteTipCancelClick">取消</div>
-        </div>
-      </div>
-    </el-dialog>
+    <AddPeopleDialog
+      :isShow.sync="showEditPeople"
+      title="修改人员"
+      :deptTree="deptTree"
+      @close="showEditPeople=false"
+      @confirmClick="editPeopleConfirmClick"
+      @cancelClick="editPeopleCancelClick"
+    ></AddPeopleDialog>
 
-    <el-dialog
-      :visible.sync="showPeopleInfo"
-      :close-on-click-modal="clickfalse"
-      width="540px"
-      class="add-people-dlg"
-    >
-      <div class="add-people-header">
-        <div class="header-icon"></div>
-        <div class="header-text">查看人员信息</div>
-      </div>
-      <el-form
-        :model="peopleInfoForm"
-        :inline="true"
-        label-width="80px"
-        class="add-people-form"
-      >
-        <el-form-item label="姓名:" prop="name">
-          <div class="subtext1">{{ peopleInfoForm.name }}</div>
-        </el-form-item>
-        <el-form-item label="性别:" prop="six">
-          <div class="subtext1">{{ peopleInfoForm.six }}</div>
-        </el-form-item>
-        <el-form-item label="身份证号:" prop="idcard">
-          <div class="subtext1">{{ peopleInfoForm.idcard }}</div>
-        </el-form-item>
-        <el-form-item label="联系方式:" prop="phone">
-          <div class="subtext1">{{ peopleInfoForm.phone }}</div>
-        </el-form-item>
-        <el-form-item label="所属机构:" prop="dept">
-          <div class="subtext1">{{ peopleInfoForm.dept }}</div>
-        </el-form-item>
-        <el-form-item label="办公电话:" prop="telphone">
-          <div class="subtext1">{{ peopleInfoForm.telphone }}</div>
-        </el-form-item>
-        <el-form-item label="排序:" prop="num">
-          <div class="subtext1">{{ peopleInfoForm.num }}</div>
-        </el-form-item>
-        <el-form-item label="备注:" prop="note">
-          <div class="subtext1">{{ peopleInfoForm.note }}</div>
-        </el-form-item>
-      </el-form>
-      <div class="note">
-        <div>
-          <span>创建时间：11111111111111</span>
-          <span style="display:inline-block;margin-left:20px;">创建人：2222</span>
-        </div>
-        <div style="margin-top:10px;">
-          <span>最后修改时间：3333333333333333</span>
-          <span style="display:inline-block;margin-left:20px;">最后修改人：4444</span>
-        </div>
-      </div>
-      <div class="confirm-tool">
-        <div class="confirm-btn" @click="seePeopleConfirmClick">确定</div>
-      </div>
-    </el-dialog>
+    <PeopleInfoDialog
+      :isShow.sync="showPeopleInfo"
+      @close="showPeopleInfo=false"
+      @confirmClick="showPeopleInfo=false"
+    ></PeopleInfoDialog>
 
-    <el-dialog
-      :visible.sync="showAddDept"
-      :close-on-click-modal="clickfalse"
-      width="1080px"
-      class="add-dept-dlg"
-    >
-      <div class="add-dept-div">
-        <gMap
-          ref="gduMap"
-          handleType="devMap"
-          :bShowAllTools="false"
-          :baseMapIndex="2"
-          class="map-tool"
-        ></gMap>
-        <div class="add-dept-header">
-          <div class="header-icon"></div>
-          <div class="header-text">{{ addDeptTitle }}</div>
-        </div>
-        <transition name="showUnfoldBtn">
-          <div
-            class="unfold-btn"
-            @click="unfoldClick"
-            v-show="showUnfoldBtn"
-          ></div>
-        </transition>
-        <transition name="hideCourseList">
-          <div class="add-dept-base" v-show="showDeptContent">
-            <div class="fold-tool">
-              <div class="fold-btn" @click="foldClick"></div>
-            </div>
-            <div class="add-dept-content">
-              <div class="content-header">
-                <div class="icon"></div>
-                <div class="text">{{ addDeptTitle }}</div>
-              </div>
-              <el-form
-                ref="addDeptRef"
-                :model="addDeptForm"
-                :rules="addDeptRules"
-                :inline="true"
-                label-width="80px"
-                class="add-dept-form"
-              >
-                <el-form-item label="机构名称" prop="deptName">
-                  <el-input
-                    v-model="addDeptForm.deptName"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="机构地址" prop="address">
-                  <el-input
-                    v-model="addDeptForm.address"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="上级机构" prop="fatherDept">
-                  <el-cascader
-                    v-model="addDeptForm.fatherDept"
-                    :options="deptTree"
-                    :props="{
-                      expandTrigger: 'hover',
-                      label: 'deptName',
-                      value: 'deptCode',
-                    }"
-                    :show-all-levels="false"
-                  ></el-cascader>
-                </el-form-item>
-                <el-form-item label="机构电话">
-                  <el-input
-                    v-model="addDeptForm.phone"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="机构编码">
-                  <el-input
-                    v-model="addDeptForm.deptCode"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="机构简称">
-                  <el-input
-                    v-model="addDeptForm.shortName"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="经度">
-                  <el-input
-                    v-model="addDeptForm.longitude"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="纬度">
-                  <el-input
-                    v-model="addDeptForm.latitude"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="机构状态">
-                  <el-select
-                    v-model="addDeptForm.status"
-                    :popper-append-to-body="false"
-                    placeholder="请选择"
-                  >
-                    <el-option
-                      v-for="item in deptStatusTypes"
-                      :key="item.id"
-                      :label="item.label"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="排序">
-                  <el-input
-                    v-model="addDeptForm.num"
-                    placeholder="请输入"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="图标">
-                  <div class="icon-tool">
-                    <el-avatar :size="30" :src="deptIconUrl"></el-avatar>
-                    <el-popover
-                      placement="top"
-                      trigger="click"
-                      popper-class="iconPopover"
-                      v-model="showPopover"
-                    >
-                      <div class="iconBox">
-                        <span
-                          class="close"
-                          @click.stop="showPopover = false"
-                        ></span>
-                        <span
-                          @click.stop="selectIcon(item)"
-                          class="icon"
-                          v-for="(item, index) in icons"
-                          :key="index"
-                          :style="{
-                            background:
-                              'url(' + serverUrl + item.path + ') no-repeat',
-                          }"
-                        ></span>
-                      </div>
-                      <div class="choose-icon-btn" slot="reference">
-                        <el-image class="btn-icon" :src="chooseIcon"></el-image>
-                        选择图标
-                      </div>
-                    </el-popover>
-                  </div>
-                </el-form-item>
-                <el-form-item label="备注">
-                  <el-input
-                    v-model="addDeptForm.note"
-                    placeholder="请输入"
-                    type="textarea"
-                    resize="none"
-                  ></el-input>
-                </el-form-item>
-              </el-form>
-            </div>
-          </div>
-        </transition>
-        <div class="confirm-tool">
-          <div class="confirm-btn" @click="addDeptConfirmClick">确定</div>
-          <div class="cancel-btn" @click="addDeptCancelClick">取消</div>
-        </div>
-      </div>
-    </el-dialog>
+    <DeleteDialog
+      :isShow.sync="showDeleteTip"
+      @close="showDeleteTip=false"
+      @confirmClick="deleteTipConfirmClick"
+      @cancelClick="deleteTipCancelClick"
+    ></DeleteDialog>
+
+    <AddDeptDialog
+      :isShow.sync="showAddDept"
+      :deptTree="deptTree"
+      @close="showAddDept=false"
+      @confirmClick="addDeptConfirmClick"
+      @cancelClick="addDeptCancelClick"
+    ></AddDeptDialog>
   </div>
 </template>
 
 <script>
-import globalApi from '@/utils/globalApi'
+import AddPeopleDialog from './components/addPeopleDialog.vue'
+import DeleteDialog from './components/deleteDialog.vue'
+import PeopleInfoDialog from './components/peopleInfoDialog.vue'
+import AddDeptDialog from './components/addDeptDialog.vue'
 
 export default {
+  components: {
+    AddPeopleDialog,
+    DeleteDialog,
+    PeopleInfoDialog,
+    AddDeptDialog
+  },
   data () {
     return {
       peopleSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
       peopleResetIcon: require('../../assets/images/backgroundManagement/resetIcon.png'),
-      clickfalse: false,
-      chooseIcon: require('../../assets/images/backgroundManagement/chooseIcon.png'),
-      deptIconUrl:
-        'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
       deptEditIcon: require('../../assets/images/backgroundManagement/deptEdit.png'),
       deptSeeIcon: require('../../assets/images/backgroundManagement/deptSee.png'),
       deptDeleteIcon: require('../../assets/images/backgroundManagement/deptDelete.png'),
@@ -486,24 +197,24 @@ export default {
           showSetting: true,
           children: [
             {
-              deptName: '一厂',
+              deptName: '东海化工一厂',
               deptCode: '1-1',
               showSetting: false,
               children: [
                 {
-                  deptName: '一车间',
+                  deptName: '东海化工一厂一车间',
                   deptCode: '1-1-1',
                   showSetting: false
                 }
               ]
             },
             {
-              deptName: '二厂',
+              deptName: '东海化工二厂',
               deptCode: '1-2',
               showSetting: false,
               children: [
                 {
-                  deptName: '一车间',
+                  deptName: '东海化工二厂一车间',
                   deptCode: '1-2-1',
                   showSetting: false
                 }
@@ -532,102 +243,10 @@ export default {
       pageSize: 0,
       currentPage: 1,
       showAddPeople: false,
-      addPeopleTitle: '新增人员',
-      addPeopleForm: {
-        name: '',
-        six: '',
-        idcard: '',
-        phone: '',
-        dept: '',
-        telphone: '',
-        num: '',
-        note: ''
-      },
-      addPeopleRules: {
-        name: [{ required: true, message: '请输入' }],
-        dept: [{ required: true, message: '请选择' }]
-      },
-      sixTypes: [
-        {
-          id: 1,
-          label: '男'
-        },
-        {
-          id: 2,
-          label: '女'
-        }
-      ],
+      showEditPeople: false,
       showDeleteTip: false,
       showPeopleInfo: false,
-      peopleInfoForm: {
-        name: '宋运辉',
-        six: '男',
-        idcard: '000000000000000000',
-        phone: '00000000000',
-        dept: '东海化工',
-        telphone: '02700000000',
-        num: '02',
-        note: '东海化工常务副厂长'
-      },
-      showAddDept: false,
-      addDeptTitle: '新增机构',
-      addDeptForm: {
-        deptName: '',
-        address: '',
-        fatherDept: '',
-        phone: '',
-        deptCode: '',
-        shortName: '',
-        longitude: '',
-        latitude: '',
-        status: '',
-        note: ''
-      },
-      addDeptRules: {
-        deptName: [{ required: true, message: '请输入' }],
-        address: [{ required: true, message: '请选择' }],
-        fatherDept: [{ required: true, message: '请选择' }]
-      },
-      deptStatusTypes: [
-        {
-          id: 1,
-          label: '再用'
-        },
-        {
-          id: 2,
-          label: '已注销'
-        }
-      ],
-      showPopover: false,
-      serverUrl: globalApi.headImg,
-      icons: [
-        {
-          path: '/cloud-oneMap/combatEvent/1608349933941_1608349933941.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350408597_1608350408597.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350573010_1608350573010.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350504537_1608350504537.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350546000_1608350546000.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350378214_1608350378214.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350440076_1608350440076.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350478586_1608350478586.png'
-        }
-      ],
-      showDeptContent: true,
-      showUnfoldBtn: false
+      showAddDept: false
     }
   },
   created () {
@@ -680,11 +299,6 @@ export default {
     // 多选时触发
     handleSelectionChange () {},
 
-    // 修改时触发
-    editPeopleClick () {
-      this.showAddPeople = true
-    },
-
     // 查看时触发
     seePeopleClick () {
       this.showPeopleInfo = true
@@ -713,6 +327,21 @@ export default {
       this.showAddPeople = false
     },
 
+    // 编辑人员时触发
+    editPeopleClick () {
+      this.showEditPeople = true
+    },
+
+    // 编辑人员确定时触发
+    editPeopleConfirmClick () {
+      this.showEditPeople = false
+    },
+
+    // 编辑人员取消时触发
+    editPeopleCancelClick () {
+      this.showEditPeople = false
+    },
+
     // 删除人员时触发
     deletePeopleClick () {
       this.showDeleteTip = true
@@ -726,26 +355,6 @@ export default {
     // 删除人员取消时触发
     deleteTipCancelClick () {
       this.showDeleteTip = false
-    },
-
-    /**
-     *  选择图标
-     */
-    selectIcon (item) {
-      this.showPopover = false
-      // this.curIcon = item.path
-    },
-
-    // 折叠
-    foldClick () {
-      this.showDeptContent = false
-      this.showUnfoldBtn = true
-    },
-
-    // 展开
-    unfoldClick () {
-      this.showDeptContent = true
-      this.showUnfoldBtn = false
     },
 
     // 编辑机构
@@ -1033,398 +642,6 @@ export default {
 }
 .table-btn-see {
   margin-left: 18px;
-}
-
-.add-people-dlg.el-dialog__wrapper {
-  /deep/.el-dialog {
-    .el-dialog__header {
-      display: none;
-    }
-    .el-dialog__body {
-      padding: 0px 20px;
-      width: 100%;
-      border: 1px solid #1eb0fc;
-      background-color: #121e3a;
-      .add-people-header {
-        height: 40px;
-        border-bottom: 1px solid #1eb0fc;
-        .header-icon {
-          display: inline-block;
-          width: 22px;
-          height: 16px;
-          background-image: url("../../assets/images/fire_title.png");
-          margin-top: 15px;
-        }
-        .header-text {
-          display: inline-block;
-          vertical-align: top;
-          margin-top: 13px;
-          margin-left: 10px;
-          font-size: 14px;
-          color: #fff;
-        }
-      }
-    }
-    .add-people-form {
-      margin-top: 35px;
-      border-bottom: 1px solid rgba($color: #1eb0fc, $alpha: 0.6);
-      .el-input__inner {
-        background-color: rgba($color: #09546d, $alpha: 0.3);
-        border-color: #1eb0fc;
-        border-radius: 0;
-        width: 150px;
-        height: 24px;
-        color: #fff;
-        font-size: 12px;
-      }
-      .el-form-item {
-        margin-top: -20px;
-      }
-      .el-form-item__label {
-        color: #fff;
-        font-size: 12px;
-      }
-      .el-form-item__error {
-        margin-top: -10px;
-      }
-      .el-textarea__inner {
-        background-color: rgba($color: #09546d, $alpha: 0.3);
-        border-color: #1eb0fc;
-        border-radius: 0;
-        width: 390px;
-        height: 78px;
-        color: #fff;
-        font-size: 12px;
-        margin-top: 8px;
-      }
-      .subtext1 {
-        color: #fff;
-        font-size: 12px;
-        width: 180px;
-      }
-    }
-    .note {
-      margin-top: 20px;
-      font-size: 12px;
-      color: rgba($color: #fff, $alpha: 0.6);
-    }
-    .confirm-tool {
-      height: 50px;
-      margin-top: 20px;
-      .confirm-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        cursor: pointer;
-      }
-      .cancel-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: transparent;
-        border: 1px solid #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        margin-right: 20px;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.delete-tip-dial.el-dialog__wrapper {
-  /deep/.el-dialog {
-    background-color: transparent;
-    box-shadow: none;
-    .el-dialog__header {
-      display: none;
-    }
-    .el-dialog__body {
-      display: inline-block;
-      padding: 0;
-      width: 100%;
-      height: 155px;
-      border: 1px solid #1eb0fc;
-      background-color: #121e3a;
-      .warning-img {
-        background-image: url("../../assets/images/backgroundManagement/warning.png");
-        width: 15px;
-        height: 14px;
-        display: inline-block;
-        vertical-align: top;
-        margin-left: 42px;
-      }
-      .title1 {
-        color: #ffffff;
-        font-size: 14px;
-        height: 14px;
-        line-height: 14px;
-        display: inline-block;
-        vertical-align: top;
-        margin-left: 13px;
-      }
-      .title2 {
-        margin-left: 70px;
-        height: 14px;
-        font-size: 14px;
-        line-height: 14px;
-        margin-top: 11px;
-      }
-      .confirm-btn {
-        width: 70px;
-        height: 24px;
-        background-color: #00cff9;
-        float: right;
-        margin-right: 19px;
-        border-radius: 4px;
-        color: white;
-        font-size: 12px;
-        text-align: center;
-        line-height: 24px;
-        cursor: pointer;
-      }
-      .cancel-btn {
-        width: 70px;
-        height: 24px;
-        background-color: transparent;
-        float: right;
-        margin-right: 10px;
-        color: #00cff9;
-        font-size: 12px;
-        text-align: center;
-        line-height: 24px;
-        border: 1px solid #00cff9;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.add-dept-dlg.el-dialog__wrapper {
-  /deep/.el-dialog {
-    overflow: hidden;
-    .el-dialog__header {
-      display: none;
-    }
-    .el-dialog__body {
-      padding: 0;
-      width: 100%;
-    }
-    .add-dept-div {
-      border: 1px solid #1eb0fc;
-      background-color: #121e3a;
-    }
-    .map-tool {
-      width: 100%;
-      height: 617px;
-    }
-    .add-dept-header {
-      background: -webkit-linear-gradient(
-        top,
-        rgba($color: #000, $alpha: 0.7),
-        rgba($color: #000, $alpha: 0)
-      );
-      position: absolute;
-      height: 100px;
-      width: 100%;
-      top: 1px;
-      left: 1px;
-      .header-icon {
-        display: inline-block;
-        width: 22px;
-        height: 16px;
-        background-image: url("../../assets/images/fire_title.png");
-        margin-top: 15px;
-        margin-left: 18px;
-      }
-      .header-text {
-        display: inline-block;
-        vertical-align: top;
-        margin-top: 13px;
-        margin-left: 10px;
-        font-size: 14px;
-        color: #fff;
-      }
-    }
-    .unfold-btn {
-      position: absolute;
-      width: 23px;
-      height: 100px;
-      top: 272px;
-      right: 0px;
-      background-image: url("../../assets/images/backgroundManagement/unfold.png");
-      cursor: pointer;
-    }
-    .add-dept-base {
-      position: absolute;
-      width: 505px;
-      height: 449px;
-      top: 97px;
-      right: 0px;
-      .fold-tool {
-        float: left;
-        width: 23px;
-        height: 100%;
-        .fold-btn {
-          position: absolute;
-          width: 23px;
-          height: 100px;
-          top: 50%;
-          margin-top: -50px;
-          background-image: url("../../assets/images/backgroundManagement/fold.png");
-          cursor: pointer;
-        }
-      }
-      .add-dept-content {
-        float: right;
-        width: 456px;
-        height: 447px;
-        border: 1px solid #1eb0fc;
-        background-color: #121e3a;
-        padding: 0 12px;
-        .content-header {
-          height: 33px;
-          border-bottom: 1px solid #1eb0fc;
-          .icon {
-            display: inline-block;
-            width: 22px;
-            height: 16px;
-            background-image: url("../../assets/images/fire_title.png");
-            margin-top: 10px;
-          }
-          .text {
-            display: inline-block;
-            vertical-align: top;
-            margin-top: 8px;
-            margin-left: 10px;
-            font-size: 14px;
-            color: #fff;
-          }
-        }
-        .add-dept-form {
-          margin-top: 35px;
-          .el-input__inner {
-            background-color: rgba($color: #09546d, $alpha: 0.3);
-            border-color: #1eb0fc;
-            border-radius: 0;
-            width: 138px;
-            height: 24px;
-            color: #fff;
-            font-size: 12px;
-          }
-          .el-form-item {
-            margin-top: -20px;
-          }
-          .el-form-item__label {
-            color: #fff;
-            font-size: 12px;
-          }
-          .el-form-item__error {
-            margin-top: -10px;
-          }
-          .el-textarea__inner {
-            background-color: rgba($color: #09546d, $alpha: 0.3);
-            border-color: #1eb0fc;
-            border-radius: 0;
-            width: 365px;
-            height: 78px;
-            color: #fff;
-            font-size: 12px;
-            margin-top: 8px;
-          }
-          .subtext1 {
-            color: #fff;
-            font-size: 12px;
-            width: 180px;
-          }
-          .icon-tool {
-            display: inline-block;
-            height: 30px;
-            vertical-align: middle;
-            .choose-icon-btn {
-              display: inline-block;
-              width: 86px;
-              height: 24px;
-              border: 1px solid #1ea7f0;
-              color: #fff;
-              font-size: 12px;
-              line-height: 24px;
-              vertical-align: top;
-              margin-left: 8px;
-              margin-top: 3px;
-              cursor: pointer;
-              .btn-icon {
-                width: 12px;
-                height: 12px;
-                margin-left: 10px;
-                margin-top: 6px;
-                vertical-align: top;
-              }
-            }
-          }
-        }
-      }
-    }
-    .confirm-tool {
-      height: 50px;
-      margin-top: 20px;
-      margin-right: 15px;
-      .confirm-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        cursor: pointer;
-      }
-      .cancel-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: transparent;
-        border: 1px solid #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        margin-right: 20px;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.hideCourseList-enter,
-.hideCourseList-leave-to {
-  transform: translateX(505px);
-}
-.hideCourseList-enter-active,
-.hideCourseList-leave-active {
-  transition: all 0.3s ease;
-}
-
-.showUnfoldBtn-enter,
-.showUnfoldBtn-leave-to {
-  opacity: 0;
-}
-.showUnfoldBtn-enter-active,
-.showUnfoldBtn-leave-active {
-  transition: all 0.3s ease;
 }
 
 .dept-tree-right-menu {

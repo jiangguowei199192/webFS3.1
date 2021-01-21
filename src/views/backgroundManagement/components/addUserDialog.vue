@@ -1,111 +1,109 @@
 <template>
-  <div>
-    <el-dialog
-      :visible.sync="isShow"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      width="480px"
-      class="add-people-dlg"
+  <el-dialog
+    :visible="isShow"
+    :close-on-click-modal="false"
+    @close="$emit('close')"
+    width="480px"
+    class="add-people-dlg"
+  >
+    <div class="add-people-header">
+      <div class="header-icon"></div>
+      <div class="header-text">{{ title }}</div>
+    </div>
+    <el-form
+      ref="adduserRef"
+      :model="addUserForm"
+      :rules="addUserRules"
+      :inline="true"
+      label-width="80px"
+      class="add-people-form"
     >
-      <div class="add-people-header">
-        <div class="header-icon"></div>
-        <div class="header-text">{{ title }}</div>
-      </div>
-      <el-form
-        ref="adduserRef"
-        :model="addUserForm"
-        :rules="addUserRules"
-        :inline="true"
-        label-width="80px"
-        class="add-people-form"
-      >
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="addUserForm.username" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="账号" prop="account">
-          <el-input
-            v-model="addUserForm.account"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="联系方式" prop="phone">
-          <el-input v-model="addUserForm.phone" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="用户层级" prop="dept">
-          <el-cascader
-            v-model="addUserForm.dept"
-            :options="deptTree"
-            :props="{
-              expandTrigger: 'hover',
-              label: 'deptName',
-              value: 'deptCode',
-            }"
-            :show-all-levels="false"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item label="关联角色" prop="roles">
-          <el-select
-            v-model="addUserForm.roles"
-            :popper-append-to-body="false"
-            placeholder="请选择"
-            multiple
-            class="role-sel"
-          >
-            <el-option
-              v-for="item in roleTypes"
-              :key="item.id"
-              :label="item.label"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="用户状态" prop="status">
-          <el-select
-            v-model="addUserForm.status"
-            :popper-append-to-body="false"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in userStatusTypes"
-              :key="item.id"
-              :label="item.label"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="到期时间" prop="dueToTime">
-          <el-date-picker
-            v-model="addUserForm.dueToTime"
-            type="date"
-            placeholder="请选择"
-            style="width: 150px"
-          >
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="排序" prop="num">
-          <el-input v-model="addUserForm.num" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="绑定人员" prop="people">
-          <el-select
-            v-model="addUserForm.people"
-            :popper-append-to-body="false"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in bindPeopleTypes"
-              :key="item.id"
-              :label="item.label"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div class="confirm-tool">
-        <div class="confirm-btn" @click="confirmClick">确定</div>
-        <div class="cancel-btn" @click="cancelClick">取消</div>
-      </div>
-    </el-dialog>
-  </div>
+      <el-form-item label="用户名" prop="username">
+        <el-input
+          v-model="addUserForm.username"
+          placeholder="请输入"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="账号" prop="account">
+        <el-input v-model="addUserForm.account" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="联系方式" prop="phone">
+        <el-input v-model="addUserForm.phone" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="用户层级" prop="dept">
+        <el-cascader
+          v-model="addUserForm.dept"
+          :options="deptTree"
+          :props="{
+            expandTrigger: 'hover',
+            label: 'deptName',
+            value: 'deptCode',
+          }"
+          :show-all-levels="false"
+        ></el-cascader>
+      </el-form-item>
+      <el-form-item label="关联角色" prop="roles">
+        <el-select
+          v-model="addUserForm.roles"
+          :popper-append-to-body="false"
+          placeholder="请选择"
+          multiple
+          class="role-sel"
+        >
+          <el-option
+            v-for="item in roleTypes"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户状态" prop="status">
+        <el-select
+          v-model="addUserForm.status"
+          :popper-append-to-body="false"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in userStatusTypes"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="到期时间" prop="dueToTime">
+        <el-date-picker
+          v-model="addUserForm.dueToTime"
+          type="date"
+          placeholder="请选择"
+          style="width: 150px"
+        >
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="排序" prop="num">
+        <el-input v-model="addUserForm.num" placeholder="请输入"></el-input>
+      </el-form-item>
+      <el-form-item label="绑定人员" prop="people">
+        <el-select
+          v-model="addUserForm.people"
+          :popper-append-to-body="false"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in bindPeopleTypes"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <div class="confirm-tool">
+      <div class="confirm-btn" @click="confirmClick">确定</div>
+      <div class="cancel-btn" @click="cancelClick">取消</div>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
