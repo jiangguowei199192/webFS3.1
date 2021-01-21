@@ -128,92 +128,6 @@
     </div>
 
     <el-dialog
-      :visible.sync="showAddPeople"
-      :close-on-click-modal="clickfalse"
-      width="480px"
-      class="add-people-dlg"
-    >
-      <div class="add-people-header">
-        <div class="header-icon"></div>
-        <div class="header-text">{{ addPeopleTitle }}</div>
-      </div>
-      <el-form
-        ref="addPeopleRef"
-        :model="addPeopleForm"
-        :rules="addPeopleRules"
-        :inline="true"
-        label-width="80px"
-        class="add-people-form"
-      >
-        <el-form-item label="姓名" prop="name">
-          <el-input
-            v-model="addPeopleForm.name"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="性别" prop="six">
-          <el-select
-            v-model="addPeopleForm.six"
-            :popper-append-to-body="false"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in sixTypes"
-              :key="item.id"
-              :label="item.label"
-              :value="item.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="身份证号" prop="idcard">
-          <el-input
-            v-model="addPeopleForm.idcard"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="联系方式" prop="phone">
-          <el-input
-            v-model="addPeopleForm.phone"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="所属机构" prop="dept">
-          <el-cascader
-            v-model="addPeopleForm.dept"
-            :options="deptTree"
-            :props="{
-              expandTrigger: 'hover',
-              label: 'deptName',
-              value: 'deptCode',
-            }"
-            :show-all-levels="false"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item label="办公电话" prop="telphone">
-          <el-input
-            v-model="addPeopleForm.telphone"
-            placeholder="请输入"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="排序" prop="num">
-          <el-input v-model="addPeopleForm.num" placeholder="请输入"></el-input>
-        </el-form-item>
-        <el-form-item label="备注" prop="note">
-          <el-input
-            v-model="addPeopleForm.note"
-            placeholder="请输入"
-            type="textarea"
-            resize="none"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <div class="confirm-tool">
-        <div class="confirm-btn" @click="addPeopleConfirmClick">确定</div>
-        <div class="cancel-btn" @click="addPeopleCancelClick">取消</div>
-      </div>
-    </el-dialog>
-
-    <el-dialog
       :visible.sync="showDeleteTip"
       append-to-body
       :close-on-click-modal="false"
@@ -240,7 +154,7 @@
       :visible.sync="showPeopleInfo"
       :close-on-click-modal="clickfalse"
       width="540px"
-      class="add-people-dlg"
+      class="show-people-dlg"
     >
       <div class="add-people-header">
         <div class="header-icon"></div>
@@ -280,11 +194,15 @@
       <div class="note">
         <div>
           <span>创建时间：11111111111111</span>
-          <span style="display:inline-block;margin-left:20px;">创建人：2222</span>
+          <span style="display: inline-block; margin-left: 20px"
+            >创建人：2222</span
+          >
         </div>
-        <div style="margin-top:10px;">
+        <div style="margin-top: 10px">
           <span>最后修改时间：3333333333333333</span>
-          <span style="display:inline-block;margin-left:20px;">最后修改人：4444</span>
+          <span style="display: inline-block; margin-left: 20px"
+            >最后修改人：4444</span
+          >
         </div>
       </div>
       <div class="confirm-tool">
@@ -459,13 +377,26 @@
         </div>
       </div>
     </el-dialog>
+
+    <AddPeopleDialog
+      :isShow.sync="showAddPeople"
+      title="新增人员"
+      :deptTree="deptTree"
+      @close="showAddPeople=false"
+      @confirmClick="addPeopleConfirmClick"
+      @cancelClick="addPeopleCancelClick"
+    ></AddPeopleDialog>
   </div>
 </template>
 
 <script>
 import globalApi from '@/utils/globalApi'
+import AddPeopleDialog from './components/addPeopleDialog.vue'
 
 export default {
+  components: {
+    AddPeopleDialog
+  },
   data () {
     return {
       peopleSearchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
@@ -486,24 +417,24 @@ export default {
           showSetting: true,
           children: [
             {
-              deptName: '一厂',
+              deptName: '东海化工一厂',
               deptCode: '1-1',
               showSetting: false,
               children: [
                 {
-                  deptName: '一车间',
+                  deptName: '东海化工一厂一车间',
                   deptCode: '1-1-1',
                   showSetting: false
                 }
               ]
             },
             {
-              deptName: '二厂',
+              deptName: '东海化工二厂',
               deptCode: '1-2',
               showSetting: false,
               children: [
                 {
-                  deptName: '一车间',
+                  deptName: '东海化工二厂一车间',
                   deptCode: '1-2-1',
                   showSetting: false
                 }
@@ -532,31 +463,7 @@ export default {
       pageSize: 0,
       currentPage: 1,
       showAddPeople: false,
-      addPeopleTitle: '新增人员',
-      addPeopleForm: {
-        name: '',
-        six: '',
-        idcard: '',
-        phone: '',
-        dept: '',
-        telphone: '',
-        num: '',
-        note: ''
-      },
-      addPeopleRules: {
-        name: [{ required: true, message: '请输入' }],
-        dept: [{ required: true, message: '请选择' }]
-      },
-      sixTypes: [
-        {
-          id: 1,
-          label: '男'
-        },
-        {
-          id: 2,
-          label: '女'
-        }
-      ],
+
       showDeleteTip: false,
       showPeopleInfo: false,
       peopleInfoForm: {
@@ -1035,7 +942,7 @@ export default {
   margin-left: 18px;
 }
 
-.add-people-dlg.el-dialog__wrapper {
+.show-people-dlg.el-dialog__wrapper {
   /deep/.el-dialog {
     .el-dialog__header {
       display: none;
