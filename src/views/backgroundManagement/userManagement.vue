@@ -47,6 +47,7 @@
         <div class="add-btn" @click="addUserClick">添加</div>
       </div>
       <el-table
+        class="manageTable"
         :data="userList"
         empty-text="暂无数据"
         height="630"
@@ -534,54 +535,54 @@ export default {
     }
   }
 }
-.el-table {
-  color: #c5f3ff;
-  font-size: 16px;
-  background: transparent;
-  border: none;
-  /* 表格表头样式 */
-  /deep/.el-table__header-wrapper th {
-    color: #c5f3ff;
-    font-size: 16px;
-    height: 40px;
-    padding: 0;
-    background-color: rgba($color: #0b779e, $alpha: 0.66);
-  }
-  /* 表格每行高度*/
-  /deep/.el-table__body td {
-    height: 38px;
-    padding: 0;
-  }
-  /* 每行的背景颜色 */
-  /deep/.el-table__body td {
-    background-color: transparent;
-  }
-  /* 所有单元格颜色、无边框 */
-  /deep/td,
-  /deep/tr,
-  /deep/th {
-    border: none;
-    background-color: transparent;
-  }
-  /* 复选框样式 */
-  /deep/.el-checkbox__inner {
-    background-color: transparent;
-    border-color: #c5f3ff;
-    border-radius: 0px;
-  }
-  // /deep/.el-checkbox__input.is-checked {
-  //   // background-color: #00cff9;
-  //   border-radius: 2px;
-  // }
-  /*鼠标移入某行时的背景色*/
-  /deep/tbody tr:hover > td {
-    background-color: transparent;
-  }
-}
-/* 去除表格底部线条 */
-.el-table::before {
-  height: 0px;
-}
+// .el-table {
+//   color: #c5f3ff;
+//   font-size: 16px;
+//   background: transparent;
+//   border: none;
+//   /* 表格表头样式 */
+//   /deep/.el-table__header-wrapper th {
+//     color: #c5f3ff;
+//     font-size: 16px;
+//     height: 40px;
+//     padding: 0;
+//     background-color: rgba($color: #0b779e, $alpha: 0.66);
+//   }
+//   /* 表格每行高度*/
+//   /deep/.el-table__body td {
+//     height: 38px;
+//     padding: 0;
+//   }
+//   /* 每行的背景颜色 */
+//   /deep/.el-table__body td {
+//     background-color: transparent;
+//   }
+//   /* 所有单元格颜色、无边框 */
+//   /deep/td,
+//   /deep/tr,
+//   /deep/th {
+//     border: none;
+//     background-color: transparent;
+//   }
+//   /* 复选框样式 */
+//   /deep/.el-checkbox__inner {
+//     background-color: transparent;
+//     border-color: #c5f3ff;
+//     border-radius: 0px;
+//   }
+//   // /deep/.el-checkbox__input.is-checked {
+//   //   // background-color: #00cff9;
+//   //   border-radius: 2px;
+//   // }
+//   /*鼠标移入某行时的背景色*/
+//   /deep/tbody tr:hover > td {
+//     background-color: transparent;
+//   }
+// }
+// /* 去除表格底部线条 */
+// .el-table::before {
+//   height: 0px;
+// }
 .table-btn {
   width: 46px;
   height: 26px;

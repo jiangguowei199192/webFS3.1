@@ -44,12 +44,12 @@
       <div class="tablTool">
         <div class="left">
           <span>已选</span>
-          <span>{{checkedList.length}}</span>
+          <span>{{ checkedList.length }}</span>
           <span>项</span>
           <span @click.stop="clearSelection">清空</span>
         </div>
         <div class="right">
-          <span>添加</span>
+          <span @click.stop="addRes">添加</span>
           <span>批量删除</span>
         </div>
       </div>
@@ -66,11 +66,13 @@
         :checkedList.sync="checkedList"
       ></PageTable>
     </div>
+    <PointResDialog ref="pointDlg"></PointResDialog>
   </div>
 </template>
 
 <script>
 import PageTable from './pageTable.vue'
+import PointResDialog from './pointResDlg.vue'
 export default {
   props: {
     // 子标题
@@ -117,7 +119,8 @@ export default {
     }
   },
   components: {
-    PageTable
+    PageTable,
+    PointResDialog
   },
   mounted () {
     this.getList()
@@ -134,6 +137,12 @@ export default {
      */
     clearSelection () {
       this.$refs.pageTable.clearSelection()
+    },
+    /**
+     *  添加资源
+     */
+    addRes () {
+      this.$refs.pointDlg.addRes()
     }
   }
 }
@@ -178,6 +187,9 @@ export default {
         width: 450px;
         margin-left: 10px;
         margin-right: 10px;
+        /deep/.el-input__inner {
+          color: #ffffff;
+        }
       }
       .btn {
         box-sizing: border-box;

@@ -510,68 +510,77 @@
     background: #121e3a;
     display   : flex;
     flex-wrap : wrap;
-    padding: 13px 8px 8px 8px;
+    padding   : 13px 8px 8px 8px;
     box-sizing: border-box;
+
     .icon {
-      display: inline-block;
-      width  : 28px;
-      height : 28px;
-      margin-right: 12px;
-      margin-left: 12px;
+      display      : inline-block;
+      width        : 28px;
+      height       : 28px;
+      margin-right : 12px;
+      margin-left  : 12px;
       margin-bottom: 5px;
-      cursor: pointer;
+      cursor       : pointer;
     }
   }
+
   .selectBox {
-    width: 256px;
+    width     : 256px;
     max-height: 186px;
     background: #121E3A;
-    border: 1px solid #27BCE5;
+    border    : 1px solid #27BCE5;
+
     .searchModel {
-      margin-top: 8px;
+      margin-top : 8px;
       margin-left: 8px;
-      width: 240px;
+      width      : 240px;
+
       .el-input__inner {
         background-color: transparent;
-        border: 1px solid #27BCE5;
-        border-right: 0px solid transparent;
-        height: 22px;
-        color: #ffffff;
-        padding: 0px 6px;
+        border          : 1px solid #27BCE5;
+        border-right    : 0px solid transparent;
+        height          : 22px;
+        color           : #ffffff;
+        padding         : 0px 6px;
       }
+
       .el-input-group__append {
-        border: 1px solid #27BCE5;
+        border     : 1px solid #27BCE5;
         border-left: 0px solid transparent;
-        padding: 0px 0px;
-        background: transparent;
+        padding    : 0px 0px;
+        background : transparent;
+
         .el-button {
-          height: 20px;
+          height    : 20px;
           background: transparent;
-          margin: 0px;
-          padding: 0px 0px;
-          width: 24px;
+          margin    : 0px;
+          padding   : 0px 0px;
+          width     : 24px;
+
           .el-icon-search {
             color: #ffffff;
           }
         }
       }
     }
+
     .modelList {
-      margin: 8px;
-      width: 240px;
+      margin    : 8px;
+      width     : 240px;
       max-height: 140px;
       overflow-x: hidden;
-      color: #C5F3FF;
+      color     : #C5F3FF;
+
       .modelItem {
-        width: 228px;
-        padding: 0px 6px;
+        width        : 228px;
+        padding      : 0px 6px;
         margin-bottom: 8px;
-        height: 14px;
-        font-size: 12px;
-        cursor: pointer;
-        overflow: hidden;
+        height       : 14px;
+        font-size    : 12px;
+        cursor       : pointer;
+        overflow     : hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        white-space  : nowrap;
       }
     }
   }
@@ -601,6 +610,61 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none !important;
 }
-input[type="number"]{
+
+input[type="number"] {
   -moz-appearance: textfield;
+}
+
+
+//后台管理模块表格样式
+/* 删除表格下横线 */
+.manageTable.el-table::before {
+  height: 0px;
+}
+
+.manageTable.el-table {
+  color     : #c5f3ff;
+  font-size : 16px;
+  background: transparent;
+  border    : none;
+
+  /* 表格表头样式 */
+  .el-table__header-wrapper th {
+    color           : #c5f3ff;
+    font-size       : 16px;
+    height          : 40px;
+    padding         : 0;
+    background-color: rgba(11, 119, 158, 0.66);
+  }
+
+  /* 表格每行高度*/
+  .el-table__body td {
+    height : 38px;
+    padding: 0;
+  }
+
+  /* 每行的背景颜色 */
+  .el-table__body td {
+    background-color: transparent;
+  }
+
+  /* 所有单元格颜色、无边框 */
+  td,
+  tr,
+  th {
+    border          : none;
+    background-color: transparent;
+  }
+
+  /* 复选框样式 */
+  .el-checkbox__inner {
+    background-color: transparent;
+    border-color    : #c5f3ff;
+    border-radius   : 0px;
+  }
+
+  /*鼠标移入某行时的背景色*/
+  tbody tr:hover>td {
+    background-color: transparent;
+  }
 }
