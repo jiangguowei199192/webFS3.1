@@ -101,9 +101,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
-            <div class="table-btn" @click="editUserClick(scope.row)">
-              修改
-            </div>
+            <div class="table-btn" @click="editUserClick(scope.row)">修改</div>
             <div
               class="table-btn table-btn-see"
               @click="seeUserClick(scope.row)"
@@ -135,7 +133,7 @@
     <AddUserDialog
       :isShow.sync="showAddUser"
       title="新增用户"
-      @close="showAddUser=false"
+      @close="showAddUser = false"
       @confirmClick="addUserConfirmClick"
       @cancelClick="addUserCancelClick"
     ></AddUserDialog>
@@ -143,28 +141,36 @@
     <AddUserDialog
       :isShow.sync="showEditUser"
       title="修改用户"
-      @close="showEditUser=false"
+      @close="showEditUser = false"
       @confirmClick="editUserConfirmClick"
       @cancelClick="editUserCancelClick"
     ></AddUserDialog>
 
     <DeleteDialog
       :isShow.sync="showDeleteUser"
-      @close="showDeleteUser=false"
+      @close="showDeleteUser = false"
       @confirmClick="deleteUserConfirmClick"
       @cancelClick="deleteUserCancelClick"
     ></DeleteDialog>
+
+    <UserInfoDialog
+      :isShow="showUserInfo"
+      @close="showUserInfo = false"
+      @confirmClick="showUserInfo = false"
+    ></UserInfoDialog>
   </div>
 </template>
 
 <script>
 import AddUserDialog from './components/addUserDialog.vue'
 import DeleteDialog from './components/deleteDialog.vue'
+import UserInfoDialog from './components/userInfoDialog.vue'
 
 export default {
   components: {
     AddUserDialog,
-    DeleteDialog
+    DeleteDialog,
+    UserInfoDialog
   },
   data () {
     return {
@@ -230,7 +236,8 @@ export default {
       currentPage: 1,
       showAddUser: false,
       showDeleteUser: false,
-      showEditUser: false
+      showEditUser: false,
+      showUserInfo: false
     }
   },
   created () {
@@ -261,7 +268,9 @@ export default {
     handleSelectionChange () {},
 
     // 查看人员时触发
-    seeUserClick () {},
+    seeUserClick () {
+      this.showUserInfo = true
+    },
 
     // 重置密码时触发
     resetPasswordClick () {},

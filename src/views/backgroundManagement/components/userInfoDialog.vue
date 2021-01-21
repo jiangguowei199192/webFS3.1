@@ -8,7 +8,7 @@
   >
     <div class="add-people-header">
       <div class="header-icon"></div>
-      <div class="header-text">查看人员</div>
+      <div class="header-text">查看用户信息</div>
     </div>
     <el-form
       :model="peopleInfoForm"
@@ -16,29 +16,32 @@
       label-width="80px"
       class="add-people-form"
     >
-      <el-form-item label="姓名:" prop="name">
-        <div class="subtext1">{{ peopleInfoForm.name }}</div>
+      <el-form-item label="用户名:" prop="username">
+        <div class="subtext1">{{ peopleInfoForm.username }}</div>
       </el-form-item>
-      <el-form-item label="性别:" prop="six">
-        <div class="subtext1">{{ peopleInfoForm.six }}</div>
-      </el-form-item>
-      <el-form-item label="身份证号:" prop="idcard">
-        <div class="subtext1">{{ peopleInfoForm.idcard }}</div>
+      <el-form-item label="账号:" prop="account">
+        <div class="subtext1">{{ peopleInfoForm.account }}</div>
       </el-form-item>
       <el-form-item label="联系方式:" prop="phone">
         <div class="subtext1">{{ peopleInfoForm.phone }}</div>
       </el-form-item>
-      <el-form-item label="所属机构:" prop="dept">
+      <el-form-item label="用户层级:" prop="dept">
         <div class="subtext1">{{ peopleInfoForm.dept }}</div>
       </el-form-item>
-      <el-form-item label="办公电话:" prop="telphone">
-        <div class="subtext1">{{ peopleInfoForm.telphone }}</div>
+      <el-form-item label="关联角色:" prop="roles">
+        <div class="subtext1">{{ peopleInfoForm.roles }}</div>
+      </el-form-item>
+      <el-form-item label="用户状态:" prop="status">
+        <div class="subtext1">{{ peopleInfoForm.status }}</div>
+      </el-form-item>
+      <el-form-item label="到期时间:" prop="dueToTime">
+        <div class="subtext1">{{ peopleInfoForm.dueToTime }}</div>
       </el-form-item>
       <el-form-item label="排序:" prop="num">
         <div class="subtext1">{{ peopleInfoForm.num }}</div>
       </el-form-item>
-      <el-form-item label="备注:" prop="note">
-        <div class="subtext1">{{ peopleInfoForm.note }}</div>
+      <el-form-item label="绑定人员:" prop="people">
+        <div class="subtext1">{{ peopleInfoForm.people }}</div>
       </el-form-item>
     </el-form>
     <div class="note">
@@ -72,14 +75,15 @@ export default {
   data () {
     return {
       peopleInfoForm: {
-        name: '宋运辉',
-        six: '男',
-        idcard: '000000000000000000',
-        phone: '00000000000',
+        username: 'syh',
+        account: 'songyunhui',
+        phone: '12322222222',
         dept: '东海化工',
-        telphone: '02700000000',
+        roles: '角色1、角色2、角色3',
+        status: '有效',
+        dueToTime: '2099-12-31',
         num: '02',
-        note: '东海化工常务副厂长'
+        people: '宋运辉'
       }
     }
   },
