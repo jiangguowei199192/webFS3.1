@@ -326,29 +326,29 @@ export default {
     }
     .unfold-btn {
       position: absolute;
-      width: 23px;
-      height: 100px;
-      top: 272px;
+      width: 14px;
+      height: 61px;
+      top: 291px;
       right: 0px;
       background-image: url("../../../assets/images/backgroundManagement/unfold.png");
       cursor: pointer;
     }
     .add-dept-base {
       position: absolute;
-      width: 505px;
+      width: 496px;
       height: 449px;
       top: 97px;
       right: 0px;
       .fold-tool {
         float: left;
-        width: 23px;
+        width: 14px;
         height: 100%;
         .fold-btn {
           position: absolute;
-          width: 23px;
-          height: 100px;
+          width: 14px;
+          height: 61px;
           top: 50%;
-          margin-top: -50px;
+          margin-top: -30px;
           background-image: url("../../../assets/images/backgroundManagement/fold.png");
           cursor: pointer;
         }
