@@ -6,6 +6,7 @@
       :data="data"
       style="width: 100%"
       :height="tableHeight"
+      @selection-change="selectionChange"
     >
       <el-table-column
         v-if="checkBox"
@@ -165,6 +166,12 @@ export default {
   },
   methods: {
     /**
+     *  清空选中
+     */
+    clearSelection () {
+      this.$refs.table.clearSelection()
+    },
+    /**
      *  派发按钮点击事件
      */
     handleClick (event, data) {
@@ -206,14 +213,20 @@ export default {
           console.log(err)
         })
     },
+    /**
+     *  表格选中变化
+     */
+    selectionChange (val) {
+      this.$emit('update:checkedList', val)
+    },
     handleSizeChange (val) {
       const query = this.listInfo.query
-      query.pageSize = val // 每页条数
+      query.pageSize = val
       query.currentPage = 1 // 每页条数切换，重置当前页
       this.getList(this.api)
     },
     handleCurrentChange (val) {
-      this.listInfo.query.currentPage = val // 当前页
+      this.listInfo.query.currentPage = val
       this.getList(this.api)
     }
   }
