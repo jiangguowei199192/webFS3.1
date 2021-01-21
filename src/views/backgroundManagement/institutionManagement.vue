@@ -155,7 +155,7 @@
       :isShow.sync="showDeleteTip"
       @close="showDeleteTip=false"
       @confirmClick="deleteTipConfirmClick"
-      @cancelClick="deleteTipCancelClick"
+      @cancelClick="showDeleteTip=false"
     ></DeleteDialog>
 
     <AddDeptDialog
@@ -349,11 +349,6 @@ export default {
 
     // 删除人员确定时触发
     deleteTipConfirmClick () {
-      this.showDeleteTip = false
-    },
-
-    // 删除人员取消时触发
-    deleteTipCancelClick () {
       this.showDeleteTip = false
     },
 

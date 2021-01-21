@@ -150,7 +150,7 @@
       :isShow.sync="showDeleteUser"
       @close="showDeleteUser = false"
       @confirmClick="deleteUserConfirmClick"
-      @cancelClick="deleteUserCancelClick"
+      @cancelClick="showDeleteUser = false"
     ></DeleteDialog>
 
     <UserInfoDialog
@@ -158,6 +158,13 @@
       @close="showUserInfo = false"
       @confirmClick="showUserInfo = false"
     ></UserInfoDialog>
+
+    <ResetPasswordDialog
+      :isShow.sync="showResetPassword"
+      @close="showResetPassword = false"
+      @confirmClick="resetPasswordConfirmClick"
+      @cancelClick="showResetPassword = false"
+    ></ResetPasswordDialog>
   </div>
 </template>
 
@@ -165,12 +172,14 @@
 import AddUserDialog from './components/addUserDialog.vue'
 import DeleteDialog from './components/deleteDialog.vue'
 import UserInfoDialog from './components/userInfoDialog.vue'
+import ResetPasswordDialog from './components/resetPasswordDialog.vue'
 
 export default {
   components: {
     AddUserDialog,
     DeleteDialog,
-    UserInfoDialog
+    UserInfoDialog,
+    ResetPasswordDialog
   },
   data () {
     return {
@@ -237,7 +246,8 @@ export default {
       showAddUser: false,
       showDeleteUser: false,
       showEditUser: false,
-      showUserInfo: false
+      showUserInfo: false,
+      showResetPassword: false
     }
   },
   created () {
@@ -268,12 +278,19 @@ export default {
     handleSelectionChange () {},
 
     // 查看人员时触发
-    seeUserClick () {
+    seeUserClick (row) {
       this.showUserInfo = true
     },
 
     // 重置密码时触发
-    resetPasswordClick () {},
+    resetPasswordClick (row) {
+      this.showResetPassword = true
+    },
+
+    // 重置密码确认时触发
+    resetPasswordConfirmClick () {
+      this.showResetPassword = false
+    },
 
     // 切换分页时触发
     currentPageChange () {},
@@ -300,11 +317,6 @@ export default {
 
     // 删除用户确认时触发
     deleteUserConfirmClick () {
-      this.showDeleteUser = false
-    },
-
-    // 删除用户取消时触发
-    deleteUserCancelClick () {
       this.showDeleteUser = false
     },
 
