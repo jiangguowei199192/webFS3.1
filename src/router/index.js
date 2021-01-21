@@ -163,9 +163,14 @@ const routes = [
             component: () => import('../views/backgroundManagement/roleManagement')
           },
           {
-            path: '/backgroundManagement/permissionManagement',
-            name: 'permissionManagement',
-            component: () => import('../views/backgroundManagement/permissionManagement')
+            path: '/backgroundManagement/functionPermission',
+            name: 'functionPermission',
+            component: () => import('../views/backgroundManagement/functionPermission')
+          },
+          {
+            path: '/backgroundManagement/dataPermission',
+            name: 'dataPermission',
+            component: () => import('../views/backgroundManagement/dataPermission')
           },
           {
             path: '/backgroundManagement/dataDictionary',

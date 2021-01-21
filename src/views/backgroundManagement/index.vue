@@ -72,10 +72,19 @@ export default {
             selected: false
           }
           break
-        case 'permissionManagement':
+        case 'functionPermission':
           info = {
-            id: 'permissionManagement',
-            title: '权限管理',
+            id: 'functionPermission',
+            title: '功能权限',
+            normalImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementNormal.png'),
+            selectedImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementSelected.png'),
+            selected: false
+          }
+          break
+        case 'dataPermission':
+          info = {
+            id: 'dataPermission',
+            title: '数据权限',
             normalImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementNormal.png'),
             selectedImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementSelected.png'),
             selected: false
@@ -159,7 +168,8 @@ export default {
           info: [
             this.getLeftItemInfo('userManagement'),
             this.getLeftItemInfo('roleManagement'),
-            this.getLeftItemInfo('permissionManagement')
+            this.getLeftItemInfo('functionPermission'),
+            this.getLeftItemInfo('dataPermission')
           ]
         },
         {
@@ -204,8 +214,11 @@ export default {
         case 'roleManagement':
           this.$router.push({ path: '/backgroundManagement/roleManagement' })
           break
-        case 'permissionManagement':
-          this.$router.push({ path: '/backgroundManagement/permissionManagement' })
+        case 'functionPermission':
+          this.$router.push({ path: '/backgroundManagement/functionPermission' })
+          break
+        case 'dataPermission':
+          this.$router.push({ path: '/backgroundManagement/dataPermission' })
           break
         case 'dataDictionary':
           this.$router.push({ path: '/backgroundManagement/dataDictionary' })
