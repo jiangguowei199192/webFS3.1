@@ -1,5 +1,5 @@
 <template>
   <div>
-    角色管理
+    数据权限
   </div>
 </template>
