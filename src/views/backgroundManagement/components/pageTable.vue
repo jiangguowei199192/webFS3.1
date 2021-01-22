@@ -31,6 +31,11 @@
             v-if="item.type === 'switch'"
             v-model="scope.row[item.value]"
           ></el-switch>
+          <!-- 图片 -->
+          <img
+            v-else-if="item.type === 'image' && scope.row[item.value]"
+            :src="scope.row[item.value]"
+          />
           <span v-else>
             {{ scope.row[item.value] }}
           </span>
