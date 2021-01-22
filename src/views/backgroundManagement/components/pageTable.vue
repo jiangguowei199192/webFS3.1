@@ -202,7 +202,7 @@ export default {
     getList (api) {
       // 每次调用接口时都自动绑定最新的数据
       api(this.handleParams())
-        .then((res) => {
+        .then(res => {
           if (res.data.code === 0) {
             // 使外面可以访问到表格数据
             const arr = res.data.data.data
@@ -215,7 +215,7 @@ export default {
             }
           }
         })
-        .catch((err) => {
+        .catch(err => {
           console.log(err)
         })
     },
