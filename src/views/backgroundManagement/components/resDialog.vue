@@ -168,7 +168,7 @@ export default {
     }
     .showUnfoldBtn-enter-active,
     .showUnfoldBtn-leave-active {
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
     }
     .fold {
       position: absolute;
