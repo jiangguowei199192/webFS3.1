@@ -11,7 +11,7 @@
           :model="resForm"
           :inline="true"
           label-width="90px"
-          style="margin-top: 17px;"
+          style="margin-top: 17px"
           :rules="formRules"
         >
           <el-form-item label="资源名称 :" prop="name">
@@ -247,7 +247,7 @@
                     :disabled="disabled"
                   ></el-color-picker>
                 </el-form-item>
-                <el-form-item label="备注 :">
+                <el-form-item label="备注 :" class="note">
                   <el-input
                     v-model="item.note"
                     :placeholder="placeholder"
@@ -280,8 +280,6 @@ export default {
     return {
       placeholder: '请输入',
       placeholder2: '请选择',
-      color1: '',
-      color2: '',
       icons: [],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       title: '新增点资源',

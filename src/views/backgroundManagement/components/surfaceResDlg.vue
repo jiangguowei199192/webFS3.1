@@ -109,7 +109,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="备注 :">
+          <el-form-item label="备注 :" class="note">
             <el-input
               v-model="resForm.note"
               :placeholder="placeholder"
