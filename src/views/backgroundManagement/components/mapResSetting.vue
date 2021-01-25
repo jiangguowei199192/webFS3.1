@@ -66,15 +66,22 @@
         :checkedList.sync="checkedList"
       ></PageTable>
     </div>
-    <PointResDialog ref="pointDlg"></PointResDialog>
+    <component ref="dlg" :is="dlgView"></component>
   </div>
 </template>
 
 <script>
 import PageTable from './pageTable.vue'
-import PointResDialog from './pointResDlg.vue'
+import PointResDlg from './pointResDlg.vue'
+import LineResDlg from './lineResDlg.vue'
+import SurfaceResDlg from './surfaceResDlg.vue'
 export default {
   props: {
+    // 对话框组件名称
+    dlgView: {
+      type: String,
+      default: 'PointResDlg'
+    },
     // 子标题
     subTitle: {
       type: String
@@ -120,7 +127,9 @@ export default {
   },
   components: {
     PageTable,
-    PointResDialog
+    PointResDlg,
+    LineResDlg,
+    SurfaceResDlg
   },
   mounted () {
     this.getList()
@@ -142,7 +151,7 @@ export default {
      *  添加资源
      */
     addRes () {
-      this.$refs.pointDlg.addRes()
+      this.$refs.dlg.addRes()
     }
   }
 }

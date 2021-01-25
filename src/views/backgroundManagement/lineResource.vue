@@ -1,6 +1,7 @@
 <template>
   <div>
     <MapResSetting
+      :dlgView="dlgView"
       :tableInfo="tableInfo"
       :subTitle="subTitle"
       :query="query"
@@ -13,17 +14,20 @@ import MapResSetting from './components/mapResSetting.vue'
 export default {
   data () {
     return {
+      dlgView: 'LineResDlg',
       subTitle: '面资源设置',
       // 表格相关
       tableInfo: {
         refresh: 1,
-        data: [{
-          name: '江汉路',
-          start: '姑嫂树路',
-          type: '安保线路',
-          end: '兴业路',
-          icon: 'http://111.47.13.103:40031/cloud-oneMap/combatEvent/1608350408597_1608350408597.png'
-        }
+        data: [
+          {
+            name: '江汉路',
+            start: '姑嫂树路',
+            type: '安保线路',
+            end: '兴业路',
+            icon:
+              'http://111.47.13.103:40031/cloud-oneMap/combatEvent/1608350408597_1608350408597.png'
+          }
         ],
         fieldList: [
           { label: '线路名称', value: 'name' },
@@ -55,8 +59,7 @@ export default {
     MapResSetting
   },
   mounted () {},
-  methods: {
-  }
+  methods: {}
 }
 </script>
 

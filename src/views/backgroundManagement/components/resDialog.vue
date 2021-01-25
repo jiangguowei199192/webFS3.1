@@ -138,7 +138,7 @@ export default {
     }
     .hideContent-enter,
     .hideContent-leave-to {
-      transform: translateX(494px);
+      transform: translateX(496px);
     }
     .hideContent-enter-active,
     .hideContent-leave-active {
@@ -151,7 +151,7 @@ export default {
       right: 0px;
       align-items: center;
       .content {
-        width: 490px;
+        width: 496px;
         height: 447px;
         background: rgba($color: #121e3a, $alpha: 0.95);
       }

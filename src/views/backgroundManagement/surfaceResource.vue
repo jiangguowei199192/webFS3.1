@@ -1,6 +1,7 @@
 <template>
   <div>
     <MapResSetting
+      :dlgView="dlgView"
       :tableInfo="tableInfo"
       :subTitle="subTitle"
       :query="query"
@@ -15,6 +16,7 @@ import { settingApi } from '@/api/setting'
 export default {
   data () {
     return {
+      dlgView: 'SurfaceResDlg',
       subTitle: '面资源设置',
       // 表格相关
       tableInfo: {
