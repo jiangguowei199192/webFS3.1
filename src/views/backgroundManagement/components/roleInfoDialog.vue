@@ -4,44 +4,29 @@
     :close-on-click-modal="false"
     @close="$emit('close')"
     width="540px"
-    class="people-info-dlg"
+    class="role-info-dlg"
   >
     <div class="add-people-header">
       <div class="header-icon"></div>
-      <div class="header-text">查看用户信息</div>
+      <div class="header-text">查看角色</div>
     </div>
     <el-form
-      :model="peopleInfoForm"
+      :model="roleInfoForm"
       :inline="true"
       label-width="80px"
       class="add-people-form"
     >
-      <el-form-item label="用户名:" prop="username">
-        <div class="subtext1">{{ peopleInfoForm.username }}</div>
+      <el-form-item label="角色名称:" prop="roleName">
+        <div class="subtext1">{{ roleInfoForm.roleName }}</div>
       </el-form-item>
-      <el-form-item label="账号:" prop="account">
-        <div class="subtext1">{{ peopleInfoForm.account }}</div>
-      </el-form-item>
-      <el-form-item label="联系方式:" prop="phone">
-        <div class="subtext1">{{ peopleInfoForm.phone }}</div>
-      </el-form-item>
-      <el-form-item label="用户层级:" prop="dept">
-        <div class="subtext1">{{ peopleInfoForm.dept }}</div>
-      </el-form-item>
-      <el-form-item label="关联角色:" prop="roles">
-        <div class="subtext1">{{ peopleInfoForm.roles }}</div>
-      </el-form-item>
-      <el-form-item label="用户状态:" prop="status">
-        <div class="subtext1">{{ peopleInfoForm.status }}</div>
-      </el-form-item>
-      <el-form-item label="到期时间:" prop="dueToTime">
-        <div class="subtext1">{{ peopleInfoForm.dueToTime }}</div>
+      <el-form-item label="角色状态:" prop="status">
+        <div class="subtext1">{{ roleInfoForm.status }}</div>
       </el-form-item>
       <el-form-item label="排序:" prop="num">
-        <div class="subtext1">{{ peopleInfoForm.num }}</div>
+        <div class="subtext1">{{ roleInfoForm.num }}</div>
       </el-form-item>
-      <el-form-item label="绑定人员:" prop="people">
-        <div class="subtext1">{{ peopleInfoForm.people }}</div>
+      <el-form-item label="备注:" prop="beizhu">
+        <div class="subtext1">{{ roleInfoForm.beizhu }}</div>
       </el-form-item>
     </el-form>
     <div class="note">
@@ -74,16 +59,11 @@ export default {
   },
   data () {
     return {
-      peopleInfoForm: {
-        username: 'syh',
-        account: 'songyunhui',
-        phone: '12322222222',
-        dept: '东海化工',
-        roles: '角色1、角色2、角色3',
-        status: '有效',
-        dueToTime: '2099-12-31',
-        num: '02',
-        people: '宋运辉'
+      roleInfoForm: {
+        roleName: '角色1',
+        status: '在用',
+        num: '1',
+        beizhu: '备注备注备注备注备注'
       }
     }
   },
@@ -96,7 +76,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.people-info-dlg.el-dialog__wrapper {
+.role-info-dlg.el-dialog__wrapper {
   /deep/.el-dialog {
     .el-dialog__header {
       display: none;

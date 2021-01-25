@@ -180,20 +180,6 @@ export default {
         line-height: 30px;
         cursor: pointer;
       }
-      .cancel-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: transparent;
-        border: 1px solid #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        margin-right: 20px;
-        cursor: pointer;
-      }
     }
   }
 }
