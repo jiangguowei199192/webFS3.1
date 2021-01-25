@@ -3,63 +3,55 @@
     :visible="isShow"
     :close-on-click-modal="false"
     @close="$emit('close')"
-    width="540px"
-    class="people-info-dlg"
+    width="480px"
+    class="add-role-dlg"
   >
     <div class="add-people-header">
       <div class="header-icon"></div>
-      <div class="header-text">查看用户信息</div>
+      <div class="header-text">{{ title }}</div>
     </div>
+
     <el-form
-      :model="peopleInfoForm"
+      ref="addRoleRef"
+      :model="addRoleFrom"
+      :rules="addRoleRules"
       :inline="true"
       label-width="80px"
       class="add-people-form"
     >
-      <el-form-item label="用户名:" prop="username">
-        <div class="subtext1">{{ peopleInfoForm.username }}</div>
+      <el-form-item label="角色名称" prop="roleName">
+        <el-input v-model="addRoleFrom.roleName"></el-input>
       </el-form-item>
-      <el-form-item label="账号:" prop="account">
-        <div class="subtext1">{{ peopleInfoForm.account }}</div>
+
+      <el-form-item label="角色状态" prop="status">
+        <el-select
+          v-model="addRoleFrom.status"
+          :popper-append-to-body="false"
+        >
+          <el-option
+            v-for="item in roleStatusOptions"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
-      <el-form-item label="联系方式:" prop="phone">
-        <div class="subtext1">{{ peopleInfoForm.phone }}</div>
+
+      <el-form-item label="排序" prop="num">
+        <el-input v-model="addRoleFrom.num"></el-input>
       </el-form-item>
-      <el-form-item label="用户层级:" prop="dept">
-        <div class="subtext1">{{ peopleInfoForm.dept }}</div>
-      </el-form-item>
-      <el-form-item label="关联角色:" prop="roles">
-        <div class="subtext1">{{ peopleInfoForm.roles }}</div>
-      </el-form-item>
-      <el-form-item label="用户状态:" prop="status">
-        <div class="subtext1">{{ peopleInfoForm.status }}</div>
-      </el-form-item>
-      <el-form-item label="到期时间:" prop="dueToTime">
-        <div class="subtext1">{{ peopleInfoForm.dueToTime }}</div>
-      </el-form-item>
-      <el-form-item label="排序:" prop="num">
-        <div class="subtext1">{{ peopleInfoForm.num }}</div>
-      </el-form-item>
-      <el-form-item label="绑定人员:" prop="people">
-        <div class="subtext1">{{ peopleInfoForm.people }}</div>
+
+      <el-form-item label="备注" prop="note">
+        <el-input
+          v-model="addRoleFrom.note"
+          type="textarea"
+          resize="none"
+        ></el-input>
       </el-form-item>
     </el-form>
-    <div class="note">
-      <div>
-        <span>创建时间：11111111111111</span>
-        <span style="display: inline-block; margin-left: 20px"
-          >创建人：2222</span
-        >
-      </div>
-      <div style="margin-top: 10px">
-        <span>最后修改时间：3333333333333333</span>
-        <span style="display: inline-block; margin-left: 20px"
-          >最后修改人：4444</span
-        >
-      </div>
-    </div>
     <div class="confirm-tool">
-      <div class="confirm-btn" @click="confirmClick">关闭</div>
+      <div class="confirm-btn" @click="confirmClick">确定</div>
+      <div class="cancel-btn" @click="cancelClick">取消</div>
     </div>
   </el-dialog>
 </template>
@@ -70,33 +62,44 @@ export default {
     isShow: {
       type: Boolean,
       required: true
+    },
+    title: {
+      type: String,
+      required: true
     }
   },
   data () {
     return {
-      peopleInfoForm: {
-        username: 'syh',
-        account: 'songyunhui',
-        phone: '12322222222',
-        dept: '东海化工',
-        roles: '角色1、角色2、角色3',
-        status: '有效',
-        dueToTime: '2099-12-31',
-        num: '02',
-        people: '宋运辉'
-      }
+      addRoleFrom: {
+        roleName: '',
+        status: '',
+        num: '',
+        note: ''
+      },
+      addRoleRules: {
+        roleName: [{ required: true, message: '请输入' }],
+        status: [{ required: true, message: '请选择' }]
+      },
+      roleStatusOptions: [
+        { id: 1, label: '在用' },
+        { id: 2, label: '停用' }
+      ]
     }
   },
   methods: {
     confirmClick () {
       this.$emit('confirmClick')
+    },
+
+    cancelClick () {
+      this.$emit('cancelClick')
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.people-info-dlg.el-dialog__wrapper {
+.add-role-dlg.el-dialog__wrapper {
   /deep/.el-dialog {
     .el-dialog__header {
       display: none;
@@ -128,7 +131,6 @@ export default {
     }
     .add-people-form {
       margin-top: 35px;
-      border-bottom: 1px solid rgba($color: #1eb0fc, $alpha: 0.6);
       .el-input__inner {
         background-color: rgba($color: #09546d, $alpha: 0.3);
         border-color: #1eb0fc;
@@ -171,7 +173,6 @@ export default {
     }
     .confirm-tool {
       height: 50px;
-      margin-top: 20px;
       .confirm-btn {
         float: right;
         width: 66px;
@@ -182,6 +183,20 @@ export default {
         font-size: 14px;
         text-align: center;
         line-height: 30px;
+        cursor: pointer;
+      }
+      .cancel-btn {
+        float: right;
+        width: 66px;
+        height: 30px;
+        background-color: transparent;
+        border: 1px solid #1eb0fc;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 20px;
         cursor: pointer;
       }
     }
