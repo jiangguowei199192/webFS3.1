@@ -151,7 +151,7 @@ export default {
       right: 0px;
       align-items: center;
       .content {
-        width: 480px;
+        width: 490px;
         height: 447px;
         background: rgba($color: #121e3a, $alpha: 0.95);
       }

@@ -10,11 +10,11 @@
           ref="pointForm"
           :model="resForm"
           :inline="true"
-          label-width="80px"
+          label-width="90px"
           class="pointform"
           :rules="formRules"
         >
-          <el-form-item label="资源名称" prop="name">
+          <el-form-item label="资源名称 :" prop="name">
             <el-input
               v-model="resForm.name"
               :placeholder="placeholder"
@@ -22,7 +22,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="资源地址" prop="addr">
+          <el-form-item label="资源地址 :" prop="addr">
             <el-input
               v-model="resForm.addr"
               :placeholder="placeholder"
@@ -30,11 +30,13 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="资源类型" prop="type">
+          <el-form-item label="资源类型 :" prop="type">
             <el-select
               v-model="resForm.type"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :class="{ active: !disabled }"
+              :disabled="disabled"
             >
               <el-option
                 v-for="item in resTypes"
@@ -44,7 +46,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="联系电话">
+          <el-form-item label="联系电话 :">
             <el-input
               v-model="resForm.phone"
               :placeholder="placeholder"
@@ -52,11 +54,13 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属机构" prop="organ">
+          <el-form-item label="所属机构 :" prop="organ">
             <el-select
               v-model="resForm.organ"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :class="{ active: !disabled }"
+              :disabled="disabled"
             >
               <el-option
                 v-for="item in organs"
@@ -66,11 +70,13 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="所属辖区">
+          <el-form-item label="所属辖区 :">
             <el-select
               v-model="resForm.area"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :class="{ active: !disabled }"
+              :disabled="disabled"
             >
               <el-option
                 v-for="item in areas"
@@ -80,7 +86,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="经度" prop="lon">
+          <el-form-item label="经度 :" prop="lon">
             <el-input
               v-model="resForm.lon"
               :placeholder="placeholder"
@@ -88,7 +94,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="纬度" prop="lat">
+          <el-form-item label="纬度 :" prop="lat">
             <el-input
               v-model="resForm.lat"
               :placeholder="placeholder"
@@ -96,7 +102,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="管理人员">
+          <el-form-item label="管理人员 :">
             <el-input
               v-model="resForm.people"
               :placeholder="placeholder"
@@ -104,7 +110,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="人员电话">
+          <el-form-item label="人员电话 :">
             <el-input
               v-model="resForm.mobile"
               :placeholder="placeholder"
@@ -112,7 +118,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图标" style="line-height: 40px" prop="icon">
+          <el-form-item label="图标 :" style="line-height: 40px" prop="icon">
             <div class="iconTool">
               <el-avatar
                 :size="30"
@@ -124,6 +130,7 @@
                 trigger="click"
                 popper-class="iconPopover"
                 v-model="showPopover"
+                v-if="!disabled"
               >
                 <div class="iconBox">
                   <span class="close" @click.stop="showPopover = false"></span>
@@ -144,7 +151,7 @@
               </el-popover>
             </div>
           </el-form-item>
-          <el-form-item label="排序">
+          <el-form-item label="排序 :">
             <el-input
               v-model="resForm.sort"
               :placeholder="placeholder"
@@ -152,7 +159,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注 :">
             <el-input
               v-model="resForm.note"
               :placeholder="placeholder"
@@ -173,11 +180,11 @@
               :key="index"
               :model="item"
               :inline="true"
-              label-width="80px"
+              label-width="90px"
               :rules="areaRules"
               style="margin-top: 17px; margin-bottom: 20px"
             >
-              <el-form-item label="名称" prop="name">
+              <el-form-item label="名称 :" prop="name">
                 <el-input
                   v-model="item.name"
                   :placeholder="placeholder"
@@ -185,11 +192,13 @@
                   :class="{ active: !disabled }"
                 ></el-input>
               </el-form-item>
-              <el-form-item label="类型">
+              <el-form-item label="类型 :">
                 <el-select
                   v-model="item.type"
                   :popper-append-to-body="false"
                   :placeholder="placeholder2"
+                  :class="{ active: !disabled }"
+                  :disabled="disabled"
                 >
                   <el-option
                     v-for="item in resTypes"
@@ -199,11 +208,13 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="所属机构" prop="organ">
+              <el-form-item label="所属机构 :" prop="organ">
                 <el-select
                   v-model="item.organ"
                   :popper-append-to-body="false"
                   :placeholder="placeholder2"
+                  :class="{ active: !disabled }"
+                  :disabled="disabled"
                 >
                   <el-option
                     v-for="item in organs"
@@ -213,26 +224,30 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="线宽">
+              <el-form-item label="线宽 :">
                 <el-input-number
+                  v-if="!disabled"
                   v-model="item.lineWidth"
                   :min="1"
                   :max="10"
                 ></el-input-number>
+                <span v-else>{{ item.lineWidth }}</span>
               </el-form-item>
-              <el-form-item label="线段颜色" prop="lineColor">
+              <el-form-item label="线段颜色 :" prop="lineColor">
                 <el-color-picker
                   v-model="item.lineColor"
                   show-alpha
+                  :disabled="disabled"
                 ></el-color-picker>
               </el-form-item>
-              <el-form-item label="填充颜色" prop="fillColor">
+              <el-form-item label="填充颜色 :" prop="fillColor">
                 <el-color-picker
                   v-model="item.fillColor"
                   show-alpha
+                  :disabled="disabled"
                 ></el-color-picker>
               </el-form-item>
-              <el-form-item label="备注">
+              <el-form-item label="备注 :">
                 <el-input
                   v-model="item.note"
                   :placeholder="placeholder"
@@ -380,11 +395,12 @@ export default {
   /deep/.el-form-item__label {
     font-size: 12px;
     color: #fff;
-    line-height: 34px;
+    line-height: 40px;
   }
   /deep/ .el-form-item__content {
     font-size: 12px;
-    line-height: 34px;
+    line-height: 40px;
+    padding: 0px 3px 0px 0px;
   }
   /deep/.el-form-item {
     margin-bottom: 0px;
@@ -397,10 +413,15 @@ export default {
     width: 150px;
     height: 24px;
     color: #fff;
+    padding: 0px;
   }
-  /deep/.el-input.active .el-input__inner {
+  /deep/.el-form-item__error {
+    margin-top: -10px;
+  }
+  /deep/.active .el-input__inner {
     border: 1px solid #209cdf;
     background: rgba(9, 84, 109, 0.3);
+    padding: 0px 15px;
   }
   /deep/ .el-textarea__inner {
     background: transparent;
@@ -410,10 +431,24 @@ export default {
     height: 78px;
     color: #fff;
     font-size: 12px;
+    padding: 0px;
+    position: relative;
+    top: 10px;
   }
   /deep/ .el-textarea.active .el-textarea__inner {
     border: 1px solid #1eb0fc;
     background: rgba(9, 84, 109, 0.3);
+    padding: 5px 15px;
+    top: 0px;
+  }
+  /deep/.el-select .el-input.is-disabled {
+    .el-input__inner,
+    .el-input__icon {
+      cursor: default;
+    }
+    .el-icon-arrow-up:before {
+      content: "";
+    }
   }
   .pointform {
     margin-top: 17px;
@@ -422,6 +457,7 @@ export default {
       height: 40px;
       vertical-align: middle;
       margin-bottom: 11px;
+      width: 150px;
       .chooseBox {
         display: inline-block;
         width: 86px;
@@ -490,8 +526,18 @@ export default {
         border-radius: 0px;
         padding: 0px;
         .el-icon-arrow-down:before {
-          content: "";
+          display: none;
         }
+      }
+    }
+    /deep/.el-color-picker.is-disabled {
+      .el-color-picker__mask,
+      .el-icon-close:before {
+        display: none;
+      }
+      .el-color-picker__trigger {
+        border: none;
+        cursor: default;
       }
     }
   }
