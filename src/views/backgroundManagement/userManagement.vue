@@ -14,7 +14,6 @@
         :data="deptTree"
         :props="deptTreeProps"
         default-expand-all
-        @node-click="deptTreeClick"
         node-key="deptCode"
         :current-node-key="selectedDept.deptCode"
         v-if="selectedDept.deptCode"
@@ -31,7 +30,7 @@
         ></el-input>
         <div class="people-search-btn" @click="userUserClick">
           <img :src="userSearchIcon" class="people-search-icon" />
-          <span class="people-search-text">搜索</span>
+          <span class="people-search-text">查询</span>
         </div>
         <div class="people-reset-btn" @click="userResetClick">
           <img :src="peopleResetIcon" class="people-reset-icon" />
@@ -192,22 +191,18 @@ export default {
         {
           deptName: '湖北省应急管理厅',
           deptCode: '1',
-          showSetting: true,
           children: [
             {
               deptName: '孝感市应急管理局',
-              deptCode: '1-1',
-              showSetting: false
+              deptCode: '1-1'
             },
             {
               deptName: '武汉市应急管理局',
               deptCode: '1-2',
-              showSetting: false,
               children: [
                 {
                   deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false
+                  deptCode: '1-2-1'
                 }
               ]
             }
@@ -257,17 +252,6 @@ export default {
   methods: {
     // 搜索机构时触发
     institutionSearchChange () {},
-
-    // 点击机构时触发
-    deptTreeClick (item) {
-      if (item === this.selectedDept) {
-        // console.log('选择的机构与上一次相同')
-        return
-      }
-      this.selectedDept.showSetting = false
-      item.showSetting = true
-      this.selectedDept = item
-    },
 
     // 搜索用户时触发
     userUserClick () {},

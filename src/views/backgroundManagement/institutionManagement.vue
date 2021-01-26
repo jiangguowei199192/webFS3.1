@@ -54,7 +54,7 @@
         ></el-input>
         <div class="people-search-btn" @click="peopleSearchClick">
           <img :src="peopleSearchIcon" class="people-search-icon" />
-          <span class="people-search-text">搜索</span>
+          <span class="people-search-text">查询</span>
         </div>
         <div class="people-reset-btn" @click="peopleResetClick">
           <img :src="peopleResetIcon" class="people-reset-icon" />
