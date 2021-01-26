@@ -12,6 +12,14 @@
         <span></span>
         <span>{{ title }}</span>
       </div>
+      <div class="toolBox">
+        <div v-for="(item, index) in toolItems"
+          :key="index"
+          class="toolBtn"
+          :class="[item.className,{toolBtnSelect: item.isSelect}]"
+          @click="clickToolItem(item)">
+        </div>
+      </div>
       <transition name="hideContent">
         <div class="contentBox" v-show="!unfold">
           <div
@@ -44,12 +52,57 @@ export default {
     },
     title: {
       type: String
+    },
+    drawType: {
+      type: Number,
+      default: 0
     }
   },
   data () {
     return {
       // 折叠
-      unfold: false
+      unfold: false,
+      toolItems: [
+        {
+          name: 'zoomIn',
+          className: 'zoomIn',
+          isSelect: false
+        },
+        {
+          name: 'zoomOut',
+          className: 'zoomOut',
+          isSelect: false
+        }
+      ],
+      pointItem: {
+        name: 'point',
+        className: 'point',
+        isSelect: false
+      },
+      lineItem: {
+        name: 'line',
+        className: 'line',
+        isSelect: false
+      },
+      areaItem: {
+        name: 'area',
+        className: 'area',
+        isSelect: false
+      }
+    }
+  },
+  created () {
+    if (this.drawType === 0) {
+      this.toolItems.push(this.pointItem)
+      this.toolItems.push(this.areaItem)
+    } else if (this.drawType === 1) {
+      this.toolItems.push(this.lineItem)
+      this.toolItems.push(this.pointItem)
+    } else if (this.drawType === 2) {
+      this.toolItems.push(this.areaItem)
+      this.toolItems.push(this.pointItem)
+    } else {
+      console.log('Unsupported draw type!')
     }
   },
   methods: {
@@ -58,6 +111,32 @@ export default {
      */
     cancel () {
       this.$emit('update:isShow', false)
+    },
+    clickToolItem (item) {
+      this.toolItems.forEach(t => {
+        if (item !== t) {
+          t.isSelect = false
+        }
+      })
+      if (item.name === 'point' || item.name === 'line' || item.name === 'area') {
+        if (item.isSelect) {
+          item.isSelect = false
+          this.$refs.gduMap.map2D.customDrawHelper.stop()
+        } else {
+          item.isSelect = true
+          if (item.name === 'point') {
+            this.$refs.gduMap.map2D.customDrawHelper.drawType = 0
+          } else if (item.name === 'line') {
+            this.$refs.gduMap.map2D.customDrawHelper.drawType = 1
+          } else if (item.name === 'area') {
+            this.$refs.gduMap.map2D.customDrawHelper.drawType = 2
+          }
+        }
+      } else if (item.name === 'zoomIn') {
+        this.$refs.gduMap.map2D.zoomIn()
+      } else if (item.name === 'zoomOut') {
+        this.$refs.gduMap.map2D.zoomOut()
+      }
     }
   }
 }
@@ -107,6 +186,42 @@ export default {
         line-height: 21px;
         color: #fff;
         font-size: 14px;
+      }
+    }
+    .toolBox{
+      position: absolute;
+      top: 77px;
+      left: 15px;
+      width: 36px;
+      .toolBtn {
+        display: block;
+        height: 36px;
+        width: 36px;
+        background-size: 100% 100%;
+        margin-bottom: 12px;
+        background-color: cadetblue;
+        cursor: pointer;
+      }
+      .toolBtn:active {
+        opacity: 0.8;
+      }
+      .toolBtnSelect {
+        opacity: 0.8;
+      }
+      .zoomIn {
+        background-image: url('../../../assets/images/backgroundManagement/zoomIn.png');
+      }
+      .zoomOut {
+        background-image: url('../../../assets/images/backgroundManagement/zoomOut.png');
+      }
+      .point {
+        background-image: url('../../../assets/images/backgroundManagement/pointType.png');
+      }
+      .line {
+        background-image: url('../../../assets/images/backgroundManagement/lineType.png');
+      }
+      .area {
+        background-image: url('../../../assets/images/backgroundManagement/areaType.png');
       }
     }
     .hideContent-enter,

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ResDialog :title="title" :isShow.sync="isShow">
+    <ResDialog :title="title" :drawType="0" :isShow.sync="isShow">
       <div slot="content" class="pointContent mapResForm">
         <div class="pTitle">
           <span></span>
