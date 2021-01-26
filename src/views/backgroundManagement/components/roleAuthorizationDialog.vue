@@ -38,32 +38,29 @@ export default {
     }
   },
   mounted () {
-    this.changeTreeClass()
+    this.$nextTick(() => {
+      this.changeTreeClass()
+    })
   },
-  // created () {
-  //   this.changeTreeClass()
-  // },
   data () {
     return {
       data: [
         {
-          id: 1,
-          label: '一级',
+          id: '1',
+          label: '一级菜单',
           children: [
             {
-              id: 4,
-              label: '二级',
+              id: '11',
+              label: '二级菜单',
               children: [
-                { id: 10, label: '三级' },
-                { id: 11, label: '三级' },
-                { id: 12, label: '三级' },
+                { id: '111', label: '三级菜单' },
                 {
-                  id: 9,
-                  label: '三级',
+                  id: '112',
+                  label: '三级菜单',
                   children: [
-                    { id: 11, label: '四级', tag: true },
-                    { id: 12, label: '四级', tag: true },
-                    { id: 13, label: '四级', tag: true }
+                    { id: '1111', label: '四级菜单', tag: true },
+                    { id: '1112', label: '四级菜单', tag: true },
+                    { id: '1113', label: '四级菜单', tag: true }
                   ]
                 }
               ]
@@ -71,19 +68,19 @@ export default {
           ]
         },
         {
-          id: 2,
-          label: '一级',
+          id: '2',
+          label: '一级菜单',
           children: [
-            { id: 5, label: '二级' },
-            { id: 6, label: '二级' }
+            { id: '21', label: '二级菜单' },
+            { id: '22', label: '二级菜单' }
           ]
         },
         {
           id: 3,
-          label: '一级',
+          label: '一级菜单',
           children: [
-            { id: 7, label: '二级' },
-            { id: 8, label: '二级' }
+            { id: '31', label: '二级菜单' },
+            { id: '32', label: '二级菜单' }
           ]
         }
       ],
