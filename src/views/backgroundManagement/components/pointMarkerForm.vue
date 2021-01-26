@@ -94,8 +94,7 @@
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
-                      background:
-                        'url(' + serverUrl + item.path + ') no-repeat',
+                      background: 'url(' + serverUrl + item.path + ') no-repeat'
                     }"
                   ></span>
                 </div>
@@ -159,7 +158,7 @@ export default {
           lon: '',
           lat: '',
           icon:
-          'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+            'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
         }
       ],
       formRules: {
@@ -177,10 +176,12 @@ export default {
       this.placeholder2 = val ? '' : '请选择'
     }
   },
-  methods: {
-  }
+  methods: {}
 }
 </script>
 
 <style lang="scss" scoped>
+.iconTool {
+  margin-bottom: 11px;
+}
 </style>

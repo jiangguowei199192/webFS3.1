@@ -165,14 +165,8 @@ export default {
     color: #ffffff;
   }
   .mainBox {
-    box-sizing: border-box;
-    padding: 12px 15px;
-    height: 814px;
-    background: #183157;
     margin-top: 16px;
     .toolBox {
-      display: flex;
-      align-items: center;
       margin-top: 18px;
       .txt1 {
         margin-right: 17px;
@@ -181,78 +175,6 @@ export default {
       .txt2 {
         margin-right: 17px;
         margin-left: 17px;
-      }
-      .select,
-      .search {
-        width: 150px;
-        height: 34px;
-        /deep/.el-input__inner {
-          background: rgba(9, 84, 109, 0.3);
-          border-radius: 0px;
-          border: 1px solid #1eb0fc;
-        }
-      }
-      .search {
-        width: 450px;
-        margin-left: 10px;
-        margin-right: 10px;
-        /deep/.el-input__inner {
-          color: #ffffff;
-        }
-      }
-      .btn {
-        box-sizing: border-box;
-        width: 80px;
-        height: 34px;
-        background: linear-gradient(120deg, #086384, #0b779e);
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        span {
-          color: #c5f3ff;
-        }
-        img {
-          margin-right: 6px;
-          margin-left: 9px;
-        }
-      }
-      .resetBtn {
-        margin-left: 10px;
-      }
-    }
-    .tablTool {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      margin-left: 41px;
-      margin-bottom: 13px;
-      .left {
-        span:nth-child(2) {
-          color: #1d9fe5;
-        }
-        span:nth-child(4) {
-          margin-left: 30px;
-          color: #1d9fe5;
-          border-bottom: solid 1px #1d9fe5;
-          cursor: pointer;
-        }
-      }
-      .right {
-        margin-left: 15px;
-        span {
-          text-align: center;
-          display: inline-block;
-          width: 54px;
-          height: 30px;
-          background: #1eb0fc;
-          cursor: pointer;
-          line-height: 30px;
-        }
-        span:nth-child(2) {
-          width: 96px;
-          margin-left: 12px;
-          background: #ff0000;
-        }
       }
     }
   }

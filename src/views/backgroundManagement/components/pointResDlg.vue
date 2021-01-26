@@ -139,8 +139,7 @@
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
-                      background:
-                        'url(' + serverUrl + item.path + ') no-repeat',
+                      background: 'url(' + serverUrl + item.path + ') no-repeat'
                     }"
                   ></span>
                 </div>
@@ -353,4 +352,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.iconTool {
+  margin-bottom: 11px;
+}
 </style>

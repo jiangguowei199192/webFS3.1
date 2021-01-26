@@ -4,7 +4,7 @@
  * @Author: liangkaiLee
  * @Date: 2021-01-22 13:56:08
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-01-22 14:38:10
+ * @LastEditTime: 2021-01-26 10:39:54
 -->
 <template>
   <div class="dictDetBox">
@@ -33,7 +33,7 @@
           <span @click.stop="clearSelection">清空</span>
         </div>
         <div class="right">
-          <span @click.stop="addRes">添加</span>
+          <span @click.stop="addDict">添加</span>
           <span>批量删除</span>
         </div>
       </div>
@@ -49,18 +49,29 @@
         :api="api"
         :checkedList.sync="checkedList"
       ></PageTable>
+      <!-- 添加字典弹窗 -->
+      <AddDictDialog
+        ref="dictDlg"
+        :isShow.sync="showAddDict"
+        title="添加字典"
+        @close="showAddDict = false"
+        @confirmClick="submitAddDict"
+        @cancelClick="cancelAddDict"
+      ></AddDictDialog>
     </div>
   </div>
 </template>
 
 <script>
 import PageTable from './pageTable.vue'
+import AddDictDialog from './addDictDialog.vue'
 
 export default {
   name: 'dictPage',
 
   components: {
-    PageTable
+    PageTable,
+    AddDictDialog
   },
 
   props: {
@@ -105,7 +116,8 @@ export default {
       organList: [],
       organ: '',
       searchStr: '',
-      checkedList: []
+      checkedList: [],
+      showAddDict: false
     }
   },
 
@@ -124,9 +136,19 @@ export default {
       this.$refs.pageTable.clearSelection()
     },
 
-    //  添加资源
-    addRes () {
-      this.$refs.pointDlg.addRes()
+    //  添加字典
+    addDict () {
+      this.showAddDict = true
+    },
+
+    // 添加字典提交
+    submitAddDict () {
+      alert('添加成功!')
+    },
+
+    // 取消添加
+    cancelAddDict () {
+      this.showAddDict = false
     }
   }
 }
@@ -135,88 +157,8 @@ export default {
 <style lang="scss" scoped>
 .dictDetBox {
   margin-left: 30px;
-  .mainBox {
-    box-sizing: border-box;
-    padding: 12px 15px;
-    height: 814px;
-    background: #183157;
-    .toolBox {
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      .select,
-      .search {
-        width: 150px;
-        height: 34px;
-        /deep/.el-input__inner {
-          background: rgba(9, 84, 109, 0.3);
-          border-radius: 0px;
-          border: 1px solid #1eb0fc;
-        }
-      }
-      .search {
-        width: 450px;
-        margin-left: 10px;
-        margin-right: 10px;
-        /deep/.el-input__inner {
-          color: #ffffff;
-        }
-      }
-      .btn {
-        box-sizing: border-box;
-        width: 80px;
-        height: 34px;
-        background: linear-gradient(120deg, #086384, #0b779e);
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        span {
-          color: #c5f3ff;
-        }
-        img {
-          margin-right: 6px;
-          margin-left: 9px;
-        }
-      }
-      .resetBtn {
-        margin-left: 10px;
-      }
-    }
-    .tablTool {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      margin-left: 41px;
-      margin-bottom: 13px;
-      .left {
-        span:nth-child(2) {
-          color: #1d9fe5;
-        }
-        span:nth-child(4) {
-          margin-left: 30px;
-          color: #1d9fe5;
-          border-bottom: solid 1px #1d9fe5;
-          cursor: pointer;
-        }
-      }
-      .right {
-        margin-left: 15px;
-        span {
-          text-align: center;
-          display: inline-block;
-          width: 54px;
-          height: 30px;
-          background: #1eb0fc;
-          cursor: pointer;
-          line-height: 30px;
-        }
-        span:nth-child(2) {
-          width: 96px;
-          margin-left: 12px;
-          background: #ff0000;
-        }
-      }
-    }
+  .toolBox {
+    margin-top: 13px;
   }
 }
 </style>

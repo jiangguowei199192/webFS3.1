@@ -32,15 +32,28 @@
         :query="query"
       ></DictPage>
     </div>
+
+    <!-- 新增字典弹窗 -->
+    <AddDictDialog
+      ref="dictDlg"
+      :isShow.sync="showAddDict"
+      title="新增字典"
+      :deptTree="dictTree"
+      @close="showAddDict = false"
+      @confirmClick="submitAddDict"
+      @cancelClick="cancelAddDict"
+    ></AddDictDialog>
   </div>
 </template>
 
 <script>
 import DictPage from './components/dictPage.vue'
+import AddDictDialog from './components/addDictDialog.vue'
 
 export default {
   components: {
-    DictPage
+    DictPage,
+    AddDictDialog
   },
 
   data () {
@@ -99,7 +112,6 @@ export default {
         deviceCode: '',
         deviceName: ''
       },
-
       dictEditIcon: require('../../assets/images/backgroundManagement/deptEdit.png'),
       dictSeeIcon: require('../../assets/images/backgroundManagement/deptSee.png'),
       dictDeleteIcon: require('../../assets/images/backgroundManagement/deptDelete.png'),
@@ -145,6 +157,7 @@ export default {
         }
       ],
       selectedDict: '',
+      showAddDict: false,
 
       dictTreeProps: {
         children: 'children',
@@ -158,8 +171,20 @@ export default {
     // 搜索字典
     dictSearchChange () {},
 
-    // 新增字典
-    addDictClick () {}
+    // 点击新增按钮
+    addDictClick () {
+      this.showAddDict = true
+    },
+
+    // 新增字典提交
+    submitAddDict () {
+      alert('新增成功!')
+    },
+
+    // 取消新增
+    cancelAddDict () {
+      this.showAddDict = false
+    }
   }
 }
 </script>
@@ -185,7 +210,7 @@ export default {
     width: 278px;
     margin-top: 4px;
     /deep/.el-input__inner {
-      background: #09546d;
+      background: rgba(9, 84, 109, 0.3);
       border-color: #1eb0fc;
       color: #fff;
       border-radius: 0;

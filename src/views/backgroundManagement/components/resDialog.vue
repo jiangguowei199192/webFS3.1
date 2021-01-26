@@ -28,7 +28,7 @@
         <div class="fold" v-show="unfold" @click.stop="unfold = false"></div>
       </transition>
     </div>
-    <div class="btns">
+    <div class="handelBtns">
       <span @click.stop="cancel">取消</span>
       <span>保存</span>
     </div>
@@ -81,33 +81,6 @@ export default {
     .map {
       width: 100%;
       height: 617px;
-    }
-    .btns {
-      position: absolute;
-      bottom: 22px;
-      right: 14px;
-      span {
-        cursor: pointer;
-        box-sizing: border-box;
-        display: inline-block;
-        width: 66px;
-        height: 30px;
-        background: transparent;
-        border: 1px solid #1eb0fc;
-        border-radius: 4px;
-        font-size: 14px;
-        line-height: 30px;
-        color: #1eb0fc;
-        text-align: center;
-      }
-      span:active {
-        opacity: 0.8;
-      }
-      span:nth-child(2) {
-        margin-left: 20px;
-        background: #1eb0fc;
-        color: #fff;
-      }
     }
     .title {
       background: -webkit-linear-gradient(
