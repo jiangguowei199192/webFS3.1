@@ -88,7 +88,8 @@ export default {
         name: 'area',
         className: 'area',
         isSelect: false
-      }
+      },
+      bHasInitDrawHelper: false
     }
   },
   created () {
@@ -112,6 +113,9 @@ export default {
     cancel () {
       this.$emit('update:isShow', false)
     },
+    /**
+     * 
+     */
     clickToolItem (item) {
       this.toolItems.forEach(t => {
         if (item !== t) {
@@ -119,6 +123,7 @@ export default {
         }
       })
       if (item.name === 'point' || item.name === 'line' || item.name === 'area') {
+        this.initCoustomDrawHelper()
         if (item.isSelect) {
           item.isSelect = false
           this.$refs.gduMap.map2D.customDrawHelper.stop()
@@ -137,6 +142,18 @@ export default {
       } else if (item.name === 'zoomOut') {
         this.$refs.gduMap.map2D.zoomOut()
       }
+    },
+    initCoustomDrawHelper () {
+      if (this.bHasInitDrawHelper) {
+        return
+      }
+      this.bHasInitDrawHelper = true
+      this.$refs.gduMap.map2D.customDrawHelper.addOrMoveEvent.addEventListener(
+        this.addOrModifyEventCB.bind(this)
+      )
+    },
+    addOrModifyEventCB (data) {
+      console.log('addOrModifyEventCB:', data)
     }
   }
 }
