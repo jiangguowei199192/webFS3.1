@@ -85,8 +85,8 @@ export default {
           info = {
             id: 'dataPermission',
             title: '数据权限',
-            normalImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementNormal.png'),
-            selectedImgPath: require('../../assets/images/backgroundManagement/menuPermissionManagementSelected.png'),
+            normalImgPath: require('../../assets/images/backgroundManagement/menuDataPermissionNormal.png'),
+            selectedImgPath: require('../../assets/images/backgroundManagement/menuDataPermissionSelected.png'),
             selected: false
           }
           break
