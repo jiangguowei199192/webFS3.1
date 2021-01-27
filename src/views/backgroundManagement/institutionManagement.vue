@@ -233,12 +233,11 @@ export default {
       showDeptTreeRightMenu: false,
       peopleSearch: '',
       peopleList: [
-        {
-          name: '宋运辉',
-          institution: '东海化工',
-          phone: '13687909090',
-          num: 1
-        }
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 }
       ],
       pageTotal: 100,
       pageSize: 0,
