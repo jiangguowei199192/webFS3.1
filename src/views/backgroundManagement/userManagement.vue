@@ -217,24 +217,11 @@ export default {
       selectedDept: '',
       userSearch: '',
       userList: [
-        {
-          username: 'syh',
-          account: 'songyunhui',
-          phone: '13687909090',
-          roleCount: 3,
-          bindPeople: '宋运辉',
-          num: 2,
-          enable: true
-        },
-        {
-          username: 'ldb',
-          account: 'leidongbao',
-          phone: '13687909090',
-          roleCount: 2,
-          bindPeople: '雷东宝',
-          num: 3,
-          enable: false
-        }
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true }
       ],
       pageTotal: 100,
       pageSize: 0,
