@@ -226,6 +226,7 @@ export default {
         rgba($color: #000, $alpha: 0.7),
         rgba($color: #000, $alpha: 0)
       );
+      pointer-events: none;
       width: 100%;
       height: 103px;
       position: absolute;
