@@ -27,7 +27,7 @@
               <el-radio :label="4">自定义</el-radio>
             </el-radio-group>
           </div>
-          <div class="dept-div" v-show="showRangeDept">
+          <div class="apartment-dept-div" v-show="showRangeDept">
             <div class="dept-title">机构列表</div>
             <el-input
               class="dept-search-input"
@@ -43,6 +43,7 @@
               node-key="deptCode"
               :current-node-key="selectedDept.deptCode"
               class="dept-tree"
+              style="height: 422px; margin-top: 10px; margin-left: 16px"
             ></el-tree>
           </div>
         </div>
@@ -50,9 +51,117 @@
 
       <el-tab-pane label="用户" name="user">
         <div class="tab-div2">
-          <div class="dept-div"></div>
-          <div class="user-div"></div>
-          <div class="selected-user-div"></div>
+          <div class="user-list-div">
+            <div class="user-list-title">用户列表</div>
+            <div class="user-dept-div">
+              <div class="user-dept-title">机构列表</div>
+              <el-tree
+                :data="deptTree"
+                :props="deptTreeProps"
+                default-expand-all
+                node-key="deptCode"
+                :current-node-key="selectedDept.deptCode"
+                class="dept-tree"
+                style="margin: 0 0px 0 20px; height: 400px"
+              ></el-tree>
+            </div>
+
+            <div class="account-div">
+              <div class="account-title">账号列表</div>
+              <div class="search-tool">
+                <div class="account-status-text">账号状态</div>
+
+                <el-select
+                  v-model="accountStatusSearch"
+                  class="account-status-select"
+                >
+                  <el-option
+                    v-for="item in accountStatusOptions"
+                    :key="item.id"
+                    :label="item.label"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+
+                <el-input
+                  class="account-search-input"
+                  v-model="userSearch"
+                  placeholder="请输入用户名/姓名/身份证号进行搜索"
+                ></el-input>
+
+                <div class="account-search-btn" @click="accountSearchClick">
+                  <i class="el-icon-search"></i>
+                  <span class="account-search-text">查询</span>
+                </div>
+
+                <div class="account-reset-btn" @click="accountResetClick">
+                  <i class="el-icon-refresh"></i>
+                  <span class="account-reset-text">重置</span>
+                </div>
+              </div>
+
+              <el-table
+                class="accountTable"
+                :data="accountList"
+                empty-text="暂无数据"
+                height="320"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column type="selection"></el-table-column>
+                <el-table-column
+                  label="用户编号"
+                  prop="userNum"
+                  align="center"
+                  :show-overflow-tooltip="true"
+                ></el-table-column>
+                <el-table-column
+                  label="用户名"
+                  prop="username"
+                  align="center"
+                  :show-overflow-tooltip="true"
+                ></el-table-column>
+                <el-table-column
+                  label="姓名"
+                  prop="name"
+                  align="center"
+                  :show-overflow-tooltip="true"
+                ></el-table-column>
+                <el-table-column
+                  label="联系方式"
+                  prop="phone"
+                  align="center"
+                  :show-overflow-tooltip="true"
+                ></el-table-column>
+                <el-table-column
+                  label="账号状态"
+                  prop="enable"
+                  align="center"
+                ></el-table-column>
+              </el-table>
+
+              <div style="text-align: center;">
+                <el-pagination
+                  class="tablePagination"
+                  popper-class="pageSelect"
+                  :total="pageTotal"
+                  :page-size="pageSize"
+                  :current-page.sync="currentPage"
+                  layout="total, prev, pager, next"
+                  @current-change="currentPageChange"
+                ></el-pagination>
+              </div>
+            </div>
+          </div>
+
+          <div class="selected-user-div">
+            <div class="selected-title">用户列表</div>
+            <div class="selected-box">
+              <div class="selected-item" v-for="item in selectedAccounts" :key="item.id" @click="deleteSelectedAccount(item)">
+                <span class="item-text">{{item.label}}</span>
+                <i class="el-icon-close item-delete"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -103,7 +212,10 @@ export default {
             { deptName: '孝感市应急管理局', deptCode: '1-9' },
             { deptName: '孝感市应急管理局', deptCode: '1-10' },
             { deptName: '孝感市应急管理局', deptCode: '1-11' },
-            { deptName: '孝感市应急管理局', deptCode: '1-12' }
+            { deptName: '孝感市应急管理局', deptCode: '1-12' },
+            { deptName: '孝感市应急管理局', deptCode: '1-13' },
+            { deptName: '孝感市应急管理局', deptCode: '1-14' },
+            { deptName: '孝感市应急管理局', deptCode: '1-15' }
           ]
         }
       ],
@@ -112,7 +224,96 @@ export default {
         label: 'deptName',
         value: 'deptCode'
       },
-      selectedDept: ''
+      selectedDept: '',
+      accountStatusSearch: '',
+      accountStatusOptions: [
+        { id: 1, label: '全部' },
+        { id: 2, label: '有效' },
+        { id: 3, label: '无效' }
+      ],
+      userSearch: '',
+      accountList: [
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        },
+        {
+          userNum: '00001',
+          username: 'nicai',
+          name: 'caibudao',
+          phone: '12311223333',
+          enable: '有效'
+        }
+      ],
+      pageTotal: 100,
+      pageSize: 10,
+      currentPage: 1,
+      selectedAccounts: [
+        { id: 1, label: '刘德华' },
+        { id: 2, label: '周润发' },
+        { id: 3, label: '肖战' },
+        { id: 4, label: '王一博' },
+        { id: 5, label: '南楚歌' }
+      ]
     }
   },
   methods: {
@@ -124,7 +325,24 @@ export default {
       }
     },
 
-    rangeDeptSearchChange () {}
+    rangeDeptSearchChange () {},
+
+    accountSearchClick () {},
+
+    accountResetClick () {},
+
+    handleSelectionChange (row) {
+      // console.log(row)
+    },
+
+    currentPageChange () {},
+
+    deleteSelectedAccount (item) {
+      const index = this.selectedAccounts.indexOf(item)
+      if (index > -1) {
+        this.selectedAccounts.splice(index, 1)
+      }
+    }
   }
 }
 </script>
@@ -218,7 +436,7 @@ export default {
             }
           }
         }
-        .dept-div {
+        .apartment-dept-div {
           float: left;
           width: 311px;
           height: 100%;
@@ -245,73 +463,263 @@ export default {
               color: #c5f3ff;
             }
           }
-          .dept-tree {
-            width: 278px;
-            height: 414px;
-            overflow: auto;
-            margin-top: 10px;
-            margin-left: 16px;
+        }
+      }
+      .dept-tree {
+        overflow: auto;
+        background-color: transparent;
+        color: #fff;
+        .el-tree-node {
+          .el-tree-node__content {
+            display: block !important;
+            height: 30px;
+            line-height: 30px;
+            border: 1px solid transparent;
             background-color: transparent;
+          }
+          .el-tree-node__label {
+            font-size: 14px;
+          }
+          .el-tree-node__content:hover,
+          .el-tree-node:focus > .el-tree-node__content {
             color: #fff;
-            .el-tree-node {
-              .el-tree-node__content {
-                display: block !important;
-                height: 30px;
-                line-height: 30px;
-                border: 1px solid transparent;
-                background-color: transparent;
-              }
-              .el-tree-node__label {
-                font-size: 14px;
-              }
-              .el-tree-node__content:hover,
-              .el-tree-node:focus > .el-tree-node__content {
-                color: #fff;
-                background-color: transparent !important;
-              }
+            background-color: transparent !important;
+          }
 
-              // 展开折叠图标
-              .el-tree-node__expand-icon.expanded {
-                // 动画取消
-                -webkit-transform: rotate(0deg);
-                transform: rotate(0deg);
-              }
-              .el-icon-caret-right:before {
-                // 收起
-                content: url("../../../assets/images/backgroundManagement/deptTreeUnfold.png");
-              }
-              .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
-                // 展开
-                content: url("../../../assets/images/backgroundManagement/deptTreeFold.png");
-              }
-              .el-tree-node__expand-icon.is-leaf::before {
-                display: none;
-              }
-            }
+          // 展开折叠图标
+          .el-tree-node__expand-icon.expanded {
+            // 动画取消
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+          }
+          .el-icon-caret-right:before {
+            // 收起
+            content: url("../../../assets/images/backgroundManagement/deptTreeUnfold.png");
+          }
+          .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+            // 展开
+            content: url("../../../assets/images/backgroundManagement/deptTreeFold.png");
+          }
+          .el-tree-node__expand-icon.is-leaf::before {
+            display: none;
           }
         }
       }
       .tab-div2 {
         height: 503px;
-        .dept-div {
-          display: inline-block;
-          width: 311px;
+        .user-list-div {
+          float: left;
+          width: 870px;
           height: 100%;
           background-color: rgba($color: #183157, $alpha: 0.95);
+          .user-list-title {
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            color: #00ccff;
+            font-size: 14px;
+            text-align: center;
+          }
+          .user-dept-div {
+            float: left;
+            width: 270px;
+            height: 440px;
+            margin-left: 10px;
+            border: 1px solid #1eb0fc;
+            .user-dept-title {
+              height: 40px;
+              line-height: 40px;
+              margin-left: 20px;
+              font-size: 14px;
+              color: #00ccff;
+            }
+          }
+          .account-div {
+            float: left;
+            width: 566px;
+            height: 440px;
+            border: 1px solid #1eb0fc;
+            margin-left: 10px;
+            .account-title {
+              height: 40px;
+              line-height: 40px;
+              margin-left: 15px;
+              font-size: 14px;
+              color: #00ccff;
+            }
+            .search-tool {
+              height: 24px;
+              margin: 0 15px;
+              .account-status-text {
+                float: left;
+                color: #fff;
+                display: inline-block;
+                font-size: 12px;
+                height: 24px;
+                line-height: 24px;
+              }
+              .account-status-select {
+                float: left;
+                width: 91px;
+                height: 24px;
+                margin-left: 10px;
+                .el-input__inner {
+                  background: #09546d;
+                  border-color: #1eb0fc;
+                  border-radius: 0;
+                  color: white;
+                  height: 24px;
+                  font-size: 12px;
+                }
+                /* 使箭头居中 */
+                .el-input__icon {
+                  line-height: 24px;
+                }
+              }
+              .account-search-input {
+                float: left;
+                width: 233px;
+                margin-left: 10px;
+                .el-input__inner {
+                  background: #09546d;
+                  border-color: #1eb0fc;
+                  border-radius: 0;
+                  color: white;
+                  height: 24px;
+                  font-size: 12px;
+                }
+              }
+              .account-search-btn {
+                float: left;
+                width: 56px;
+                height: 24px;
+                margin-left: 10px;
+                background: -webkit-linear-gradient(top, #086384, #0b779e);
+                font-size: 12px;
+                line-height: 24px;
+                color: #c5f3ff;
+                text-align: center;
+                cursor: pointer;
+                .account-search-text {
+                  margin-left: 5px;
+                }
+              }
+              .account-reset-btn {
+                float: left;
+                width: 56px;
+                height: 24px;
+                margin-left: 10px;
+                background: -webkit-linear-gradient(top, #086384, #0b779e);
+                font-size: 12px;
+                line-height: 24px;
+                color: #c5f3ff;
+                text-align: center;
+                cursor: pointer;
+                .account-reset-text {
+                  margin-left: 5px;
+                }
+              }
+            }
+
+            /* 删除表格下横线 */
+            .accountTable.el-table::before {
+              height: 0px;
+            }
+            .accountTable.el-table {
+              color: #c5f3ff;
+              font-size: 12px;
+              background: transparent;
+              border: none;
+              margin-top: 10px;
+              margin-left: 15px;
+              width: 536px;
+
+              /* 表格表头样式 */
+              .el-table__header-wrapper th {
+                color: #c5f3ff;
+                font-size: 12px;
+                height: 40px;
+                padding: 0;
+                background-color: rgba(11, 119, 158, 0.66);
+              }
+
+              /* 表格每行高度*/
+              .el-table__body td {
+                height: 38px;
+                padding: 0;
+              }
+
+              /* 每行的背景颜色 */
+              .el-table__body td {
+                background-color: transparent;
+              }
+
+              /* 所有单元格颜色、无边框 */
+              td,
+              tr,
+              th {
+                border: none;
+                background-color: transparent;
+              }
+
+              /* 复选框样式 */
+              .el-checkbox__inner {
+                background-color: transparent;
+                border-color: #c5f3ff;
+                border-radius: 0px;
+              }
+
+              /*鼠标移入某行时的背景色*/
+              tbody tr:hover > td {
+                background-color: transparent;
+              }
+            }
+          }
         }
-        .user-div {
-          display: inline-block;
-          width: 554px;
-          height: 100%;
-          background-color: rgba($color: #183157, $alpha: 0.95);
-          margin-left: 5px;
-        }
+
         .selected-user-div {
-          display: inline-block;
+          float: left;
           width: 190px;
           height: 100%;
           background-color: rgba($color: #183157, $alpha: 0.95);
           margin-left: 5px;
+          .selected-title {
+            height: 40px;
+            line-height: 40px;
+            color: #00CCFF;
+            font-size: 14px;
+            text-align: center;
+          }
+          .selected-box {
+            height: 440px;
+            .selected-item {
+              display: inline-block;
+              width: 80px;
+              height: 25px;
+              margin-left: 10px;
+              margin-bottom: 10px;
+              background-color: #39A4DD;
+              border-radius: 2px;
+              text-align: center;
+              cursor: pointer;
+              .item-text {
+                display: inline-block;
+                max-width: 50px;
+                font-size: 12px;
+                color: #fff;
+                line-height: 25px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+              .item-delete {
+                color: #fff;
+                line-height: 25px;
+                float: right;
+                margin-right: 7px;
+              }
+            }
+          }
         }
       }
     }
