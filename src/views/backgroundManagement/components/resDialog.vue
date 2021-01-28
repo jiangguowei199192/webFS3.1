@@ -56,6 +56,10 @@ export default {
     drawType: {
       type: Number,
       default: 0
+    },
+    bVideoPoint: {
+      type: Boolean,
+      required: false
     }
   },
   data () {
@@ -95,7 +99,9 @@ export default {
   created () {
     if (this.drawType === 0) {
       this.toolItems.push(this.pointItem)
-      this.toolItems.push(this.areaItem)
+      if (!this.bVideoPoint) {
+        this.toolItems.push(this.areaItem)
+      }
     } else if (this.drawType === 1) {
       this.toolItems.push(this.lineItem)
       this.toolItems.push(this.pointItem)
@@ -114,15 +120,16 @@ export default {
       this.$emit('update:isShow', false)
     },
     /**
-     * 
+     * 功能按钮
      */
     clickToolItem (item) {
-      this.toolItems.forEach(t => {
-        if (item !== t) {
-          t.isSelect = false
-        }
-      })
       if (item.name === 'point' || item.name === 'line' || item.name === 'area') {
+        this.toolItems.forEach(t => {
+          if (item !== t) {
+            t.isSelect = false
+          }
+        })
+
         this.initCoustomDrawHelper()
         if (item.isSelect) {
           item.isSelect = false
@@ -149,10 +156,22 @@ export default {
       }
       this.bHasInitDrawHelper = true
       const drawHelper = this.$refs.gduMap.map2D.customDrawHelper
-      //限定绘图类型及该类型图案个数
+      // 0:不能修改；1:仅能修改当前类型；2:可修改所有类型。
+      drawHelper.modifyFlag = 2
+      // true:多边形或线段可以添加顶点;false:多边形或线段不可以添加顶点。
+      drawHelper.bCanAddVertex = true
+      // true，显示线段长度；false，不显示线段长度。
+      drawHelper.bShowLineText = true
+      // true，显示面积；false，不显示面积。
+      drawHelper.bShowAreaText = false
+      // 设置长度、面积显示的背景色及文字颜色
+      // drawHelper.setTextStyle('rgba(128,0,88,1)','rgba(33,128,66,0.6)')
+      // true,显示"单击继续,双击结束!"提示；false,不显示。
+      drawHelper.bShowDrawToolTip = true
+      // 限定绘图类型及该类型图案个数
       drawHelper.limitedType = this.drawType
       drawHelper.limitedCount = 1
-      //设置是否自动删除一个图案，继而可以继续绘图。
+      // 设置是否自动删除一个图案，继而可以继续绘图。
       drawHelper.bAutoRemove = true
       // 注册新绘图或修改图案回调事件
       drawHelper.addOrMoveEvent.addEventListener(
