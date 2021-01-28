@@ -1,6 +1,12 @@
 <template>
   <div>
-    <ResDialog :title="title" :drawType="0" :bVideoPoint="true" :isShow.sync="isShow">
+    <ResDialog
+      :title="title"
+      :drawType="0"
+      :bVideoPoint="true"
+      :isShow.sync="isShow"
+      @mapResAddOrModify="mapResAddOrModify"
+    >
       <div slot="content" class="lineContent mapResForm">
         <div class="pTitle">
           <span></span>
@@ -189,7 +195,11 @@ export default {
      */
     addRes () {
       this.isShow = true
-    }
+    },
+    /**
+     * 新增或修改图形回调处理
+     */
+    mapResAddOrModify (data) {}
   }
 }
 </script>
