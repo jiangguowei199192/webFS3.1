@@ -103,6 +103,7 @@ export default {
 }
 
 .base-div {
+  min-width: 600px;
   height: 674px;
   background-color: #183157;
   margin-left: 30px;

@@ -38,7 +38,6 @@
         default-expand-all
         node-key="deptCode"
         :current-node-key="selectedDept.deptCode"
-        v-if="selectedDept.deptCode"
         class="dept-tree"
         @node-contextmenu="deptTreeRightCick"
       ></el-tree>
@@ -193,34 +192,40 @@ export default {
       institutionSearch: '',
       deptTree: [
         {
-          deptName: '东海化工',
+          deptName: '湖北省应急管理厅',
           deptCode: '1',
-          showSetting: true,
           children: [
+            { deptName: '孝感市应急管理局', deptCode: '1-1' },
             {
-              deptName: '东海化工一厂',
-              deptCode: '1-1',
-              showSetting: false,
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
               children: [
                 {
-                  deptName: '东海化工一厂一车间',
-                  deptCode: '1-1-1',
-                  showSetting: false
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1'
                 }
               ]
             },
-            {
-              deptName: '东海化工二厂',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '东海化工二厂一车间',
-                  deptCode: '1-2-1',
-                  showSetting: false
-                }
-              ]
-            }
+            { deptName: '孝感市应急管理局', deptCode: '1-3' },
+            { deptName: '孝感市应急管理局', deptCode: '1-4' },
+            { deptName: '孝感市应急管理局', deptCode: '1-5' },
+            { deptName: '孝感市应急管理局', deptCode: '1-6' },
+            { deptName: '孝感市应急管理局', deptCode: '1-7' },
+            { deptName: '孝感市应急管理局', deptCode: '1-8' },
+            { deptName: '孝感市应急管理局', deptCode: '1-9' },
+            { deptName: '孝感市应急管理局', deptCode: '1-10' },
+            { deptName: '孝感市应急管理局', deptCode: '1-11' },
+            { deptName: '孝感市应急管理局', deptCode: '1-12' },
+            { deptName: '孝感市应急管理局', deptCode: '1-13' },
+            { deptName: '孝感市应急管理局', deptCode: '1-14' },
+            { deptName: '孝感市应急管理局', deptCode: '1-15' },
+            { deptName: '孝感市应急管理局', deptCode: '1-16' },
+            { deptName: '孝感市应急管理局', deptCode: '1-17' },
+            { deptName: '孝感市应急管理局', deptCode: '1-18' },
+            { deptName: '孝感市应急管理局', deptCode: '1-19' },
+            { deptName: '孝感市应急管理局', deptCode: '1-20' },
+            { deptName: '孝感市应急管理局', deptCode: '1-21' },
+            { deptName: '孝感市应急管理局', deptCode: '1-22' }
           ]
         }
       ],
@@ -233,6 +238,21 @@ export default {
       showDeptTreeRightMenu: false,
       peopleSearch: '',
       peopleList: [
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
+        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
         { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
         { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
         { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
@@ -250,7 +270,7 @@ export default {
     }
   },
   created () {
-    this.selectedDept = this.deptTree[0]
+    // this.selectedDept = this.deptTree[0]
   },
   methods: {
     // 搜索机构时触发
@@ -466,6 +486,7 @@ export default {
   background: orange;
 }
 .right-div {
+  min-width: 800px;
   height: 814px;
   background-color: #183157;
   margin-left: 360px;

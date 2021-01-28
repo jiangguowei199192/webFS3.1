@@ -95,13 +95,22 @@
         ></el-pagination>
       </div>
     </div>
+
+    <DataPermissionDialog
+      :isShow.sync="showDataPermission"
+      @close="showDataPermission = false"
+      @cancelClick="showDataPermission = false"
+      @confirmClick="dataAuthConfirmClick"
+    ></DataPermissionDialog>
   </div>
 </template>
 
 <script>
+import DataPermissionDialog from './components/dataPermissionDialog.vue'
 
 export default {
   components: {
+    DataPermissionDialog
   },
   data () {
     return {
@@ -134,11 +143,27 @@ export default {
         { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
         { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
         { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
+        { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 },
         { resourceName: '江汉路', address: '武汉市江汉区江汉路', type: '商业', management: '江汉区商务局', num: 2 }
       ],
       pageTotal: 100,
       pageSize: 0,
-      currentPage: 1
+      currentPage: 1,
+      showDataPermission: false
     }
   },
   created () {
@@ -155,7 +180,14 @@ export default {
     userResetClick () {},
 
     // 数据授权时触发
-    dataAuthClick () {},
+    dataAuthClick () {
+      this.showDataPermission = true
+    },
+
+    // 数据授权确认时触发
+    dataAuthConfirmClick () {
+      this.showDataPermission = false
+    },
 
     // 多选时触发
     handleSelectionChange () {},
@@ -245,6 +277,7 @@ export default {
 }
 
 .right-div {
+  min-width: 800px;
   height: 814px;
   background-color: #183157;
   margin-left: 360px;
@@ -333,5 +366,4 @@ export default {
     }
   }
 }
-
 </style>

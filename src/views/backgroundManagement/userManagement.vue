@@ -192,10 +192,7 @@ export default {
           deptName: '湖北省应急管理厅',
           deptCode: '1',
           children: [
-            {
-              deptName: '孝感市应急管理局',
-              deptCode: '1-1'
-            },
+            { deptName: '孝感市应急管理局', deptCode: '1-1' },
             {
               deptName: '武汉市应急管理局',
               deptCode: '1-2',
@@ -205,7 +202,27 @@ export default {
                   deptCode: '1-2-1'
                 }
               ]
-            }
+            },
+            { deptName: '孝感市应急管理局', deptCode: '1-3' },
+            { deptName: '孝感市应急管理局', deptCode: '1-4' },
+            { deptName: '孝感市应急管理局', deptCode: '1-5' },
+            { deptName: '孝感市应急管理局', deptCode: '1-6' },
+            { deptName: '孝感市应急管理局', deptCode: '1-7' },
+            { deptName: '孝感市应急管理局', deptCode: '1-8' },
+            { deptName: '孝感市应急管理局', deptCode: '1-9' },
+            { deptName: '孝感市应急管理局', deptCode: '1-10' },
+            { deptName: '孝感市应急管理局', deptCode: '1-11' },
+            { deptName: '孝感市应急管理局', deptCode: '1-12' },
+            { deptName: '孝感市应急管理局', deptCode: '1-13' },
+            { deptName: '孝感市应急管理局', deptCode: '1-14' },
+            { deptName: '孝感市应急管理局', deptCode: '1-15' },
+            { deptName: '孝感市应急管理局', deptCode: '1-16' },
+            { deptName: '孝感市应急管理局', deptCode: '1-17' },
+            { deptName: '孝感市应急管理局', deptCode: '1-18' },
+            { deptName: '孝感市应急管理局', deptCode: '1-19' },
+            { deptName: '孝感市应急管理局', deptCode: '1-20' },
+            { deptName: '孝感市应急管理局', deptCode: '1-21' },
+            { deptName: '孝感市应急管理局', deptCode: '1-22' }
           ]
         }
       ],
@@ -217,6 +234,21 @@ export default {
       selectedDept: '',
       userSearch: '',
       userList: [
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
+        { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
         { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
         { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
         { username: 'syh', account: 'songyunhui', phone: '13687909090', roleCount: 3, bindPeople: '宋运辉', num: 2, enable: true },
@@ -345,7 +377,7 @@ export default {
     }
   }
   .dept-tree {
-    height: 646px;
+    height: 696px;
     overflow: auto;
     margin-top: 15px;
     background-color: transparent;
@@ -389,6 +421,7 @@ export default {
 }
 
 .right-div {
+  min-width: 800px;
   height: 814px;
   background-color: #183157;
   margin-left: 360px;
