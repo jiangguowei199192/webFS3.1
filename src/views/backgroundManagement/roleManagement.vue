@@ -191,6 +191,26 @@ export default {
         { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
         { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
         { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
+        { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 },
         { roleName: '角色1', userCount: 10, status: '在用', authorization: '已授权', num: 2 }
       ],
       pageTotal: 100,
@@ -269,6 +289,7 @@ export default {
 }
 
 .base-div {
+  min-width: 1150px;
   height: 814px;
   background-color: #183157;
   margin-left: 30px;
