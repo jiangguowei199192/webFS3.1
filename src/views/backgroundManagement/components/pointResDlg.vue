@@ -1,6 +1,12 @@
 <template>
   <div>
-    <ResDialog :title="title" :drawType="0" :isShow.sync="isShow">
+    <ResDialog
+      :title="title"
+      :drawType="0"
+      :isShow.sync="isShow"
+      @mapResAddOrModify="mapResAddOrModify"
+      ref="resDlg"
+    >
       <div slot="content" class="pointContent mapResForm">
         <div class="pTitle">
           <span></span>
@@ -139,7 +145,8 @@
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
-                      background: 'url(' + serverUrl + item.path + ') no-repeat'
+                      background:
+                        'url(' + serverUrl + item.path + ') no-repeat',
                     }"
                   ></span>
                 </div>
@@ -170,13 +177,13 @@
           </el-form-item>
         </el-form>
         <div class="listForm">
-          <div class="pTitle">
+          <div class="pTitle" v-show="ctlAreas.length > 0">
             <span></span>
             <span>管控范围信息</span>
           </div>
-          <template v-for="(item, index) in ctlAreas">
-            <div :key="index">
-              <span class="del"></span>
+          <template v-for="item in ctlAreas">
+            <div :key="item.id">
+              <span class="del" @click.stop="deleteArea(item)"></span>
               <el-form
                 :model="item"
                 :inline="true"
@@ -229,6 +236,9 @@
                     v-model="item.lineWidth"
                     :min="1"
                     :max="10"
+                    :step="1"
+                    step-strictly
+                    @blur="lineStyleChange(item)"
                   ></el-input-number>
                   <span v-else>{{ item.lineWidth }}</span>
                 </el-form-item>
@@ -237,6 +247,7 @@
                     v-model="item.lineColor"
                     show-alpha
                     :disabled="disabled"
+                    @change="lineStyleChange(item)"
                   ></el-color-picker>
                 </el-form-item>
                 <el-form-item label="填充颜色 :" prop="fillColor">
@@ -244,6 +255,7 @@
                     v-model="item.fillColor"
                     show-alpha
                     :disabled="disabled"
+                    @change="fillColorChange(item)"
                   ></el-color-picker>
                 </el-form-item>
                 <el-form-item label="备注 :" class="note">
@@ -287,17 +299,17 @@ export default {
       areas: [],
       resTypes: [],
       showPopover: false,
-      ctlAreas: [
-        {
-          name: '',
-          type: '',
-          organ: '',
-          lineWidth: '',
-          note: '',
-          lineColor: '',
-          fillColor: ''
-        }
-      ], // 管辖范围
+      area: {
+        id: '',
+        name: '',
+        type: '',
+        organ: '',
+        lineWidth: 2,
+        note: '',
+        lineColor: 'rgba(0, 204, 255, 1)',
+        fillColor: 'rgba(0, 204, 255, 0.4)'
+      },
+      ctlAreas: [], // 管辖范围
       areaRules: {
         name: [{ required: true, message: '请输入名称' }],
         lineColor: [{ required: true, message: '请选择线段颜色' }],
@@ -314,7 +326,7 @@ export default {
         lon: [{ required: true, message: '请输入经度' }]
       },
       resForm: {
-        name: '11111',
+        name: '',
         addr: '',
         type: '',
         phone: '',
@@ -328,7 +340,8 @@ export default {
         note: '',
         icon:
           'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-      }
+      },
+      pointId: ''
     }
   },
   watch: {
@@ -346,6 +359,63 @@ export default {
      */
     addRes () {
       this.isShow = true
+    },
+    /**
+     *  管辖区域填充颜色改变
+     */
+    fillColorChange (item) {
+      const data = {
+        drawId: item.id,
+        drawType: 2,
+        fillStyle: { color: item.fillColor }
+      }
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
+     *  管辖区域线段样式改变
+     */
+    lineStyleChange (item) {
+      const data = {
+        drawId: item.id,
+        drawType: 2,
+        strokeStyle: {
+          color: item.lineColor,
+          width: item.lineWidth
+        }
+      }
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
+     *  删除管辖区域
+     */
+    deleteArea (item) {
+      this.$confirm('确定要删除此管辖区域吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false
+      })
+        .then(() => {
+          const index = this.ctlAreas.indexOf(item)
+          if (index !== -1) {
+            this.$refs.resDlg.removeFeatureByID(item.id)
+            this.ctlAreas.splice(index, 1)
+          }
+        })
+        .catch(() => {})
+    },
+    /**
+     *  地图资源添加或修改
+     */
+    mapResAddOrModify (data) {
+      if (data.drawType === 0) {
+        this.pointId = data.drawId
+        this.resForm.lon = data.coordinates[0].toFixed(7)
+        this.resForm.lat = data.coordinates[1].toFixed(7)
+      } else if (data.drawType === 2) {
+        var area = JSON.parse(JSON.stringify(this.area))
+        area.id = data.drawId
+        this.ctlAreas.push(area)
+      }
     }
   }
 }

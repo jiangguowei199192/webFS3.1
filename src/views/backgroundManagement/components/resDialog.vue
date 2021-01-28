@@ -178,8 +178,24 @@ export default {
         this.addOrModifyEventCB.bind(this)
       )
     },
+    /**
+     *  地图操作回调
+     */
     addOrModifyEventCB (data) {
       console.log('addOrModifyEventCB:', data)
+      this.$emit('mapResAddOrModify', data)
+    },
+    /**
+     *  删除绘制元素
+     */
+    removeFeatureByID (id) {
+      this.$refs.gduMap.map2D.customDrawHelper.removeFeatureByID(id)
+    },
+    /**
+     *  修改绘制元素
+     */
+    addOrUpdateFeature (data) {
+      this.$refs.gduMap.map2D.customDrawHelper.addOrUpdateFeature(data)
     }
   }
 }
