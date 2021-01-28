@@ -106,6 +106,8 @@
                 empty-text="暂无数据"
                 height="320"
                 @selection-change="handleSelectionChange"
+                @select="accountSelect"
+                @select-all="accountSelectAll"
               >
                 <el-table-column type="selection"></el-table-column>
                 <el-table-column
@@ -139,7 +141,7 @@
                 ></el-table-column>
               </el-table>
 
-              <div style="text-align: center;">
+              <div style="text-align: center">
                 <el-pagination
                   class="tablePagination"
                   popper-class="pageSelect"
@@ -154,10 +156,15 @@
           </div>
 
           <div class="selected-user-div">
-            <div class="selected-title">用户列表</div>
+            <div class="selected-title">已关联用户</div>
             <div class="selected-box">
-              <div class="selected-item" v-for="item in selectedAccounts" :key="item.id" @click="deleteSelectedAccount(item)">
-                <span class="item-text">{{item.label}}</span>
+              <div
+                class="selected-item"
+                v-for="item in selectedAccounts"
+                :key="item.userNum"
+                @click="deleteSelectedAccount(item)"
+              >
+                <span class="item-text">{{ item.name }}</span>
                 <i class="el-icon-close item-delete"></i>
               </div>
             </div>
@@ -235,71 +242,71 @@ export default {
       accountList: [
         {
           userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          username: '00001',
+          name: '00001',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00002',
+          username: '00002',
+          name: '00002',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00003',
+          username: '00003',
+          name: '00003',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00004',
+          username: '00004',
+          name: '00004',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00005',
+          username: '00005',
+          name: '00005',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00006',
+          username: '00006',
+          name: '00006',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00007',
+          username: '00007',
+          name: '00007',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00008',
+          username: '00008',
+          name: '00008',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00009',
+          username: '00009',
+          name: '00009',
           phone: '12311223333',
           enable: '有效'
         },
         {
-          userNum: '00001',
-          username: 'nicai',
-          name: 'caibudao',
+          userNum: '00010',
+          username: '00010',
+          name: '00010',
           phone: '12311223333',
           enable: '有效'
         }
@@ -307,13 +314,7 @@ export default {
       pageTotal: 100,
       pageSize: 10,
       currentPage: 1,
-      selectedAccounts: [
-        { id: 1, label: '刘德华' },
-        { id: 2, label: '周润发' },
-        { id: 3, label: '肖战' },
-        { id: 4, label: '王一博' },
-        { id: 5, label: '南楚歌' }
-      ]
+      selectedAccounts: []
     }
   },
   methods: {
@@ -331,12 +332,54 @@ export default {
 
     accountResetClick () {},
 
-    handleSelectionChange (row) {
-      // console.log(row)
+    // 表格选中某一行时触发
+    handleSelectionChange (items) {
+      // items.forEach((item) => {
+      //   if (this.selectedAccounts.indexOf(item) === -1) {
+      //     this.selectedAccounts.push(item);
+      //   }
+      // });
+    },
+    // 选择单行
+    accountSelect (selection, row) {
+      if (selection.indexOf(row) === -1) {
+        // 取消选中
+        console.log('取消选中')
+        const index = this.selectedAccounts.indexOf(row)
+        if (index > -1) {
+          this.selectedAccounts.splice(index, 1)
+        }
+      } else {
+        // 选中
+        console.log('选中')
+        this.selectedAccounts.push(row)
+      }
+    },
+    // 全选或全不选
+    accountSelectAll (selection) {
+      if (selection && selection.length) {
+        console.log('全选')
+        var _this1 = this
+        selection.forEach((item) => {
+          if (_this1.selectedAccounts.indexOf(item) === -1) {
+            _this1.selectedAccounts.push(item)
+          }
+        })
+      } else {
+        console.log('全不选')
+        var _this2 = this
+        this.accountList.forEach((item) => {
+          const index = _this2.selectedAccounts.indexOf(item)
+          if (index > -1) {
+            _this2.selectedAccounts.splice(index, 1)
+          }
+        })
+      }
     },
 
     currentPageChange () {},
 
+    // 删除已选中用户时触发
     deleteSelectedAccount (item) {
       const index = this.selectedAccounts.indexOf(item)
       if (index > -1) {
@@ -645,7 +688,7 @@ export default {
 
               /* 表格每行高度*/
               .el-table__body td {
-                height: 38px;
+                height: 28px;
                 padding: 0;
               }
 
@@ -686,7 +729,7 @@ export default {
           .selected-title {
             height: 40px;
             line-height: 40px;
-            color: #00CCFF;
+            color: #00ccff;
             font-size: 14px;
             text-align: center;
           }
@@ -698,7 +741,7 @@ export default {
               height: 25px;
               margin-left: 10px;
               margin-bottom: 10px;
-              background-color: #39A4DD;
+              background-color: #39a4dd;
               border-radius: 2px;
               text-align: center;
               cursor: pointer;
