@@ -148,7 +148,14 @@ export default {
         return
       }
       this.bHasInitDrawHelper = true
-      this.$refs.gduMap.map2D.customDrawHelper.addOrMoveEvent.addEventListener(
+      const drawHelper = this.$refs.gduMap.map2D.customDrawHelper
+      //限定绘图类型及该类型图案个数
+      drawHelper.limitedType = this.drawType
+      drawHelper.limitedCount = 1
+      //设置是否自动删除一个图案，继而可以继续绘图。
+      drawHelper.bAutoRemove = true
+      // 注册新绘图或修改图案回调事件
+      drawHelper.addOrMoveEvent.addEventListener(
         this.addOrModifyEventCB.bind(this)
       )
     },
