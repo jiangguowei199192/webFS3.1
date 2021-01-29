@@ -234,7 +234,7 @@
                     ></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="线宽 :">
+                <el-form-item label="线宽 :" prop="lineWidth">
                   <el-input-number
                     v-if="!disabled"
                     v-model="item.lineWidth"
@@ -283,11 +283,7 @@
 
 <script>
 import ResDialog from './resDialog.vue'
-import {
-  isNotNull,
-  lonValidate,
-  latValidate
-} from '@/utils/formRules'
+import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 
 export default {
   props: {
@@ -325,7 +321,8 @@ export default {
         name: [{ required: true, message: '请输入名称' }],
         lineColor: [{ required: true, message: '请选择线段颜色' }],
         organ: [{ required: true, message: '请选择所属机构' }],
-        fillColor: [{ required: true, message: '请选择填充颜色' }]
+        fillColor: [{ required: true, message: '请选择填充颜色' }],
+        lineWidth: [{ required: true, message: '请输入线宽' }]
       },
       formRules: {
         name: [{ required: true, message: '请输入资源名称' }],
@@ -369,16 +366,19 @@ export default {
       let latV = true
       let lonV = true
       this.$refs.pointForm.validateField('lat', (valid) => {
-        if (valid)latV = false
+        if (valid) latV = false
       })
       this.$refs.pointForm.validateField('lon', (valid) => {
-        if (valid)lonV = false
+        if (valid) lonV = false
       })
       if (latV && lonV) {
         const data = {
           drawId: this.pointId,
           drawType: 0,
-          coordinates: [parseFloat(this.resForm.lon), parseFloat(this.resForm.lat)]
+          coordinates: [
+            parseFloat(this.resForm.lon),
+            parseFloat(this.resForm.lat)
+          ]
         }
         this.$refs.resDlg.addOrUpdateFeature(data)
       }
@@ -400,6 +400,7 @@ export default {
      *  管辖区域线段宽度改变
      */
     lineWidthChange (item) {
+      if (!item.lineWidth) return
       item.lineWidth = Math.round(item.lineWidth)
       this.lineStyleChange(item)
     },
@@ -412,7 +413,6 @@ export default {
         drawType: 2,
         fillStyle: { color: item.fillColor }
       }
-      console.log(data)
       this.$refs.resDlg.addOrUpdateFeature(data)
     },
     /**
@@ -456,7 +456,7 @@ export default {
         this.resForm.lon = data.coordinates[0].toFixed(7)
         this.resForm.lat = data.coordinates[1].toFixed(7)
       } else if (data.drawType === 2) {
-        const a = this.ctlAreas.find(c => c.id === data.drawId)
+        const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {
           a.coordinates = data.coordinates
           return

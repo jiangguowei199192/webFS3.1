@@ -97,6 +97,16 @@ export default {
       bHasInitDrawHelper: false
     }
   },
+  watch: {
+    isShow (val) {
+      if (val) {
+        this.toolItems.forEach((t) => {
+          t.isSelect = false
+        })
+        this.$refs.gduMap.map2D.customDrawHelper.stop()
+      }
+    }
+  },
   created () {
     if (this.drawType === 0) {
       this.toolItems.push(this.pointItem)

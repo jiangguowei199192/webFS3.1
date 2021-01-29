@@ -120,11 +120,7 @@
             ></el-input>
           </el-form-item>
         </el-form>
-        <div class="boundary">
-          <div class="pTitle">
-            <span></span>
-            <span>标识点信息 </span>
-          </div>
+        <div>
           <PointMarkerForm></PointMarkerForm>
         </div>
       </div>

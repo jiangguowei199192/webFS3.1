@@ -1,13 +1,18 @@
 <template>
   <div class="listForm">
+    <div class="pTitle" v-show="list.length > 0">
+      <span></span>
+      <span>标识点信息 </span>
+    </div>
     <template v-for="(item, index) in list">
       <div :key="index">
-        <span class="del"></span>
+        <span class="del" @click.stop="deleteMarker(item)"></span>
         <el-form
           :model="item"
           :inline="true"
           label-width="90px"
           :rules="formRules"
+          ref="markerForm"
         >
           <el-form-item label="名称 :" prop="name">
             <el-input
@@ -94,7 +99,8 @@
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
-                      background: 'url(' + serverUrl + item.path + ') no-repeat'
+                      background:
+                        'url(' + serverUrl + item.path + ') no-repeat',
                     }"
                   ></span>
                 </div>
@@ -130,6 +136,7 @@
 </template>
 
 <script>
+import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 export default {
   props: {
     // 是否禁止编辑
@@ -147,26 +154,26 @@ export default {
       organs: [],
       areas: [],
       showPopover: false,
-      list: [
-        {
-          name: '',
-          addr: '',
-          type: '',
-          organ: '',
-          note: '',
-          sort: '',
-          lon: '',
-          lat: '',
-          icon:
-            'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-        }
-      ],
+      point: {
+        id: '',
+        name: '',
+        addr: '',
+        type: '',
+        organ: '',
+        note: '',
+        sort: '',
+        lon: '',
+        lat: '',
+        icon:
+          'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      },
+      list: [],
       formRules: {
         name: [{ required: true, message: '请输入资源名称' }],
         organ: [{ required: true, message: '请选择所属机构' }],
         icon: [{ required: true, message: '请选择图标' }],
-        lat: [{ required: true, message: '请输入纬度' }],
-        lon: [{ required: true, message: '请输入经度' }]
+        lon: isNotNull('请输入经度').concat(lonValidate()),
+        lat: isNotNull('请输入纬度').concat(latValidate())
       }
     }
   },
@@ -176,7 +183,64 @@ export default {
       this.placeholder2 = val ? '' : '请选择'
     }
   },
-  methods: {}
+  methods: {
+    /**
+     *  标记点添加或修改
+     */
+    addOrModifyPoint (data) {
+      const a = this.list.find((c) => c.id === data.drawId)
+      const lon = data.coordinates[0].toFixed(7)
+      const lat = data.coordinates[1].toFixed(7)
+      if (a !== undefined) {
+        a.lon = lon
+        a.lat = lat
+        return
+      }
+      var point = JSON.parse(JSON.stringify(this.point))
+      point.id = data.drawId
+      point.lon = lon
+      point.lat = lat
+      this.list.push(point)
+    },
+    /**
+     *  删除标记点
+     */
+    deleteMarker (item) {
+      this.$confirm('确定要删除此标识点吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false
+      })
+        .then(() => {
+          const index = this.list.indexOf(item)
+          if (index !== -1) {
+            this.$emit('removeFeature', item.id)
+            this.list.splice(index, 1)
+          }
+        })
+        .catch(() => {})
+    },
+    /**
+     *  表单验证
+     */
+    formValid () {
+      const vList = []
+      let i = 0
+      for (; i < this.list.length; i++) {
+        this.$refs.markerForm[i].validate((valid) => {
+          vList.push(valid)
+        })
+      }
+      const result = vList.every((v) => v === true)
+      return result
+    },
+    /**
+     *  重置数据
+     */
+    resetData () {
+      this.list = []
+    }
+  }
 }
 </script>
 

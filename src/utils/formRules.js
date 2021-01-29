@@ -28,6 +28,20 @@ export function latValidate () {
   return rules
 }
 
+// 数字验证（是否是数字）
+export function numberValidate (msg) {
+  const rules = []
+  rules.push({
+    validator: (rule, value, callback) => {
+      if (!value) callback()
+      else if (!isNaN(value)) { callback() } else { callback(new Error(msg)) }
+    },
+    message: '',
+    trigger: 'blur'
+  })
+  return rules
+}
+
 // 字符串不能为空
 export function isNotNull (msg) {
   const rules = []

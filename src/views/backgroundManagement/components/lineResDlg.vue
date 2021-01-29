@@ -1,6 +1,13 @@
 <template>
   <div>
-    <ResDialog :title="title" :drawType="1" :isShow.sync="isShow">
+    <ResDialog
+      :title="title"
+      :drawType="1"
+      :isShow.sync="isShow"
+      @mapResAddOrModify="mapResAddOrModify"
+      @submitResForm="submitResForm"
+      ref="resDlg"
+    >
       <div slot="content" class="lineContent mapResForm">
         <div class="pTitle">
           <span></span>
@@ -12,6 +19,7 @@
           label-width="90px"
           style="margin-top: 17px"
           :rules="formRules"
+          ref="lineForm"
         >
           <el-form-item label="资源名称 :" prop="name">
             <el-input
@@ -94,7 +102,7 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="总长度 :">
+          <el-form-item label="总长度 :" prop="totalLen">
             <el-input
               v-model="resForm.totalLen"
               :placeholder="placeholder"
@@ -115,6 +123,7 @@
               v-model="resForm.lineColor"
               show-alpha
               :disabled="disabled"
+              @change="lineStyleChange()"
             ></el-color-picker>
           </el-form-item>
           <el-form-item label="线宽 :" prop="lineWidth">
@@ -123,6 +132,9 @@
               v-model="resForm.lineWidth"
               :min="1"
               :max="10"
+              :step="1"
+              step-strictly
+              @change="lineStyleChange()"
             ></el-input-number>
             <span v-else>{{ resForm.lineWidth }}</span>
           </el-form-item>
@@ -137,12 +149,11 @@
             ></el-input>
           </el-form-item>
         </el-form>
-        <div class="boundary">
-          <div class="pTitle">
-            <span></span>
-            <span>标识点信息 </span>
-          </div>
-          <PointMarkerForm></PointMarkerForm>
+        <div>
+          <PointMarkerForm
+            ref="markerForm"
+            @removeFeature="removeMarker"
+          ></PointMarkerForm>
         </div>
       </div>
     </ResDialog>
@@ -152,6 +163,7 @@
 <script>
 import ResDialog from './resDialog.vue'
 import PointMarkerForm from './pointMarkerForm.vue'
+import { numberValidate } from '@/utils/formRules'
 export default {
   props: {
     // 是否禁止编辑
@@ -174,10 +186,11 @@ export default {
         type: [{ required: true, message: '请选择资源类型' }],
         organ: [{ required: true, message: '请选择所属机构' }],
         lineWidth: [{ required: true, message: '请输入线宽' }],
-        lineColor: [{ required: true, message: '请选择线段颜色' }]
+        lineColor: [{ required: true, message: '请选择线段颜色' }],
+        totalLen: numberValidate('请输入正确的总长度')
       },
       resForm: {
-        name: '11111',
+        name: '',
         type: '',
         phone: '',
         organ: '',
@@ -187,9 +200,11 @@ export default {
         totalLen: '',
         sort: '',
         note: '',
-        lineWidth: '',
-        lineColor: ''
-      }
+        lineWidth: 2,
+        lineColor: 'rgba(0, 204, 255, 1)',
+        coordinates: []
+      },
+      lineId: ''
     }
   },
   watch: {
@@ -208,6 +223,59 @@ export default {
      */
     addRes () {
       this.isShow = true
+      this.$nextTick(() => {
+        // 重置数据
+        this.$refs.lineForm.resetFields()
+        this.$refs.resDlg.clearCustomDraw()
+        this.$refs.markerForm.resetData()
+        this.lineId = ''
+      })
+    },
+    /**
+     *  线段样式改变
+     */
+    lineStyleChange () {
+      if (!this.resForm.lineWidth) return
+      this.resForm.lineWidth = Math.round(this.resForm.lineWidth)
+      const data = {
+        drawId: this.lineId,
+        drawType: 1,
+        strokeStyle: {
+          color: this.resForm.lineColor,
+          width: this.resForm.lineWidth
+        }
+      }
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
+     *  地图资源添加或修改
+     */
+    mapResAddOrModify (data) {
+      if (data.drawType === 0) {
+        this.$refs.markerForm.addOrModifyPoint(data)
+      } else if (data.drawType === 1) {
+        this.lineId = data.drawId
+        this.resForm.coordinates = data.coordinates
+        this.resForm.totalLen = data.length.toFixed(2)
+      }
+    },
+    /**
+     *  提交点资源数据
+     */
+    submitResForm () {
+      let vLine = ''
+      this.$refs.lineForm.validate((valid) => {
+        vLine = valid
+      })
+      const vMarker = this.$refs.markerForm.formValid()
+      if (vLine && vMarker) {
+      }
+    },
+    /**
+     *  删除标识点
+     */
+    removeMarker (id) {
+      this.$refs.resDlg.removeFeatureByID(id)
     }
   }
 }
