@@ -283,8 +283,8 @@ export default {
         icon: [{ required: true, message: '请选择图标' }]
       },
       resForm: {
-        type: '',
-        name: '11111',
+        type: 'WRJ',
+        name: '',
         devCode: '',
         address: '',
         organ: '',
@@ -318,7 +318,14 @@ export default {
     /**
      *  添加资源
      */
-    addRes () {
+    showResDlg (action, data = null) {
+      if (action === 'new') {
+        console.log('showResDlg.new.data:', data)
+      } else if (action === 'modify') {
+        console.log('showResDlg.modify.data:', data)
+      } else if (action === 'readonly') {
+        console.log('showResDlg.readonly.data:', data)
+      }
       this.isShow = true
     },
     updateLonOrLat (bIsLon) {

@@ -36,10 +36,12 @@ export default {
           width: '130',
           btList: [
             {
-              label: '修改'
+              label: '修改',
+              event: 'modify'
             },
             {
-              label: '查看'
+              label: '查看',
+              event: 'readonly'
             }
           ]
         }

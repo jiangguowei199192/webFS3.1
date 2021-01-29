@@ -30,6 +30,7 @@
           <el-switch
             v-if="item.type === 'switch'"
             v-model="scope.row[item.value]"
+            @change="switchClick($event, scope.row)"
           ></el-switch>
           <!-- 图片 -->
           <img
@@ -182,6 +183,12 @@ export default {
      */
     handleClick (event, data) {
       this.$emit('handleClick', event, data)
+    },
+    /**
+     * 开关控制点击
+     */
+    switchClick (event, data) {
+      this.$emit('switchClick', event, data)
     },
     /**
      *  处理参数

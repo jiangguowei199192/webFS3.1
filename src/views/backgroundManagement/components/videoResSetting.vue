@@ -77,7 +77,7 @@
           <span @click.stop="clearSelection">清空</span>
         </div>
         <div class="right">
-          <span @click.stop="addRes">添加</span>
+          <span @click.stop="showResDlg('new')">添加</span>
           <span>批量删除</span>
         </div>
       </div>
@@ -92,6 +92,8 @@
         :query="query"
         :api="api"
         :checkedList.sync="checkedList"
+        @handleClick="handleClick"
+        @switchClick="switchClick"
       ></PageTable>
     </div>
     <component ref="dlg" :is="dlgView"></component>
@@ -195,8 +197,21 @@ export default {
     /**
      *  添加资源
      */
-    addRes () {
-      this.$refs.dlg.addRes()
+    showResDlg (action) {
+      this.$refs.dlg.showResDlg(action)
+    },
+    /**
+     * 点击表单操作按钮
+     */
+    handleClick (event, data) {
+      this.$refs.dlg.showResDlg(event, data)
+    },
+    /**
+     * 点击表单开关操作按钮
+     */
+    switchClick (event, data) {
+      console.log('switchClick.event:', event)
+      console.log('switchClick.data:', data)
     }
   }
 }
