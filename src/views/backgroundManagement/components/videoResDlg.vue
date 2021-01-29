@@ -1,6 +1,7 @@
 <template>
   <div>
     <ResDialog
+      ref="resDlgCtrl"
       :title="title"
       :drawType="0"
       :bVideoPoint="true"
@@ -139,7 +140,7 @@
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
-              @change="updateLonOrLat(true)"
+              @input="updateLonOrLat(true)"
             ></el-input>
           </el-form-item>
           <el-form-item label="纬度 :">
@@ -148,7 +149,7 @@
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
-              @change="updateLonOrLat(true)"
+              @input="updateLonOrLat(false)"
             ></el-input>
           </el-form-item>
           <el-form-item label="高度 :" v-show="resForm.type === 'GDJK'">
@@ -323,6 +324,25 @@ export default {
     updateLonOrLat (bIsLon) {
       if (this.pointData === null) {
         return
+      }
+      if (bIsLon) {
+        if (this.resForm.longitude !== '') {
+          // eslint-disable-next-line
+          const lonreg = /^(\-|\+)?(((\d|[1-9]\d|1[0-7]\d|0{1,3})\.\d{0,14})|(\d|[1-9]\d|1[0-7]\d|0{1,3})|180\.0{0,14}|180)$/
+          if (lonreg.test(this.resForm.longitude)) {
+            this.pointData.coordinates[0] = parseFloat(this.resForm.longitude)
+            this.$refs.resDlgCtrl.addOrUpdateFeature(this.pointData)
+          }
+        }
+      } else {
+        if (this.resForm.latitude !== '') {
+          // eslint-disable-next-line
+          const latreg = /^(\-|\+)?([0-8]?\d{1}\.\d{0,14}|90\.0{0,14}|[0-8]?\d{1}|90)$/
+          if (latreg.test(this.resForm.latitude)) {
+            this.pointData.coordinates[1] = parseFloat(this.resForm.latitude)
+            this.$refs.resDlgCtrl.addOrUpdateFeature(this.pointData)
+          }
+        }
       }
     },
     /**
