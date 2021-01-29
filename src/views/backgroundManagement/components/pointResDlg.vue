@@ -5,6 +5,7 @@
       :drawType="0"
       :isShow.sync="isShow"
       @mapResAddOrModify="mapResAddOrModify"
+      @submitResForm="submitResForm"
       ref="resDlg"
     >
       <div slot="content" class="pointContent mapResForm">
@@ -98,6 +99,7 @@
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
+              @change="lanChange()"
             ></el-input>
           </el-form-item>
           <el-form-item label="纬度 :" prop="lat">
@@ -106,6 +108,7 @@
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
+              @change="lanChange()"
             ></el-input>
           </el-form-item>
           <el-form-item label="管理人员 :">
@@ -189,6 +192,7 @@
                 :inline="true"
                 label-width="90px"
                 :rules="areaRules"
+                ref="areaForm"
               >
                 <el-form-item label="名称 :" prop="name">
                   <el-input
@@ -238,7 +242,7 @@
                     :max="10"
                     :step="1"
                     step-strictly
-                    @blur="lineStyleChange(item)"
+                    @change="lineWidthChange(item)"
                   ></el-input-number>
                   <span v-else>{{ item.lineWidth }}</span>
                 </el-form-item>
@@ -279,6 +283,12 @@
 
 <script>
 import ResDialog from './resDialog.vue'
+import {
+  isNotNull,
+  lonValidate,
+  latValidate
+} from '@/utils/formRules'
+
 export default {
   props: {
     // 是否禁止编辑
@@ -307,7 +317,8 @@ export default {
         lineWidth: 2,
         note: '',
         lineColor: 'rgba(0, 204, 255, 1)',
-        fillColor: 'rgba(0, 204, 255, 0.4)'
+        fillColor: 'rgba(0, 204, 255, 0.4)',
+        coordinates: []
       },
       ctlAreas: [], // 管辖范围
       areaRules: {
@@ -322,8 +333,8 @@ export default {
         type: [{ required: true, message: '请选择资源类型' }],
         organ: [{ required: true, message: '请选择所属机构' }],
         icon: [{ required: true, message: '请选择图标' }],
-        lat: [{ required: true, message: '请输入纬度' }],
-        lon: [{ required: true, message: '请输入经度' }]
+        lon: isNotNull('请输入经度').concat(lonValidate()),
+        lat: isNotNull('请输入纬度').concat(latValidate())
       },
       resForm: {
         name: '',
@@ -354,11 +365,43 @@ export default {
     ResDialog
   },
   methods: {
+    lanChange () {
+      let latV = true
+      let lonV = true
+      this.$refs.pointForm.validateField('lat', (valid) => {
+        if (valid)latV = false
+      })
+      this.$refs.pointForm.validateField('lon', (valid) => {
+        if (valid)lonV = false
+      })
+      if (latV && lonV) {
+        const data = {
+          drawId: this.pointId,
+          drawType: 0,
+          coordinates: [parseFloat(this.resForm.lon), parseFloat(this.resForm.lat)]
+        }
+        this.$refs.resDlg.addOrUpdateFeature(data)
+      }
+    },
     /**
      *  添加资源
      */
     addRes () {
       this.isShow = true
+      this.$nextTick(() => {
+        // 重置数据
+        this.$refs.pointForm.resetFields()
+        this.$refs.resDlg.clearCustomDraw()
+        this.pointId = ''
+        this.ctlAreas = []
+      })
+    },
+    /**
+     *  管辖区域线段宽度改变
+     */
+    lineWidthChange (item) {
+      item.lineWidth = Math.round(item.lineWidth)
+      this.lineStyleChange(item)
     },
     /**
      *  管辖区域填充颜色改变
@@ -369,6 +412,7 @@ export default {
         drawType: 2,
         fillStyle: { color: item.fillColor }
       }
+      console.log(data)
       this.$refs.resDlg.addOrUpdateFeature(data)
     },
     /**
@@ -412,9 +456,33 @@ export default {
         this.resForm.lon = data.coordinates[0].toFixed(7)
         this.resForm.lat = data.coordinates[1].toFixed(7)
       } else if (data.drawType === 2) {
+        const a = this.ctlAreas.find(c => c.id === data.drawId)
+        if (a !== undefined) {
+          a.coordinates = data.coordinates
+          return
+        }
         var area = JSON.parse(JSON.stringify(this.area))
         area.id = data.drawId
+        area.coordinates = data.coordinates
         this.ctlAreas.push(area)
+      }
+    },
+    /**
+     *  提交点资源数据
+     */
+    submitResForm () {
+      const vList = []
+      this.$refs.pointForm.validate((valid) => {
+        vList.push(valid)
+      })
+      let i = 0
+      for (; i < this.ctlAreas.length; i++) {
+        this.$refs.areaForm[i].validate((valid) => {
+          vList.push(valid)
+        })
+      }
+      const result = vList.every((v) => v === true)
+      if (result) {
       }
     }
   }

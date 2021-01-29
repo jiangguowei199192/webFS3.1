@@ -13,12 +13,13 @@
         <span>{{ title }}</span>
       </div>
       <div class="toolBox">
-        <div v-for="(item, index) in toolItems"
+        <div
+          v-for="(item, index) in toolItems"
           :key="index"
           class="toolBtn"
-          :class="[item.className,{toolBtnSelect: item.isSelect}]"
-          @click="clickToolItem(item)">
-        </div>
+          :class="[item.className, { toolBtnSelect: item.isSelect }]"
+          @click="clickToolItem(item)"
+        ></div>
       </div>
       <transition name="hideContent">
         <div class="contentBox" v-show="!unfold">
@@ -38,7 +39,7 @@
     </div>
     <div class="handelBtns">
       <span @click.stop="cancel">取消</span>
-      <span>保存</span>
+      <span @click.stop="save">保存</span>
     </div>
   </el-dialog>
 </template>
@@ -123,8 +124,12 @@ export default {
      * 功能按钮
      */
     clickToolItem (item) {
-      if (item.name === 'point' || item.name === 'line' || item.name === 'area') {
-        this.toolItems.forEach(t => {
+      if (
+        item.name === 'point' ||
+        item.name === 'line' ||
+        item.name === 'area'
+      ) {
+        this.toolItems.forEach((t) => {
           if (item !== t) {
             t.isSelect = false
           }
@@ -196,6 +201,18 @@ export default {
      */
     addOrUpdateFeature (data) {
       this.$refs.gduMap.map2D.customDrawHelper.addOrUpdateFeature(data)
+    },
+    /**
+     *  清除绘制
+     */
+    clearCustomDraw () {
+      this.$refs.gduMap.map2D.customDrawHelper.clear()
+    },
+    /**
+     *  保存
+     */
+    save () {
+      this.$emit('submitResForm')
     }
   }
 }
@@ -248,7 +265,7 @@ export default {
         font-size: 14px;
       }
     }
-    .toolBox{
+    .toolBox {
       position: absolute;
       top: 77px;
       left: 15px;
@@ -269,19 +286,19 @@ export default {
         opacity: 0.8;
       }
       .zoomIn {
-        background-image: url('../../../assets/images/backgroundManagement/zoomIn.png');
+        background-image: url("../../../assets/images/backgroundManagement/zoomIn.png");
       }
       .zoomOut {
-        background-image: url('../../../assets/images/backgroundManagement/zoomOut.png');
+        background-image: url("../../../assets/images/backgroundManagement/zoomOut.png");
       }
       .point {
-        background-image: url('../../../assets/images/backgroundManagement/pointType.png');
+        background-image: url("../../../assets/images/backgroundManagement/pointType.png");
       }
       .line {
-        background-image: url('../../../assets/images/backgroundManagement/lineType.png');
+        background-image: url("../../../assets/images/backgroundManagement/lineType.png");
       }
       .area {
-        background-image: url('../../../assets/images/backgroundManagement/areaType.png');
+        background-image: url("../../../assets/images/backgroundManagement/areaType.png");
       }
     }
     .hideContent-enter,
