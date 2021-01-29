@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible="isShow" width="1080px" class="resDlg">
+  <el-dialog :visible="isShow" width="1440px" class="resDlg">
     <div>
       <gMap
         ref="gduMap"
@@ -312,12 +312,12 @@ export default {
     .contentBox {
       display: flex;
       position: absolute;
-      top: 97px;
+      top: 50px;
       right: 0px;
       align-items: center;
       .content {
         width: 496px;
-        height: 447px;
+        height: 520px;
         background: rgba($color: #121e3a, $alpha: 0.95);
       }
       .unfold {

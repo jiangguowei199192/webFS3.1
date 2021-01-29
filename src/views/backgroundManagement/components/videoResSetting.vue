@@ -3,42 +3,70 @@
     <div class="title">设备数据 / {{ subTitle }}</div>
     <div class="mainBox">
       <div>{{ subTitle }}</div>
-      <div class="toolBox">
-        <span class="txt1">资源类型:</span>
-        <el-select v-model="res" placeholder="请选择" clearable class="select">
-          <el-option
-            v-for="(item, index) in resList"
-            :key="index"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <span class="txt2">所属机构:</span>
-        <el-select
-          v-model="organ"
-          placeholder="请选择"
-          clearable
-          class="select"
-        >
-          <el-option
-            v-for="(item, index) in organList"
-            :key="index"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <el-input
-          class="search"
-          v-model="searchStr"
-          placeholder="请输入资源名称/地址进行搜索"
-        ></el-input>
-        <div class="btn">
-          <img :src="searchIcon" />
-          <span>搜索</span>
+      <div>
+        <div class="toolBox">
+          <span class="txt1">视频类型:</span>
+          <el-select v-model="res" placeholder="请选择" clearable class="select commSelect">
+            <el-option
+              v-for="(item, index) in videoTypeList"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+          <span class="txt2">所属机构:</span>
+          <el-select
+            v-model="organ"
+            placeholder="请选择"
+            clearable
+            class="select commSelect"
+          >
+            <el-option
+              v-for="(item, index) in organList"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+          <span class="txt2">在线状态:</span>
+          <el-select
+            v-model="onlineStatus"
+            placeholder="请选择"
+            clearable
+            class="select commSelect"
+          >
+            <el-option
+              v-for="(item, index) in statusList"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </div>
-        <div class="btn resetBtn">
-          <img :src="resetIcon" />
-          <span>重置</span>
+        <div class="toolBox">
+          <span class="txt1">起始时间:</span>
+          <el-date-picker
+            v-model="dateRange"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            class="datePickerStyle"
+          ></el-date-picker>
+          <span class="txt2">搜索内容:</span>
+          <el-input
+            class="search inputSearch"
+            v-model="searchStr"
+            placeholder="请输入资源名称/地址进行搜索"
+          ></el-input>
+          <div class="btn" style="margin-left:40px;">
+            <img :src="searchIcon" />
+            <span>搜索</span>
+          </div>
+          <div class="btn resetBtn" style="margin-left:48px;">
+            <img :src="resetIcon" />
+            <span>重置</span>
+          </div>
         </div>
       </div>
       <div class="tablTool">
@@ -60,7 +88,7 @@
         :fieldList="tableInfo.fieldList"
         :handle="tableInfo.handle"
         :data.sync="tableInfo.data"
-        :tableHeight="610"
+        :tableHeight="560"
         :query="query"
         :api="api"
         :checkedList.sync="checkedList"
@@ -115,10 +143,31 @@ export default {
       selectCount: 0,
       searchIcon: require('../../../assets/images/backgroundManagement/searchIcon.png'),
       resetIcon: require('../../../assets/images/backgroundManagement/resetIcon.png'),
-      resList: [],
+      videoTypeList: [
+        {
+          value: 'WRJ',
+          label: '无人机'
+        },
+        {
+          value: 'GDJK',
+          label: '高点监控'
+        }
+      ],
       res: '',
       organList: [],
       organ: '',
+      statusList: [
+        {
+          value: 'online',
+          label: '在线'
+        },
+        {
+          value: 'offline',
+          label: '离线'
+        }
+      ],
+      onlineStatus: '',
+      dateRange: [],
       searchStr: '',
       checkedList: []
     }
@@ -165,13 +214,48 @@ export default {
     .toolBox {
       margin-top: 18px;
       .txt1 {
-        margin-right: 17px;
+        margin-right: 8px;
         margin-left: 12px;
       }
       .txt2 {
-        margin-right: 17px;
-        margin-left: 17px;
+        margin-right: 8px;
+        margin-left: 48px;
       }
+      .txt3 {
+        margin-right: 8px;
+        margin-left: 48px;
+      }
+    }
+    .commSelect {
+      width: 360px;
+    }
+    .datePickerStyle {
+      width: 360px;
+      height: 34px;
+      background-color: rgba(9, 84, 109, 0.3);
+      border-color: #39a4dd;
+      border-radius: 0px;
+      border: 1px solid #1eb0fc;
+      vertical-align:top;
+      padding: 3px 5px;
+    }
+    /deep/.el-date-editor .el-range-input {
+      color: #c5f3ff;
+      background: transparent;
+      font-size: 12px;
+    }
+    /deep/.el-range-separator {
+      color: white;
+      font-size: 12px;
+      line-height: 26px;
+    }
+    /deep/ .el-input__prefix,
+    /deep/ .el-input__icon {
+      line-height: 26px;
+    }
+    .inputSearch{
+      margin-left: 0px;
+      width: 360px;
     }
   }
 }
