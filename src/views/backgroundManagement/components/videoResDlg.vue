@@ -286,18 +286,14 @@
 import ResDialog from './resDialog.vue'
 export default {
   props: {
-    // 是否禁止编辑
-    disabled: {
-      type: Boolean,
-      default: false
-    }
   },
   data () {
     return {
+      disabled: false,
       placeholder: '请输入',
       placeholder2: '请选择',
       title: '新增视频资源',
-      isShow: true,
+      isShow: false,
       showPopover: false,
       infoTop: 80,
       infoHeight: 445,
@@ -422,18 +418,63 @@ export default {
     ResDialog
   },
   methods: {
+    setFormData (data) {
+      if (data) {
+        this.resForm.type = data.deviceTypeCode
+      } else {
+        this.resForm = {
+          type: 'WRJ',
+          name: '',
+          devCode: '',
+          address: '',
+          organ: '',
+          area: '',
+          enable: '',
+          brand: '',
+          model: '',
+          warrantyDate: '',
+          HStart: '',
+          HEnd: '',
+          VStart: '',
+          VEnd: '',
+          userName: '',
+          userPwd: '',
+          longitude: '',
+          latitude: '',
+          height: '',
+          baseOrientation: '',
+          sort: '',
+          icon: '',
+          note: ''
+        }
+      }
+    },
     /**
      *  添加资源
      */
     showResDlg (action, data = null) {
-      if (action === 'new') {
-        console.log('showResDlg.new.data:', data)
-      } else if (action === 'modify') {
-        console.log('showResDlg.modify.data:', data)
-      } else if (action === 'readonly') {
-        console.log('showResDlg.readonly.data:', data)
-      }
       this.isShow = true
+      if (action === 'new') {
+        this.$nextTick(() => {
+          // 重置数据
+          this.$refs.formCtrl.resetFields()
+          this.setFormData()
+          this.disabled = false
+        })
+      } else if (action === 'modify') {
+        this.$nextTick(() => {
+          this.setFormData(data)
+          this.disabled = false
+        })
+      } else if (action === 'readonly') {
+        this.$nextTick(() => {
+          this.setFormData(data)
+          this.disabled = true
+        })
+      }
+      this.$nextTick(() => {
+        this.updateDlgSize(this.resForm.type)
+      })
     },
     updateLonOrLat (bIsLon) {
       if (this.pointData === null) {
@@ -476,15 +517,17 @@ export default {
       this.resForm.longitude = data.coordinates[0].toFixed(7)
       this.resForm.latitude = data.coordinates[1].toFixed(7)
     },
-    devTypeChange (event) {
-      console.log('devTypeChange:', event)
-      if (event === 'WRJ') {
+    updateDlgSize (type) {
+      if (type === 'WRJ') {
         this.infoTop = 80
         this.infoHeight = 445
-      } else if (event === 'GDJK') {
+      } else if (type === 'GDJK') {
         this.infoTop = 30
         this.infoHeight = 560
       }
+    },
+    devTypeChange (event) {
+      this.updateDlgSize(event)
     }
   }
 }
