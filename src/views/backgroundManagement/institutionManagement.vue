@@ -8,7 +8,6 @@
         suffix-icon="el-icon-search"
         v-model="institutionSearch"
         placeholder=""
-        @change="institutionSearchChange"
       ></el-input>
       <div v-show="showDeptTreeRightMenu">
         <ul id="menu" class="dept-tree-right-menu">
@@ -33,13 +32,16 @@
         </ul>
       </div>
       <el-tree
+        ref="insDeptTreeRef"
         :data="deptTree"
         :props="deptTreeProps"
         default-expand-all
-        node-key="deptCode"
-        :current-node-key="selectedDept.deptCode"
+        @node-click="deptTreeClick"
+        :expand-on-click-node="false"
+        node-key="id"
         class="dept-tree"
         @node-contextmenu="deptTreeRightCick"
+        :filter-node-method="filterNode"
       ></el-tree>
       <div class="add-institution-btn" @click="addDeptClick">╋ 新增机构</div>
     </div>
@@ -79,25 +81,25 @@
         <el-table-column type="selection"></el-table-column>
         <el-table-column
           label="姓名"
-          prop="name"
+          prop="employeeName"
           align="center"
           :show-overflow-tooltip="true"
         ></el-table-column>
         <el-table-column
           label="所属机构"
-          prop="institution"
+          prop=""
           align="center"
           :show-overflow-tooltip="true"
         ></el-table-column>
         <el-table-column
           label="联系方式"
-          prop="phone"
+          prop="employeeTel"
           align="center"
           :show-overflow-tooltip="true"
         ></el-table-column>
         <el-table-column
           label="排序"
-          prop="num"
+          prop="employeeSort"
           align="center"
         ></el-table-column>
         <el-table-column label="操作" align="center">
@@ -173,6 +175,7 @@ import AddPeopleDialog from './components/addPeopleDialog.vue'
 import DeleteDialog from './components/deleteDialog.vue'
 import PeopleInfoDialog from './components/peopleInfoDialog.vue'
 import AddDeptDialog from './components/addDeptDialog.vue'
+import { backApi } from '@/api/back'
 
 export default {
   components: {
@@ -180,6 +183,11 @@ export default {
     DeleteDialog,
     PeopleInfoDialog,
     AddDeptDialog
+  },
+  watch: {
+    institutionSearch (val) {
+      this.$refs.insDeptTreeRef.filter(val)
+    }
   },
   data () {
     return {
@@ -190,45 +198,7 @@ export default {
       deptDeleteIcon: require('../../assets/images/backgroundManagement/deptDelete.png'),
 
       institutionSearch: '',
-      deptTree: [
-        {
-          deptName: '湖北省应急管理厅',
-          deptCode: '1',
-          children: [
-            { deptName: '孝感市应急管理局', deptCode: '1-1' },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1'
-                }
-              ]
-            },
-            { deptName: '孝感市应急管理局', deptCode: '1-3' },
-            { deptName: '孝感市应急管理局', deptCode: '1-4' },
-            { deptName: '孝感市应急管理局', deptCode: '1-5' },
-            { deptName: '孝感市应急管理局', deptCode: '1-6' },
-            { deptName: '孝感市应急管理局', deptCode: '1-7' },
-            { deptName: '孝感市应急管理局', deptCode: '1-8' },
-            { deptName: '孝感市应急管理局', deptCode: '1-9' },
-            { deptName: '孝感市应急管理局', deptCode: '1-10' },
-            { deptName: '孝感市应急管理局', deptCode: '1-11' },
-            { deptName: '孝感市应急管理局', deptCode: '1-12' },
-            { deptName: '孝感市应急管理局', deptCode: '1-13' },
-            { deptName: '孝感市应急管理局', deptCode: '1-14' },
-            { deptName: '孝感市应急管理局', deptCode: '1-15' },
-            { deptName: '孝感市应急管理局', deptCode: '1-16' },
-            { deptName: '孝感市应急管理局', deptCode: '1-17' },
-            { deptName: '孝感市应急管理局', deptCode: '1-18' },
-            { deptName: '孝感市应急管理局', deptCode: '1-19' },
-            { deptName: '孝感市应急管理局', deptCode: '1-20' },
-            { deptName: '孝感市应急管理局', deptCode: '1-21' },
-            { deptName: '孝感市应急管理局', deptCode: '1-22' }
-          ]
-        }
-      ],
+      deptTree: [],
       deptTreeProps: {
         children: 'children',
         label: 'deptName',
@@ -238,30 +208,18 @@ export default {
       showDeptTreeRightMenu: false,
       peopleSearch: '',
       peopleList: [
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 },
-        { name: '宋运辉', institution: '东海化工', phone: '13687909090', num: 1 }
+        // {
+        //   name: '宋运辉',
+        //   institution: '东海化工',
+        //   phone: '13687909090',
+        //   num: 1
+        // }
       ],
+
       pageTotal: 100,
-      pageSize: 0,
+      pageSize: 10,
       currentPage: 1,
+
       showAddPeople: false,
       showEditPeople: false,
       showDeleteTip: false,
@@ -270,26 +228,100 @@ export default {
     }
   },
   created () {
-    // this.selectedDept = this.deptTree[0]
+    this.getDeptTree()
   },
   methods: {
+    async getDeptTree () {
+      var _this = this
+      this.$axios.post(backApi.getDeptTree).then((res) => {
+        if (res && res.data && res.data.code === 0) {
+          _this.deptTree = this.handleDeptTree(res.data.data)
+          if (_this.deptTree.length > 0) {
+            _this.selectedDept = _this.deptTree[0]
+            // _this.$refs.insDeptTreeRef.setCurrentKey(_this.deptTree[0].id)
+            _this.getPeoplePage()
+          }
+        }
+      })
+    },
+    // children为" "时置为null
+    handleDeptTree (tree) {
+      tree.forEach((item) => {
+        if (item.children) {
+          if (item.children.length <= 0) {
+            item.children = null
+          } else {
+            this.handleDeptTree(item.children)
+          }
+        }
+      })
+      return tree
+    },
+
+    async getPeoplePage () {
+      var param = {
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+        deptCode: this.selectedDept.deptCode
+      }
+      const _this = this
+      this.$axios
+        .post(backApi.getPeoplePage, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.peopleList = res.data.data.records
+          }
+        })
+    },
+
     // 搜索机构时触发
-    institutionSearchChange () {},
+    filterNode (value, data) {
+      if (!value) {
+        return true
+      }
+      return data.deptName.indexOf(value) !== -1
+    },
+
+    // 单击机构时触发
+    deptTreeClick (item) {
+      this.selectedDept = item
+      this.getPeoplePage()
+    },
 
     // 右击机构时触发
     deptTreeRightCick (event, data, node, obj) {
+      this.selectedDept = data
+      this.$refs.insDeptTreeRef.setCurrentKey(data.id)
+
       this.showDeptTreeRightMenu = false
       this.showDeptTreeRightMenu = true
       const menu = document.querySelector('#menu')
-      menu.style.left = event.clientX + 'px'
-      menu.style.top = event.clientY + 'px'
-      // 给整个document添加监听鼠标事件，点击任何位置执行closeRightMenu方法，及时将菜单关闭
-      document.addEventListener('click', this.closeRightMenu)
+      menu.style.left = event.pageX + 'px'
+      menu.style.top = event.pageY + 'px'
+      // 添加监听鼠标事件，点击任何位置将菜单关闭
+      document.addEventListener('click', this.closeRightMenu, true)
     },
     closeRightMenu () {
       this.showDeptTreeRightMenu = false
       // 及时关掉鼠标监听事件
-      document.removeEventListener('click', this.closeRightMenu)
+      document.removeEventListener('click', this.closeRightMenu, true)
+    },
+
+    // 编辑机构
+    deptEditClick () {
+      console.log('编辑机构')
+    },
+
+    // 查看机构
+    deptSeeClick () {
+      console.log('查看机构')
+    },
+
+    // 删除机构
+    deptDeleteClick () {
+      // console.log('删除机构')
     },
 
     // 添加机构时触发
@@ -338,8 +370,25 @@ export default {
     },
 
     // 添加人员确定时触发
-    addPeopleConfirmClick () {
+    addPeopleConfirmClick (form) {
+      console.log(form)
       this.showAddPeople = false
+      const param = {
+        employeeName: form.name,
+        deptCode: form.dept[form.dept.length - 1],
+        employeeGender: form.six,
+        employeeIdentity: form.idcard,
+        employeeRemark: form.note,
+        employeeSort: form.num,
+        employeeTel: form.phone,
+        officePhone: form.telphone
+      }
+      const _this = this
+      this.$axios.post(backApi.addPeople, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        _this.getPeoplePage()
+      })
     },
 
     // 添加人员取消时触发
@@ -370,21 +419,6 @@ export default {
     // 删除人员确定时触发
     deleteTipConfirmClick () {
       this.showDeleteTip = false
-    },
-
-    // 编辑机构
-    deptEditClick () {
-      console.log('编辑机构')
-    },
-
-    // 查看机构
-    deptSeeClick () {
-      console.log('查看机构')
-    },
-
-    // 删除机构
-    deptDeleteClick () {
-      console.log('删除机构')
     }
   }
 }
@@ -440,11 +474,11 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .el-tree-node__content:hover,
-      .el-tree-node:focus > .el-tree-node__content {
-        color: #fff;
-        background-color: transparent !important;
-      }
+      // .el-tree-node__content:hover,
+      // .el-tree-node:focus > .el-tree-node__content {
+      //   color: #1eb0fc;
+      //   background-color: transparent !important;
+      // }
 
       // 展开折叠图标
       .el-tree-node__expand-icon.expanded {
@@ -463,6 +497,10 @@ export default {
       .el-tree-node__expand-icon.is-leaf::before {
         display: none;
       }
+    }
+    /deep/ .el-tree-node.is-current > .el-tree-node__content {
+      background: transparent !important;
+      color: #1eb0fc;
     }
   }
   .add-institution-btn {

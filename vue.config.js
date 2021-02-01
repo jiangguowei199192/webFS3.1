@@ -19,6 +19,7 @@ const createServerConfig = function (compilation) {
 
         // 消防v2.0开发环境
         baseUrl: 'http://111.47.13.103:40025',
+        // baseUrl: 'http://172.16.63.176:8850', // 良良本机地址，联调用
         mqttServer: '111.47.13.103',
         mqttPort: 40027,
         headImg: 'http://111.47.13.103:40031'

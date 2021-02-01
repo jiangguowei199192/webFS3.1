@@ -101,11 +101,11 @@
               </div>
 
               <el-table
+                ref="accountTableRef"
                 class="accountTable"
                 :data="accountList"
                 empty-text="暂无数据"
                 height="320"
-                @selection-change="handleSelectionChange"
                 @select="accountSelect"
                 @select-all="accountSelectAll"
               >
@@ -332,33 +332,26 @@ export default {
 
     accountResetClick () {},
 
-    // 表格选中某一行时触发
-    handleSelectionChange (items) {
-      // items.forEach((item) => {
-      //   if (this.selectedAccounts.indexOf(item) === -1) {
-      //     this.selectedAccounts.push(item);
-      //   }
-      // });
-    },
     // 选择单行
     accountSelect (selection, row) {
       if (selection.indexOf(row) === -1) {
         // 取消选中
-        console.log('取消选中')
+        // console.log('取消选中')
         const index = this.selectedAccounts.indexOf(row)
         if (index > -1) {
           this.selectedAccounts.splice(index, 1)
         }
       } else {
         // 选中
-        console.log('选中')
+        // console.log('选中')
         this.selectedAccounts.push(row)
       }
     },
+
     // 全选或全不选
     accountSelectAll (selection) {
       if (selection && selection.length) {
-        console.log('全选')
+        // console.log('全选')
         var _this1 = this
         selection.forEach((item) => {
           if (_this1.selectedAccounts.indexOf(item) === -1) {
@@ -366,7 +359,7 @@ export default {
           }
         })
       } else {
-        console.log('全不选')
+        // console.log('全不选')
         var _this2 = this
         this.accountList.forEach((item) => {
           const index = _this2.selectedAccounts.indexOf(item)
@@ -377,15 +370,20 @@ export default {
       }
     },
 
-    currentPageChange () {},
-
     // 删除已选中用户时触发
     deleteSelectedAccount (item) {
       const index = this.selectedAccounts.indexOf(item)
       if (index > -1) {
         this.selectedAccounts.splice(index, 1)
       }
-    }
+
+      if (this.accountList.indexOf(item) > -1) {
+        // console.log('取消表格中当前行的选中')
+        this.$refs.accountTableRef.toggleRowSelection(item, false)
+      }
+    },
+
+    currentPageChange () {}
   }
 }
 </script>
