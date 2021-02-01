@@ -52,6 +52,7 @@
             expandTrigger: 'hover',
             label: 'deptName',
             value: 'deptCode',
+            checkStrictly: true,
           }"
           :show-all-levels="false"
         ></el-cascader>
@@ -97,6 +98,15 @@ export default {
       required: true
     }
   },
+  watch: {
+    isShow (newS) {
+      if (newS) {
+        if (this.$refs.addPeopleRef) {
+          this.$refs.addPeopleRef.resetFields()
+        }
+      }
+    }
+  },
   data () {
     return {
       addPeopleForm: {
@@ -115,11 +125,11 @@ export default {
       },
       sixTypes: [
         {
-          id: 1,
+          id: '男',
           label: '男'
         },
         {
-          id: 2,
+          id: '女',
           label: '女'
         }
       ]
@@ -127,7 +137,12 @@ export default {
   },
   methods: {
     confirmClick () {
-      this.$emit('confirmClick')
+      this.$refs.addPeopleRef.validate(async (valid) => {
+        if (!valid) {
+          return
+        }
+        this.$emit('confirmClick', this.addPeopleForm)
+      })
     },
 
     cancelClick () {

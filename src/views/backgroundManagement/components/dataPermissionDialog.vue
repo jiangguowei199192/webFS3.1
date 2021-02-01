@@ -378,7 +378,7 @@ export default {
       }
 
       if (this.accountList.indexOf(item) > -1) {
-        console.log('取消表格中当前行的选中')
+        // console.log('取消表格中当前行的选中')
         this.$refs.accountTableRef.toggleRowSelection(item, false)
       }
     },
