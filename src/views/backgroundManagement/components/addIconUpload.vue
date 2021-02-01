@@ -8,6 +8,7 @@
   >
     <el-upload
       class="upload-demo"
+      ref="upload"
       :auto-upload="false"
       drag
       action="#"
@@ -17,7 +18,7 @@
       :on-remove="handleRemove"
       :on-change="handleChange"
       :file-list="fileList"
-      accept=".JPG, .PNG, .JPEG,.jpg, .png, .jpeg,.gif"
+      accept=".jpg,.png,.jpeg,.gif"
     >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">
@@ -59,23 +60,29 @@ export default {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemove (file, fileList) {
-      console.log(file, fileList)
+      // console.log(file, fileList)
       this.uploadList = fileList
     },
     handleChange (file, fileList) {
       console.log(fileList)
       const isLt300k = file.size / 1024 <= 300
       if (!isLt300k) {
+        // this.$refs.upload.uploadFiles.splice(this.$refs.upload.uploadFiles.length - 1, 1)
+        this.fileList.splice(this.fileList.length - 1, 1)
         return this.$notify.error('上传图片大小不能超过 300kb!')
       }
-      // console.log(file, fileList)
-      this.uploadList = fileList
+      // // console.log(file, fileList)
+      this.uploadList.push(file)
     },
     uploadImg () {
-      console.log('上传时的数据', this.uploadList)
+      // if (this.$refs.upload.uploadFiles.length === 0) {
+      //   return this.$notify.warning('请先上传图片！')
+      // }
       const formData = new FormData()
+      // this.$refs.upload.uploadFiles.forEach(file => {
+      //   formData.append('file', file.raw)
+      // })
       this.uploadList.forEach(file => {
-        // 因为要上传多个文件，所以需要遍历
         formData.append('file', file.raw)
       })
       const config = { headers: { 'Content-Type': 'multipart/form-data' } }
