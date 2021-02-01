@@ -54,7 +54,7 @@
           <span>{{multipleSelection.length}}</span> 项
         </div>
         <div>
-          <el-button class="add">添加</el-button>
+          <el-button class="add" @click.stop="addIcon">添加</el-button>
           <el-button class="delete">批量删除</el-button>
         </div>
       </div>
@@ -103,12 +103,15 @@
         :total="pageInfo.totalCount"
       ></el-pagination>
     </div>
+    <iconUploadDialog :dialogVisible="dialogVisible" @closeDialog="()=>{this.dialogVisible=false}"></iconUploadDialog>
   </div>
 </template>
 <script>
+import iconUploadDialog from './components/addIconUpload'
 export default {
   data () {
     return {
+      dialogVisible: false,
       userSerchIcon: require('../../assets/images/backgroundManagement/searchIcon.png'),
       userResetIcon: require('../../assets/images/backgroundManagement/resetIcon.png'),
       statusOptions: [
@@ -171,7 +174,13 @@ export default {
       }
     }
   },
+  components: {
+    iconUploadDialog
+  },
   methods: {
+    addIcon () {
+      this.dialogVisible = true
+    },
     // 表格多选选择方法
     handleSelectionChange (val) {
       console.log(val)
