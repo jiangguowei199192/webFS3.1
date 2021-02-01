@@ -115,7 +115,9 @@ export default {
         this.toolItems.forEach((t) => {
           t.isSelect = false
         })
-        this.$refs.gduMap.map2D.customDrawHelper.stop()
+        this.$nextTick(() => {
+          this.$refs.gduMap.map2D.customDrawHelper.stop()
+        })
       }
     }
   },
