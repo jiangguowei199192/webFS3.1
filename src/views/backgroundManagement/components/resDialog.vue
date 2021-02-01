@@ -22,13 +22,13 @@
         ></div>
       </div>
       <transition name="hideContent">
-        <div class="contentBox" v-show="!unfold">
+        <div class="contentBox" :style="'top:' + infoTop + 'px;'" v-show="!unfold">
           <div
             class="unfold"
             v-show="!unfold"
             @click.stop="unfold = true"
           ></div>
-          <div class="content">
+          <div class="content" :style="'height:' + infoHeight + 'px;width:' + infoWidth + 'px;'">
             <slot name="content"></slot>
           </div>
         </div>
@@ -61,6 +61,18 @@ export default {
     bVideoPoint: {
       type: Boolean,
       required: false
+    },
+    infoTop: {
+      type: Number,
+      default: 97
+    },
+    infoWidth: {
+      type: Number,
+      default: 496
+    },
+    infoHeight: {
+      type: Number,
+      default: 447
     }
   },
   data () {
@@ -322,12 +334,9 @@ export default {
     .contentBox {
       display: flex;
       position: absolute;
-      top: 50px;
       right: 0px;
       align-items: center;
       .content {
-        width: 496px;
-        height: 520px;
         background: rgba($color: #121e3a, $alpha: 0.95);
       }
       .unfold {

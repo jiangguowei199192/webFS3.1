@@ -6,10 +6,12 @@
       :drawType="0"
       :bVideoPoint="true"
       :isShow.sync="isShow"
+      :infoTop="infoTop"
+      :infoHeight="infoHeight"
       @mapResAddOrModify="mapResAddOrModify"
       @submitResForm="submitResForm"
     >
-      <div slot="content" class="videoContent mapResForm">
+      <div slot="content" class="mapResForm">
         <div class="pTitle" style="margin-top:6px;">
           <span></span>
           <span>视频资源信息</span>
@@ -29,6 +31,7 @@
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
               :disabled="disabled"
+              @change="devTypeChange($event)"
             >
               <el-option
                 v-for="item in resTypes"
@@ -63,20 +66,13 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="所属机构 :" prop="organ">
-            <el-select
+            <el-cascader
               v-model="resForm.organ"
-              :popper-append-to-body="false"
-              :placeholder="placeholder2"
+              :options="organTree"
+              :props="deptTreeProps"
+              :show-all-levels="false"
               :class="{ active: !disabled }"
-              :disabled="disabled"
-            >
-              <el-option
-                v-for="item in organs"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+            ></el-cascader>
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
@@ -87,7 +83,7 @@
               :disabled="disabled"
             >
               <el-option
-                v-for="item in areas"
+                v-for="item in areaList"
                 :key="item.id"
                 :label="item.label"
                 :value="item.id"
@@ -117,6 +113,68 @@
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
+          </el-form-item>
+          <el-form-item label="设备型号 :">
+            <el-select
+              v-model="resForm.model"
+              :popper-append-to-body="false"
+              :placeholder="placeholder2"
+              :class="{ active: !disabled }"
+              :disabled="disabled"
+            >
+              <el-option
+                v-for="item in modelList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="质保日期 :">
+            <el-date-picker
+              v-model="resForm.warrantyDate"
+              type="date"
+              style="width: 150px"
+            >
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="H旋转范围 :" v-show="resForm.type === 'GDJK'">
+            <el-input
+              v-model="resForm.HStart"
+              :placeholder="placeholder"
+              :readonly="disabled"
+              class="rangeInput rangeInputer"
+            ></el-input>
+            <span style="color:white;">°</span>
+            <span style="padding: 0px 7px;color:white;">-</span>
+          </el-form-item>
+          <el-form-item v-show="resForm.type === 'GDJK'">
+            <el-input
+              v-model="resForm.HEnd"
+              :placeholder="placeholder"
+              :readonly="disabled"
+              class="rangeInput rangeInputer"
+            ></el-input>
+            <span style="color:white;">°</span>
+          </el-form-item>
+          <el-form-item label="V旋转范围 :" v-show="resForm.type === 'GDJK'">
+            <el-input
+              v-model="resForm.VStart"
+              :placeholder="placeholder"
+              :readonly="disabled"
+              class="rangeInput rangeInputer"
+            ></el-input>
+            <span style="color:white;">°</span>
+            <span style="padding: 0px 7px;color:white;">-</span>
+          </el-form-item>
+          <el-form-item v-show="resForm.type === 'GDJK'">
+            <el-input
+              v-model="resForm.VEnd"
+              :placeholder="placeholder"
+              :readonly="disabled"
+              class="rangeInput rangeInputer"
+            ></el-input>
+            <span style="color:white;">°</span>
           </el-form-item>
           <el-form-item label="用户 :" v-show="resForm.type === 'GDJK'">
             <el-input
@@ -167,14 +225,6 @@
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
-          </el-form-item>
-          <el-form-item label="质保日期 :">
-            <el-date-picker
-              v-model="resForm.warrantyDate"
-              type="date"
-              style="width: 150px"
-            >
-            </el-date-picker>
           </el-form-item>
           <el-form-item label="排序 :">
             <el-input
@@ -249,8 +299,50 @@ export default {
       title: '新增视频资源',
       isShow: true,
       showPopover: false,
-      organs: [],
-      areas: [],
+      infoTop: 80,
+      infoHeight: 445,
+      organTree: [
+        {
+          deptName: '湖北省应急管理厅',
+          deptCode: '1',
+          showSetting: true,
+          children: [
+            {
+              deptName: '孝感市应急管理局',
+              deptCode: '1-1',
+              showSetting: false
+            },
+            {
+              deptName: '武汉市应急管理局',
+              deptCode: '1-2',
+              showSetting: false,
+              children: [
+                {
+                  deptName: '江夏区应急管理所',
+                  deptCode: '1-2-1',
+                  showSetting: false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      deptTreeProps: {
+        expandTrigger: 'hover',
+        children: 'children',
+        label: 'deptName',
+        value: 'deptCode'
+      },
+      areaList: [
+        {
+          label: '洪山区',
+          id: '1'
+        },
+        {
+          label: '江夏区',
+          id: '2'
+        }
+      ],
       resTypes: [
         {
           value: 'WRJ',
@@ -269,6 +361,16 @@ export default {
         {
           value: 'false',
           label: '不启用'
+        }
+      ],
+      modelList: [
+        {
+          value: 'mId1',
+          label: 'GTX001'
+        },
+        {
+          value: 'mId2',
+          label: 'GDU088'
         }
       ],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
@@ -291,13 +393,18 @@ export default {
         area: '',
         enable: '',
         brand: '',
+        model: '',
+        warrantyDate: '',
+        HStart: '',
+        HEnd: '',
+        VStart: '',
+        VEnd: '',
         userName: '',
         userPwd: '',
         longitude: '',
         latitude: '',
         height: '',
         baseOrientation: '',
-        warrantyDate: '',
         sort: '',
         icon: '',
         note: ''
@@ -368,13 +475,27 @@ export default {
       this.pointData = data
       this.resForm.longitude = data.coordinates[0].toFixed(7)
       this.resForm.latitude = data.coordinates[1].toFixed(7)
+    },
+    devTypeChange (event) {
+      console.log('devTypeChange:', event)
+      if (event === 'WRJ') {
+        this.infoTop = 80
+        this.infoHeight = 445
+      } else if (event === 'GDJK') {
+        this.infoTop = 30
+        this.infoHeight = 560
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.videoContent {
-  height: 540px;
+/deep/.el-cascader:not(.is-disabled):hover .el-input__inner {
+  cursor: pointer;
+  border-color:#209cdf;
+}
+.rangeInputer {
+  display: inline;
 }
 </style>
