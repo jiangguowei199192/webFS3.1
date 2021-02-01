@@ -242,7 +242,7 @@
                     :max="10"
                     :step="1"
                     step-strictly
-                    @change="lineWidthChange(item)"
+                    @change="lineWidthChange()"
                   ></el-input-number>
                   <span v-else>{{ item.lineWidth }}</span>
                 </el-form-item>
@@ -259,7 +259,7 @@
                     v-model="item.fillColor"
                     show-alpha
                     :disabled="disabled"
-                    @change="fillColorChange(item)"
+                    @change="fillColorChange()"
                   ></el-color-picker>
                 </el-form-item>
                 <el-form-item label="备注 :" class="note">
@@ -391,7 +391,6 @@ export default {
       this.$nextTick(() => {
         // 重置数据
         this.$refs.pointForm.resetFields()
-        this.$refs.resDlg.clearCustomDraw()
         this.pointId = ''
         this.ctlAreas = []
       })

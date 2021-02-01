@@ -226,7 +226,6 @@ export default {
       this.$nextTick(() => {
         // 重置数据
         this.$refs.lineForm.resetFields()
-        this.$refs.resDlg.clearCustomDraw()
         this.$refs.markerForm.resetData()
         this.lineId = ''
       })
@@ -257,6 +256,21 @@ export default {
         this.lineId = data.drawId
         this.resForm.coordinates = data.coordinates
         this.resForm.totalLen = data.length.toFixed(2)
+        // 重新画线资源的时候，需要设置样式
+        if (data.bIsAdd) {
+          const me = this
+          setTimeout(() => {
+            const d = {
+              drawId: me.lineId,
+              drawType: 1,
+              strokeStyle: {
+                color: me.resForm.lineColor,
+                width: me.resForm.lineWidth
+              }
+            }
+            me.$refs.resDlg.addOrUpdateFeature(d)
+          }, 20)
+        }
       }
     },
     /**

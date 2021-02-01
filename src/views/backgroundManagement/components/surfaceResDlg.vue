@@ -1,6 +1,13 @@
 <template>
   <div>
-    <ResDialog :title="title" :drawType="2" :isShow.sync="isShow">
+    <ResDialog
+      :title="title"
+      :drawType="2"
+      :isShow.sync="isShow"
+      @mapResAddOrModify="mapResAddOrModify"
+      @submitResForm="submitResForm"
+      ref="resDlg"
+    >
       <div slot="content" class="lineContent mapResForm">
         <div class="pTitle">
           <span></span>
@@ -12,6 +19,7 @@
           label-width="90px"
           style="margin-top: 17px"
           :rules="formRules"
+          ref="areaForm"
         >
           <el-form-item label="资源名称 :" prop="name">
             <el-input
@@ -83,6 +91,7 @@
               v-model="resForm.lineColor"
               show-alpha
               :disabled="disabled"
+              @change="lineStyleChange()"
             ></el-color-picker>
           </el-form-item>
           <el-form-item label="线宽 :" prop="lineWidth">
@@ -91,6 +100,8 @@
               v-model="resForm.lineWidth"
               :min="1"
               :max="10"
+              step-strictly
+              @change="lineWidthChange()"
             ></el-input-number>
             <span v-else>{{ resForm.lineWidth }}</span>
           </el-form-item>
@@ -121,7 +132,10 @@
           </el-form-item>
         </el-form>
         <div>
-          <PointMarkerForm></PointMarkerForm>
+          <PointMarkerForm
+            ref="markerForm"
+            @removeFeature="removeMarker"
+          ></PointMarkerForm>
         </div>
       </div>
     </ResDialog>
@@ -148,6 +162,7 @@ export default {
       organs: [],
       areas: [],
       resTypes: [],
+      areaID: '',
       formRules: {
         name: [{ required: true, message: '请输入资源名称' }],
         type: [{ required: true, message: '请选择资源类型' }],
@@ -156,16 +171,17 @@ export default {
         lineColor: [{ required: true, message: '请选择线段颜色' }]
       },
       resForm: {
-        name: '11111',
+        name: '',
         type: '',
         phone: '',
         organ: '',
         area: '',
         sort: '',
         note: '',
-        lineWidth: '',
-        lineColor: '',
-        fillColor: ''
+        lineWidth: 2,
+        lineColor: 'rgba(0, 204, 255, 1)',
+        fillColor: 'rgba(0, 204, 255, 0.4)',
+        coordinates: []
       }
     }
   },
@@ -185,6 +201,90 @@ export default {
      */
     addRes () {
       this.isShow = true
+      this.$nextTick(() => {
+        // 重置数据
+        this.$refs.areaForm.resetFields()
+        this.$refs.markerForm.resetData()
+        this.areaID = ''
+      })
+    },
+    /**
+     *  面线段宽度改变
+     */
+    lineWidthChange () {
+      if (!this.resForm.lineWidth) return
+      this.resForm.lineWidth = Math.round(this.resForm.lineWidth)
+      this.lineStyleChange()
+    },
+    /**
+     *  面填充颜色改变
+     */
+    fillColorChange () {
+      const data = {
+        drawId: this.areaID,
+        drawType: 2,
+        fillStyle: { color: this.resForm.fillColor }
+      }
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
+     *  面线段样式改变
+     */
+    lineStyleChange () {
+      const data = {
+        drawId: this.areaID,
+        drawType: 2,
+        strokeStyle: {
+          color: this.resForm.lineColor,
+          width: this.resForm.lineWidth
+        }
+      }
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
+     *  地图资源添加或修改
+     */
+    mapResAddOrModify (data) {
+      if (data.drawType === 2) {
+        this.areaID = data.drawId
+        this.resForm.coordinates = data.coordinates
+        // 重新画面资源的时候，需要设置样式
+        if (data.bIsAdd) {
+          const me = this
+          setTimeout(() => {
+            const d = {
+              drawId: me.areaID,
+              drawType: 2,
+              strokeStyle: {
+                color: me.resForm.lineColor,
+                width: me.resForm.lineWidth
+              },
+              fillStyle: { color: me.resForm.fillColor }
+            }
+            me.$refs.resDlg.addOrUpdateFeature(d)
+          }, 20)
+        }
+      } else if (data.drawType === 0) {
+        this.$refs.markerForm.addOrModifyPoint(data)
+      }
+    },
+    /**
+     *  删除标识点
+     */
+    removeMarker (id) {
+      this.$refs.resDlg.removeFeatureByID(id)
+    },
+    /**
+     *  提交点资源数据
+     */
+    submitResForm () {
+      let vSurface = ''
+      this.$refs.areaForm.validate((valid) => {
+        vSurface = valid
+      })
+      const vMarker = this.$refs.markerForm.formValid()
+      if (vSurface && vMarker) {
+      }
     }
   }
 }

@@ -116,6 +116,7 @@ export default {
           t.isSelect = false
         })
         this.$nextTick(() => {
+          this.$refs.gduMap.map2D.customDrawHelper.clear()
           this.$refs.gduMap.map2D.customDrawHelper.stop()
         })
       }
