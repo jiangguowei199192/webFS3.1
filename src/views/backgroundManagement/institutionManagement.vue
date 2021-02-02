@@ -126,6 +126,7 @@
           :current-page.sync="currentPage"
           layout="total, sizes, prev, pager, next, jumper"
           @current-change="currentPageChange"
+          @size-change="pageSizeChange"
         ></el-pagination>
       </div>
     </div>
@@ -216,7 +217,7 @@ export default {
       peopleInfo: {},
       selectedPeoples: [],
 
-      pageTotal: 100,
+      pageTotal: 0,
       pageSize: 10,
       currentPage: 1,
 
@@ -272,6 +273,8 @@ export default {
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
             _this.peopleList = res.data.data.records
+            _this.currentPage = res.data.data.current
+            _this.pageTotal = res.data.data.total
           }
         })
     },
@@ -369,7 +372,14 @@ export default {
     },
 
     // 切换分页时触发
-    currentPageChange () {},
+    currentPageChange (curPage) {
+      this.currentPage = curPage
+      this.getPeoplePage()
+    },
+    pageSizeChange (curSize) {
+      this.pageSize = curSize
+      this.getPeoplePage()
+    },
 
     // 添加人员时触发
     addPeopleClick () {
