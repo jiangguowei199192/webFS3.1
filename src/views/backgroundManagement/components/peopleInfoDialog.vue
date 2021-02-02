@@ -10,51 +10,55 @@
       <div class="header-icon"></div>
       <div class="header-text">查看人员</div>
     </div>
+
     <el-form
-      :model="peopleInfoForm"
+      :model="peopleInfo"
       :inline="true"
       label-width="80px"
       class="add-people-form"
+      v-if="peopleInfo"
     >
-      <el-form-item label="姓名:" prop="name">
-        <div class="subtext1">{{ peopleInfoForm.name }}</div>
+      <el-form-item label="姓名:">
+        <div class="subtext1">{{ peopleInfo.employeeName }}</div>
       </el-form-item>
-      <el-form-item label="性别:" prop="six">
-        <div class="subtext1">{{ peopleInfoForm.six }}</div>
+      <el-form-item label="性别:">
+        <div class="subtext1">{{ peopleInfo.employeeGender }}</div>
       </el-form-item>
-      <el-form-item label="身份证号:" prop="idcard">
-        <div class="subtext1">{{ peopleInfoForm.idcard }}</div>
+      <el-form-item label="身份证号:">
+        <div class="subtext1">{{ peopleInfo.employeeIdentity }}</div>
       </el-form-item>
-      <el-form-item label="联系方式:" prop="phone">
-        <div class="subtext1">{{ peopleInfoForm.phone }}</div>
+      <el-form-item label="联系方式:">
+        <div class="subtext1">{{ peopleInfo.employeeTel }}</div>
       </el-form-item>
-      <el-form-item label="所属机构:" prop="dept">
-        <div class="subtext1">{{ peopleInfoForm.dept }}</div>
+      <el-form-item label="所属机构:">
+        <div class="subtext1">{{ peopleInfo.deptName }}</div>
       </el-form-item>
-      <el-form-item label="办公电话:" prop="telphone">
-        <div class="subtext1">{{ peopleInfoForm.telphone }}</div>
+      <el-form-item label="办公电话:">
+        <div class="subtext1">{{ peopleInfo.officePhone }}</div>
       </el-form-item>
-      <el-form-item label="排序:" prop="num">
-        <div class="subtext1">{{ peopleInfoForm.num }}</div>
+      <el-form-item label="排序:">
+        <div class="subtext1">{{ peopleInfo.employeeSort }}</div>
       </el-form-item>
-      <el-form-item label="备注:" prop="note">
-        <div class="subtext1">{{ peopleInfoForm.note }}</div>
+      <el-form-item label="备注:">
+        <div class="subtext1">{{ peopleInfo.employeeRemark }}</div>
       </el-form-item>
     </el-form>
+
     <div class="note">
       <div>
-        <span>创建时间：11111111111111</span>
+        <span>创建时间：{{peopleInfo.createTime}}</span>
         <span style="display: inline-block; margin-left: 20px"
-          >创建人：2222</span
+          >创建人：{{peopleInfo.createUserName}}</span
         >
       </div>
       <div style="margin-top: 10px">
-        <span>最后修改时间：3333333333333333</span>
+        <span>最后修改时间：{{peopleInfo.updateTime}}</span>
         <span style="display: inline-block; margin-left: 20px"
-          >最后修改人：4444</span
+          >最后修改人：{{peopleInfo.updateUserName}}</span
         >
       </div>
     </div>
+
     <div class="confirm-tool">
       <div class="confirm-btn" @click="confirmClick">关闭</div>
     </div>
@@ -63,24 +67,9 @@
 
 <script>
 export default {
-  props: {
-    isShow: {
-      type: Boolean,
-      required: true
-    }
-  },
+  props: ['isShow', 'peopleInfo'],
   data () {
     return {
-      peopleInfoForm: {
-        name: '宋运辉',
-        six: '男',
-        idcard: '000000000000000000',
-        phone: '00000000000',
-        dept: '东海化工',
-        telphone: '02700000000',
-        num: '02',
-        note: '东海化工常务副厂长'
-      }
     }
   },
   methods: {
