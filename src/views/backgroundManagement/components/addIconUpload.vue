@@ -17,7 +17,6 @@
       :before-remove="beforeRemove"
       :on-remove="handleRemove"
       :on-change="handleChange"
-      :file-list="fileList"
       accept=".jpg,.png,.jpeg,.gif"
     >
       <i class="el-icon-upload"></i>
@@ -45,57 +44,47 @@ export default {
   },
   data () {
     return {
-      fileList: [], // 文件列表的数组
-      uploadList: [] // 文件流
     }
   },
   methods: {
     // 关闭弹框
     handleClose () {
-      this.fileList = []
-      this.uploadList = []
       this.$emit('closeDialog')
+      this.$refs.upload.clearFiles()
     },
     beforeRemove (file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
     handleRemove (file, fileList) {
       // console.log(file, fileList)
-      this.uploadList = fileList
     },
     handleChange (file, fileList) {
-      console.log(fileList)
       const isLt300k = file.size / 1024 <= 300
       if (!isLt300k) {
-        // this.$refs.upload.uploadFiles.splice(this.$refs.upload.uploadFiles.length - 1, 1)
-        this.fileList.splice(this.fileList.length - 1, 1)
-        return this.$notify.error('上传图片大小不能超过 300kb!')
+        this.$refs.upload.uploadFiles.splice(this.$refs.upload.uploadFiles.length - 1, 1)
+        return this.$notify.error('图片大小不能超过 300kb!')
       }
-      // // console.log(file, fileList)
-      this.uploadList.push(file)
     },
     uploadImg () {
-      // if (this.$refs.upload.uploadFiles.length === 0) {
-      //   return this.$notify.warning('请先上传图片！')
-      // }
+      if (this.$refs.upload.uploadFiles.length === 0) {
+        return this.$notify.warning('请先上传图片！')
+      }
       const formData = new FormData()
-      // this.$refs.upload.uploadFiles.forEach(file => {
-      //   formData.append('file', file.raw)
-      // })
-      this.uploadList.forEach(file => {
+      this.$refs.upload.uploadFiles.forEach(file => {
         formData.append('file', file.raw)
       })
       const config = { headers: { 'Content-Type': 'multipart/form-data' } }
       this.$axios.post(iconLibaryApi.uploadImgFiles, formData, config).then(res => {
         if (res && res.data && res.data.code === 0) {
           this.$notify.success('图片上传成功')
-        } else {
-          this.$notify.error('图片上传失败')
         }
-        this.fileList = []
-        this.uploadList = []
+        //  else {
+        //   this.$notify.error('图片上传失败')
+        // }
+        this.$refs.upload.clearFiles()
       })
     },
+    // 图片上传  先关闭弹框 再上传
     confirmAjax () {
       this.$emit('closeDialog')
       this.uploadImg()
