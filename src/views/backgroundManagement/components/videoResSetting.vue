@@ -53,13 +53,17 @@
             v-model="queryParams.searchStr"
             placeholder="请输入资源名称/地址进行搜索"
           ></el-input>
-          <div class="btn" style="margin-left:40px;">
+          <div class="btn" style="margin-left:40px;"
+            @click.stop="searchVideoDatas"
+          >
             <img :src="searchIcon" />
-            <span @click.stop="searchVideoDatas">搜索</span>
+            <span>搜索</span>
           </div>
-          <div class="btn resetBtn" style="margin-left:48px;">
+          <div class="btn resetBtn" style="margin-left:48px;"
+            @click.stop="resetSearchParams"
+          >
             <img :src="resetIcon" />
-            <span @click.stop="resetSearchParams">重置</span>
+            <span>重置</span>
           </div>
         </div>
       </div>
