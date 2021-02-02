@@ -47,6 +47,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 20, resForm, 'name')"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备编号 :" prop="devCode">
@@ -55,6 +56,7 @@
               :placeholder="readonly || disabled ? '' : placeholder"
               :disabled="readonly || disabled"
               :class="{ active: !readonly || !disabled}"
+              @input="limitMaxLength($event, 20, resForm, 'devCode')"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备地址 :" prop="address">
@@ -63,6 +65,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 50, resForm, 'address')"
             ></el-input>
           </el-form-item>
           <el-form-item label="所属机构 :" prop="organ">
@@ -114,6 +117,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 20, resForm, 'brand')"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备型号 :">
@@ -147,6 +151,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               class="rangeInput rangeInputer"
+              @input="limitMaxLength($event, 4, resForm, 'HStart')"
             ></el-input>
             <span style="color:white;">°</span>
             <span style="padding: 0px 7px;color:white;">-</span>
@@ -157,6 +162,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               class="rangeInput rangeInputer"
+              @input="limitMaxLength($event, 4, resForm, 'HEnd')"
             ></el-input>
             <span style="color:white;">°</span>
           </el-form-item>
@@ -166,6 +172,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               class="rangeInput rangeInputer"
+              @input="limitMaxLength($event, 4, resForm, 'VStart')"
             ></el-input>
             <span style="color:white;">°</span>
             <span style="padding: 0px 7px;color:white;">-</span>
@@ -176,6 +183,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               class="rangeInput rangeInputer"
+              @input="limitMaxLength($event, 4, resForm, 'VEnd')"
             ></el-input>
             <span style="color:white;">°</span>
           </el-form-item>
@@ -185,6 +193,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 20, resForm, 'userName')"
             ></el-input>
           </el-form-item>
           <el-form-item label="密码 :" v-show="resForm.type === 'GDJK'">
@@ -193,9 +202,10 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 20, resForm, 'userPwd')"
             ></el-input>
           </el-form-item>
-          <el-form-item label="经度 :">
+          <el-form-item label="经度 :" prop="longitude">
             <el-input
               v-model="resForm.longitude"
               :placeholder="placeholder"
@@ -204,7 +214,7 @@
               @input="updateLonOrLat(true)"
             ></el-input>
           </el-form-item>
-          <el-form-item label="纬度 :">
+          <el-form-item label="纬度 :" prop="latitude">
             <el-input
               v-model="resForm.latitude"
               :placeholder="placeholder"
@@ -219,6 +229,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 4, resForm, 'height')"
             ></el-input>
           </el-form-item>
           <el-form-item label="底座方向角 :" v-show="resForm.type === 'GDJK'">
@@ -227,6 +238,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 4, resForm, 'baseOrientation')"
             ></el-input>
           </el-form-item>
           <el-form-item label="排序 :">
@@ -235,6 +247,7 @@
               :placeholder="placeholder"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 20, resForm, 'sort')"
             ></el-input>
           </el-form-item>
           <el-form-item label="图标 :" style="line-height: 40px" prop="icon">
@@ -277,6 +290,7 @@
               resize="none"
               :disabled="readonly"
               :class="{ active: !readonly }"
+              @input="limitMaxLength($event, 200, resForm, 'note')"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -287,6 +301,12 @@
 
 <script>
 import ResDialog from './resDialog.vue'
+import {
+  isNotNull,
+  lonValidate,
+  latValidate,
+  limitMaxLength
+} from '@/utils/formRules'
 export default {
   props: {
   },
@@ -382,6 +402,8 @@ export default {
         address: [{ required: true, message: '请输入设备地址' }],
         organ: [{ required: true, message: '请选择所属机构' }],
         enable: [{ required: true, message: '请选择是否启用' }],
+        longitude: isNotNull('请输入经度').concat(lonValidate()),
+        latitude: isNotNull('请输入纬度').concat(latValidate()),
         icon: [{ required: true, message: '请选择图标' }]
       },
       resForm: {
@@ -422,12 +444,16 @@ export default {
     ResDialog
   },
   methods: {
+    limitMaxLength,
+    /**
+     * 设置表单数据
+     */
     setFormData (data) {
       if (data) {
         this.resForm.type = data.deviceTypeCode
       } else {
         this.resForm = {
-          type: 'WRJ',
+          type: 'GDJK',
           name: '',
           devCode: '',
           address: '',
@@ -461,10 +487,10 @@ export default {
       this.$nextTick(() => {
         // 重置数据
         this.$refs.formCtrl.resetFields()
+        this.setFormData()
       })
       if (action === 'new') {
         this.$nextTick(() => {
-          this.setFormData()
           this.disabled = false
           this.readonly = false
         })

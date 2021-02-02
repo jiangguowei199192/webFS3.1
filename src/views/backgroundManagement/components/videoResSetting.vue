@@ -1,5 +1,5 @@
 <template>
-  <div class="mapResBox">
+  <div class="videoResBox">
     <div class="title">设备数据 / {{ subTitle }}</div>
     <div class="mainBox">
       <div>{{ subTitle }}</div>
@@ -218,7 +218,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mapResBox {
+.videoResBox {
   padding: 20px 31px 0px 20px;
   .title {
     font-size: 16px;
@@ -254,10 +254,13 @@ export default {
       vertical-align:top;
       padding: 3px 5px;
     }
+    /deep/.el-input__inner {
+      color: #c5f3ff;
+    }
     /deep/.el-date-editor .el-range-input {
       color: #c5f3ff;
       background: transparent;
-      font-size: 12px;
+      font-size: 14px;
     }
     /deep/.el-range-separator {
       color: white;
