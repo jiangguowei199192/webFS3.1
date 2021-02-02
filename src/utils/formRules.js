@@ -52,9 +52,13 @@ export function isNotNull (msg) {
 // 校验手机号，用法见addPeopleDialog
 export function checkPhone () {
   const checkPhone = (rule, value, callback) => {
-    const reg = /^1[345789]\d{9}$/
-    if (!reg.test(value)) {
-      callback(new Error('请输入11位手机号'))
+    if (value) {
+      const reg = /^1[345789]\d{9}$/
+      if (!reg.test(value)) {
+        callback(new Error('请输入11位手机号'))
+      } else {
+        callback()
+      }
     } else {
       callback()
     }

@@ -53,6 +53,7 @@
             label: 'deptName',
             value: 'deptCode',
             checkStrictly: true,
+            emitPath: false,
           }"
           :show-all-levels="false"
         ></el-cascader>
@@ -98,6 +99,10 @@ export default {
     deptTree: {
       type: Array,
       required: true
+    },
+    peopleInfo: {
+      type: Object,
+      required: false
     }
   },
   watch: {
@@ -106,6 +111,18 @@ export default {
         if (this.$refs.addPeopleRef) {
           this.$refs.addPeopleRef.resetFields()
         }
+      }
+    },
+    peopleInfo (newP) {
+      if (newP) {
+        this.addPeopleForm.name = newP.employeeName
+        this.addPeopleForm.six = newP.employeeGender
+        this.addPeopleForm.idcard = newP.employeeIdentity
+        this.addPeopleForm.phone = newP.employeeTel
+        this.addPeopleForm.dept = newP.deptCode
+        this.addPeopleForm.telphone = newP.officePhone
+        this.addPeopleForm.num = newP.employeeSort
+        this.addPeopleForm.note = newP.employeeRemark
       }
     }
   },

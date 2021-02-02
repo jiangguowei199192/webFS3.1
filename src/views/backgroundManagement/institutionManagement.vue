@@ -141,11 +141,12 @@
 
     <AddPeopleDialog
       :isShow.sync="showEditPeople"
+      :peopleInfo="peopleInfo"
       title="修改人员"
       :deptTree="deptTree"
       @close="showEditPeople = false"
       @confirmClick="editPeopleConfirmClick"
-      @cancelClick="editPeopleCancelClick"
+      @cancelClick="showEditPeople = false"
     ></AddPeopleDialog>
 
     <PeopleInfoDialog
@@ -212,7 +213,7 @@ export default {
 
       peopleSearch: '',
       peopleList: [],
-      peopleInfo: '',
+      peopleInfo: {},
       selectedPeoples: [],
 
       pageTotal: 100,
@@ -377,11 +378,11 @@ export default {
 
     // 添加人员确定时触发
     addPeopleConfirmClick (form) {
-      console.log(form)
+      // console.log(form)
       this.showAddPeople = false
       const param = {
         employeeName: form.name,
-        deptCode: form.dept[form.dept.length - 1],
+        deptCode: form.dept,
         employeeGender: form.six,
         employeeIdentity: form.idcard,
         employeeRemark: form.note,
@@ -395,7 +396,9 @@ export default {
           headers: { 'Content-Type': 'application/json;charset=UTF-8' }
         })
         .then((res) => {
-          _this.getPeoplePage()
+          if (res && res.data && res.data.data) {
+            _this.getPeoplePage()
+          }
         })
     },
 
@@ -405,18 +408,43 @@ export default {
     },
 
     // 编辑人员时触发
-    editPeopleClick () {
-      this.showEditPeople = true
+    editPeopleClick (item) {
+      const param = { id: item.id }
+      const _this = this
+      this.$axios.post(backApi.peopleInfo, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.peopleInfo = res.data.data
+          this.showEditPeople = true
+        }
+      })
     },
 
     // 编辑人员确定时触发
-    editPeopleConfirmClick () {
+    editPeopleConfirmClick (form) {
       this.showEditPeople = false
-    },
-
-    // 编辑人员取消时触发
-    editPeopleCancelClick () {
-      this.showEditPeople = false
+      const param = {
+        id: this.peopleInfo.id,
+        employeeName: form.name,
+        deptCode: form.dept,
+        employeeGender: form.six,
+        employeeIdentity: form.idcard,
+        employeeRemark: form.note,
+        employeeSort: form.num,
+        employeeTel: form.phone,
+        officePhone: form.telphone
+      }
+      const _this = this
+      this.$axios
+        .post(backApi.editPeople, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.data) {
+            _this.getPeoplePage()
+          }
+        })
     },
 
     // 删除人员时触发
@@ -436,6 +464,20 @@ export default {
     // 删除人员确定时触发
     deleteTipConfirmClick () {
       this.showDeleteTip = false
+
+      var peopleIds = []
+      this.selectedPeoples.forEach(item => {
+        peopleIds.push(item.id)
+      })
+      const param = { ids: peopleIds }
+      const _this = this
+      this.$axios.post(backApi.deletePeople, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.data) {
+          _this.getPeoplePage()
+        }
+      })
     }
   }
 }
