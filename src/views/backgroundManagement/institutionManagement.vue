@@ -164,6 +164,13 @@
       @cancelClick="showDeleteTip = false"
     ></DeleteDialog>
 
+    <DeleteDialog
+      :isShow.sync="showDeleteDeptTip"
+      @close="showDeleteDeptTip = false"
+      @confirmClick="deleteDeptTipConfirm"
+      @cancelClick="showDeleteDeptTip = false"
+    ></DeleteDialog>
+
     <AddDeptDialog
       :isShow.sync="showAddDept"
       :deptTree="deptTree"
@@ -210,6 +217,7 @@ export default {
         value: 'deptCode'
       },
       selectedDept: '',
+      rightClickDept: {},
       showDeptTreeRightMenu: false,
 
       peopleSearch: '',
@@ -225,7 +233,9 @@ export default {
       showEditPeople: false,
       showDeleteTip: false,
       showPeopleInfo: false,
-      showAddDept: false
+      showAddDept: false,
+
+      showDeleteDeptTip: false
     }
   },
   created () {
@@ -239,7 +249,7 @@ export default {
           _this.deptTree = this.handleDeptTree(res.data.data)
           if (_this.deptTree.length > 0) {
             _this.selectedDept = _this.deptTree[0]
-            // _this.$refs.insDeptTreeRef.setCurrentKey(_this.deptTree[0].id)
+            _this.$refs.insDeptTreeRef.setCurrentKey(_this.deptTree[0].id)
             _this.getPeoplePage()
           }
         }
@@ -298,8 +308,7 @@ export default {
 
     // 右击机构时触发
     deptTreeRightCick (event, data, node, obj) {
-      this.selectedDept = data
-      // this.$refs.insDeptTreeRef.setCurrentKey(data.id)
+      this.rightClickDept = data
 
       this.showDeptTreeRightMenu = false
       this.showDeptTreeRightMenu = true
@@ -327,7 +336,23 @@ export default {
 
     // 删除机构
     deptDeleteClick () {
-      // console.log('删除机构')
+      this.showDeleteDeptTip = true
+    },
+    deleteDeptTipConfirm () {
+      this.showDeleteDeptTip = false
+
+      const param = { id: this.rightClickDept.id }
+      const _this = this
+      this.$axios
+        .post(backApi.deleteDept, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.getDeptTree()
+            _this.peopleSearch = ''
+          }
+        })
     },
 
     // 添加机构时触发
@@ -371,13 +396,15 @@ export default {
 
       const param = { id: item.id }
       const _this = this
-      this.$axios.post(backApi.peopleInfo, param, {
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
-      }).then(res => {
-        if (res && res.data && res.data.code === 0) {
-          _this.peopleInfo = res.data.data
-        }
-      })
+      this.$axios
+        .post(backApi.peopleInfo, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.peopleInfo = res.data.data
+          }
+        })
     },
 
     // 切换分页时触发
@@ -430,14 +457,16 @@ export default {
     editPeopleClick (item) {
       const param = { id: item.id }
       const _this = this
-      this.$axios.post(backApi.peopleInfo, param, {
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
-      }).then(res => {
-        if (res && res.data && res.data.code === 0) {
-          _this.peopleInfo = res.data.data
-          this.showEditPeople = true
-        }
-      })
+      this.$axios
+        .post(backApi.peopleInfo, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.peopleInfo = res.data.data
+            this.showEditPeople = true
+          }
+        })
     },
 
     // 编辑人员确定时触发
@@ -485,18 +514,20 @@ export default {
       this.showDeleteTip = false
 
       var peopleIds = []
-      this.selectedPeoples.forEach(item => {
+      this.selectedPeoples.forEach((item) => {
         peopleIds.push(item.id)
       })
       const param = { ids: peopleIds }
       const _this = this
-      this.$axios.post(backApi.deletePeople, param, {
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
-      }).then(res => {
-        if (res && res.data && res.data.data) {
-          _this.getPeoplePage()
-        }
-      })
+      this.$axios
+        .post(backApi.deletePeople, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.data) {
+            _this.getPeoplePage()
+          }
+        })
     }
   }
 }
