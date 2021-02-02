@@ -64,12 +64,13 @@
       </div>
       <div class="operate-table-tool">
         <span class="selected-count"
-          >已选<span style="color: #1eb0fc">0</span>项</span
+          >已选<span style="color: #1eb0fc">{{ selectedPeoples.length }}</span
+          >项</span
         >
-        <!-- <div class="clean-btn">清空</div> -->
         <div class="delete-btn" @click="deletePeopleClick">批量删除</div>
         <div class="add-btn" @click="addPeopleClick">添加</div>
       </div>
+
       <el-table
         class="manageTable"
         :data="peopleList"
@@ -87,7 +88,7 @@
         ></el-table-column>
         <el-table-column
           label="所属机构"
-          prop=""
+          prop="deptName"
           align="center"
           :show-overflow-tooltip="true"
         ></el-table-column>
@@ -140,15 +141,17 @@
 
     <AddPeopleDialog
       :isShow.sync="showEditPeople"
+      :peopleInfo="peopleInfo"
       title="修改人员"
       :deptTree="deptTree"
       @close="showEditPeople = false"
       @confirmClick="editPeopleConfirmClick"
-      @cancelClick="editPeopleCancelClick"
+      @cancelClick="showEditPeople = false"
     ></AddPeopleDialog>
 
     <PeopleInfoDialog
       :isShow.sync="showPeopleInfo"
+      :peopleInfo="peopleInfo"
       @close="showPeopleInfo = false"
       @confirmClick="showPeopleInfo = false"
     ></PeopleInfoDialog>
@@ -176,6 +179,7 @@ import DeleteDialog from './components/deleteDialog.vue'
 import PeopleInfoDialog from './components/peopleInfoDialog.vue'
 import AddDeptDialog from './components/addDeptDialog.vue'
 import { backApi } from '@/api/back'
+import { Notification } from 'element-ui'
 
 export default {
   components: {
@@ -206,15 +210,11 @@ export default {
       },
       selectedDept: '',
       showDeptTreeRightMenu: false,
+
       peopleSearch: '',
-      peopleList: [
-        // {
-        //   name: '宋运辉',
-        //   institution: '东海化工',
-        //   phone: '13687909090',
-        //   num: 1
-        // }
-      ],
+      peopleList: [],
+      peopleInfo: {},
+      selectedPeoples: [],
 
       pageTotal: 100,
       pageSize: 10,
@@ -349,16 +349,23 @@ export default {
     clickTableRow () {},
 
     // 多选时触发
-    handleSelectionChange () {},
-
-    // 查看时触发
-    seePeopleClick () {
-      this.showPeopleInfo = true
+    handleSelectionChange (items) {
+      this.selectedPeoples = items
     },
 
-    // 查看确定时触发
-    seePeopleConfirmClick () {
-      this.showPeopleInfo = false
+    // 查看人员时触发
+    async seePeopleClick (item) {
+      this.showPeopleInfo = true
+
+      const param = { id: item.id }
+      const _this = this
+      this.$axios.post(backApi.peopleInfo, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.peopleInfo = res.data.data
+        }
+      })
     },
 
     // 切换分页时触发
@@ -371,11 +378,11 @@ export default {
 
     // 添加人员确定时触发
     addPeopleConfirmClick (form) {
-      console.log(form)
+      // console.log(form)
       this.showAddPeople = false
       const param = {
         employeeName: form.name,
-        deptCode: form.dept[form.dept.length - 1],
+        deptCode: form.dept,
         employeeGender: form.six,
         employeeIdentity: form.idcard,
         employeeRemark: form.note,
@@ -384,11 +391,15 @@ export default {
         officePhone: form.telphone
       }
       const _this = this
-      this.$axios.post(backApi.addPeople, param, {
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
-      }).then(res => {
-        _this.getPeoplePage()
-      })
+      this.$axios
+        .post(backApi.addPeople, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.data) {
+            _this.getPeoplePage()
+          }
+        })
     },
 
     // 添加人员取消时触发
@@ -397,28 +408,76 @@ export default {
     },
 
     // 编辑人员时触发
-    editPeopleClick () {
-      this.showEditPeople = true
+    editPeopleClick (item) {
+      const param = { id: item.id }
+      const _this = this
+      this.$axios.post(backApi.peopleInfo, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.peopleInfo = res.data.data
+          this.showEditPeople = true
+        }
+      })
     },
 
     // 编辑人员确定时触发
-    editPeopleConfirmClick () {
+    editPeopleConfirmClick (form) {
       this.showEditPeople = false
-    },
-
-    // 编辑人员取消时触发
-    editPeopleCancelClick () {
-      this.showEditPeople = false
+      const param = {
+        id: this.peopleInfo.id,
+        employeeName: form.name,
+        deptCode: form.dept,
+        employeeGender: form.six,
+        employeeIdentity: form.idcard,
+        employeeRemark: form.note,
+        employeeSort: form.num,
+        employeeTel: form.phone,
+        officePhone: form.telphone
+      }
+      const _this = this
+      this.$axios
+        .post(backApi.editPeople, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.data) {
+            _this.getPeoplePage()
+          }
+        })
     },
 
     // 删除人员时触发
     deletePeopleClick () {
+      if (this.selectedPeoples.length <= 0) {
+        Notification({
+          title: '提示',
+          message: '请选择人员',
+          type: 'warning',
+          duration: 2 * 1000
+        })
+        return
+      }
       this.showDeleteTip = true
     },
 
     // 删除人员确定时触发
     deleteTipConfirmClick () {
       this.showDeleteTip = false
+
+      var peopleIds = []
+      this.selectedPeoples.forEach(item => {
+        peopleIds.push(item.id)
+      })
+      const param = { ids: peopleIds }
+      const _this = this
+      this.$axios.post(backApi.deletePeople, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.data) {
+          _this.getPeoplePage()
+        }
+      })
     }
   }
 }
@@ -598,17 +657,6 @@ export default {
       margin-top: 18px;
       margin-left: 10px;
     }
-    // .clean-btn {
-    //   width: 32px;
-    //   height: 20px;
-    //   margin-top: 18px;
-    //   margin-left: 30px;
-    //   display: inline-block;
-    //   color: #1d9fe5;
-    //   font-size: 16px;
-    //   border-bottom: solid 1px #1d9fe5;
-    //   cursor: pointer;
-    // }
     .delete-btn {
       float: right;
       width: 96px;

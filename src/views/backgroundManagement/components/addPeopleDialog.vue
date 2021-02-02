@@ -53,6 +53,7 @@
             label: 'deptName',
             value: 'deptCode',
             checkStrictly: true,
+            emitPath: false,
           }"
           :show-all-levels="false"
         ></el-cascader>
@@ -83,6 +84,8 @@
 </template>
 
 <script>
+import { numberValidate, checkPhone, checkIdcard } from '@/utils/formRules'
+
 export default {
   props: {
     isShow: {
@@ -96,6 +99,10 @@ export default {
     deptTree: {
       type: Array,
       required: true
+    },
+    peopleInfo: {
+      type: Object,
+      required: false
     }
   },
   watch: {
@@ -104,6 +111,18 @@ export default {
         if (this.$refs.addPeopleRef) {
           this.$refs.addPeopleRef.resetFields()
         }
+      }
+    },
+    peopleInfo (newP) {
+      if (newP) {
+        this.addPeopleForm.name = newP.employeeName
+        this.addPeopleForm.six = newP.employeeGender
+        this.addPeopleForm.idcard = newP.employeeIdentity
+        this.addPeopleForm.phone = newP.employeeTel
+        this.addPeopleForm.dept = newP.deptCode
+        this.addPeopleForm.telphone = newP.officePhone
+        this.addPeopleForm.num = newP.employeeSort
+        this.addPeopleForm.note = newP.employeeRemark
       }
     }
   },
@@ -121,7 +140,11 @@ export default {
       },
       addPeopleRules: {
         name: [{ required: true, message: '请输入' }],
-        dept: [{ required: true, message: '请选择' }]
+        dept: [{ required: true, message: '请选择' }],
+        idcard: [checkIdcard()],
+        phone: [checkPhone()],
+        telphone: numberValidate('请输入正确的办公电话'),
+        num: numberValidate('请输入数字')
       },
       sixTypes: [
         {
