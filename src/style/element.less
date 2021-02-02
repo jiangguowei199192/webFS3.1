@@ -759,6 +759,16 @@ input[type="number"] {
     padding   : 0px 15px;
   }
 
+  .el-input .el-input__inner:disabled,
+  .el-select .el-input.is-disabled .el-input__inner:hover {
+    background: transparent;
+    border: 1px solid #209cdf55;
+    padding: 0px 15px;
+  }
+  .el-input__inner:disabled {
+    cursor: default;
+  }
+
   .rangeInput .el-input__inner {
     border-radius: 0px;
     width        : 60px;
@@ -796,7 +806,8 @@ input[type="number"] {
     top       : 0px;
   }
 
-  .el-select .el-input.is-disabled {
+  .el-select .el-input.is-disabled,
+  .el-cascader .el-input.is-disabled{
 
     .el-input__inner,
     .el-input__icon {
@@ -804,6 +815,9 @@ input[type="number"] {
     }
 
     .el-icon-arrow-up:before {
+      content: "";
+    }
+    .el-icon-arrow-down::before {
       content: "";
     }
   }

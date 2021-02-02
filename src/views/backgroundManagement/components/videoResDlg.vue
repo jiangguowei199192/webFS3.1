@@ -29,8 +29,8 @@
               v-model="resForm.type"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
+              :class="{ active: !readonly || !disabled }"
+              :disabled="readonly || disabled"
               @change="devTypeChange($event)"
             >
               <el-option
@@ -45,33 +45,35 @@
             <el-input
               v-model="resForm.name"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备编号 :" prop="devCode">
             <el-input
               v-model="resForm.devCode"
-              :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :placeholder="readonly || disabled ? '' : placeholder"
+              :disabled="readonly || disabled"
+              :class="{ active: !readonly || !disabled}"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备地址 :" prop="address">
             <el-input
               v-model="resForm.address"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="所属机构 :" prop="organ">
             <el-cascader
               v-model="resForm.organ"
+              :placeholder="placeholder2"
               :options="organTree"
               :props="deptTreeProps"
               :show-all-levels="false"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-cascader>
           </el-form-item>
           <el-form-item label="所属辖区 :">
@@ -79,8 +81,8 @@
               v-model="resForm.area"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
+              :class="{ active: !readonly }"
+              :disabled="readonly"
             >
               <el-option
                 v-for="item in areaList"
@@ -95,8 +97,8 @@
               v-model="resForm.enable"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
+              :class="{ active: !readonly }"
+              :disabled="readonly"
             >
               <el-option
                 v-for="item in enableOptions"
@@ -110,8 +112,8 @@
             <el-input
               v-model="resForm.brand"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="设备型号 :">
@@ -119,8 +121,8 @@
               v-model="resForm.model"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
+              :class="{ active: !readonly }"
+              :disabled="readonly"
             >
               <el-option
                 v-for="item in modelList"
@@ -135,6 +137,7 @@
               v-model="resForm.warrantyDate"
               type="date"
               style="width: 150px"
+              :disabled="readonly"
             >
             </el-date-picker>
           </el-form-item>
@@ -142,7 +145,7 @@
             <el-input
               v-model="resForm.HStart"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="readonly"
               class="rangeInput rangeInputer"
             ></el-input>
             <span style="color:white;">°</span>
@@ -152,7 +155,7 @@
             <el-input
               v-model="resForm.HEnd"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="readonly"
               class="rangeInput rangeInputer"
             ></el-input>
             <span style="color:white;">°</span>
@@ -161,7 +164,7 @@
             <el-input
               v-model="resForm.VStart"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="readonly"
               class="rangeInput rangeInputer"
             ></el-input>
             <span style="color:white;">°</span>
@@ -171,7 +174,7 @@
             <el-input
               v-model="resForm.VEnd"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="readonly"
               class="rangeInput rangeInputer"
             ></el-input>
             <span style="color:white;">°</span>
@@ -180,24 +183,24 @@
             <el-input
               v-model="resForm.userName"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="密码 :" v-show="resForm.type === 'GDJK'">
             <el-input
               v-model="resForm.userPwd"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="经度 :">
             <el-input
               v-model="resForm.longitude"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
               @input="updateLonOrLat(true)"
             ></el-input>
           </el-form-item>
@@ -205,8 +208,8 @@
             <el-input
               v-model="resForm.latitude"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
               @input="updateLonOrLat(false)"
             ></el-input>
           </el-form-item>
@@ -214,24 +217,24 @@
             <el-input
               v-model="resForm.height"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="底座方向角 :" v-show="resForm.type === 'GDJK'">
             <el-input
               v-model="resForm.baseOrientation"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="排序 :">
             <el-input
               v-model="resForm.sort"
               :placeholder="placeholder"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
           <el-form-item label="图标 :" style="line-height: 40px" prop="icon">
@@ -246,7 +249,7 @@
                 trigger="click"
                 popper-class="iconPopover"
                 v-model="showPopover"
-                v-if="!disabled"
+                v-if="!readonly"
               >
                 <div class="iconBox">
                   <span class="close" @click.stop="showPopover = false"></span>
@@ -272,8 +275,8 @@
               :placeholder="placeholder"
               type="textarea"
               resize="none"
-              :readonly="disabled"
-              :class="{ active: !disabled }"
+              :disabled="readonly"
+              :class="{ active: !readonly }"
             ></el-input>
           </el-form-item>
         </el-form>
@@ -290,6 +293,7 @@ export default {
   data () {
     return {
       disabled: false,
+      readonly: false,
       placeholder: '请输入',
       placeholder2: '请选择',
       title: '新增视频资源',
@@ -409,7 +413,7 @@ export default {
     }
   },
   watch: {
-    disabled (val) {
+    readonly (val) {
       this.placeholder = val ? '' : '请输入'
       this.placeholder2 = val ? '' : '请选择'
     }
@@ -454,22 +458,27 @@ export default {
      */
     showResDlg (action, data = null) {
       this.isShow = true
+      this.$nextTick(() => {
+        // 重置数据
+        this.$refs.formCtrl.resetFields()
+      })
       if (action === 'new') {
         this.$nextTick(() => {
-          // 重置数据
-          this.$refs.formCtrl.resetFields()
           this.setFormData()
           this.disabled = false
+          this.readonly = false
         })
       } else if (action === 'modify') {
         this.$nextTick(() => {
           this.setFormData(data)
-          this.disabled = false
+          this.disabled = true
+          this.readonly = false
         })
       } else if (action === 'readonly') {
         this.$nextTick(() => {
           this.setFormData(data)
-          this.disabled = true
+          this.disabled = false
+          this.readonly = true
         })
       }
       this.$nextTick(() => {
@@ -534,10 +543,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/deep/.el-cascader:not(.is-disabled):hover .el-input__inner {
-  cursor: pointer;
-  border-color:#209cdf;
-}
 .rangeInputer {
   display: inline;
 }
