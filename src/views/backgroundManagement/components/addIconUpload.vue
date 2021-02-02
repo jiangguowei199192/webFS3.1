@@ -62,21 +62,21 @@ export default {
       const isLt300k = file.size / 1024 <= 300
       if (!isLt300k) {
         this.$refs.upload.uploadFiles.splice(this.$refs.upload.uploadFiles.length - 1, 1)
-        return this.$notify.error('图片大小不能超过 300kb!')
+        return this.$notify({ title: '提示', message: '图片大小不能超过 300kb!', type: 'error' })
       }
     },
     uploadImg () {
       if (this.$refs.upload.uploadFiles.length === 0) {
-        return this.$notify.warning('请先上传图片！')
+        return this.$notify({ title: '提示', message: '请先上传图片！', type: 'warning' })
       }
       const formData = new FormData()
       this.$refs.upload.uploadFiles.forEach(file => {
-        formData.append('file', file.raw)
+        formData.append('files', file.raw)
       })
       const config = { headers: { 'Content-Type': 'multipart/form-data' } }
       this.$axios.post(iconLibaryApi.uploadImgFiles, formData, config).then(res => {
         if (res && res.data && res.data.code === 0) {
-          this.$notify.success('图片上传成功')
+          this.$notify({ title: '提示', message: '上传图片成功!', type: 'success' })
           this.$emit('updatePic')
         }
         //  else {

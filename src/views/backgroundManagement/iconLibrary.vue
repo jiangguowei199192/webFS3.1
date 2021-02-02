@@ -22,7 +22,7 @@
         </el-select>
         <span>是否引用：</span>
         <el-select
-          v-model="isRequired"
+          v-model="isQuote"
           placeholder="请选择"
           style="width:150px;height:34px;margin-right:10px;"
           popper-class="pageSelect"
@@ -70,26 +70,26 @@
       >
         <el-table-column type="selection" align="center"></el-table-column>
         <el-table-column label="图片" align="center">
-          <template slot-scope="scope">{{ scope.row.pic }}</template>
+          <template slot-scope="scope"><img  :src="scope.row.iconPath"></template>
         </el-table-column>
-        <el-table-column prop="name" label="名称" align="center"></el-table-column>
-        <el-table-column prop="bigness" label="大小" align="center"></el-table-column>
-        <el-table-column prop="size" label="尺寸" align="center"></el-table-column>
-        <el-table-column prop="date" label="时间" align="center"></el-table-column>
+        <el-table-column prop="iconName" label="名称" align="center"  show-overflow-tooltip></el-table-column>
+        <el-table-column prop="iconLength" label="大小" align="center"></el-table-column>
+        <el-table-column prop="iconSize" label="尺寸" align="center"></el-table-column>
+        <el-table-column prop="updateTime" label="时间" align="center"></el-table-column>
         <el-table-column label="状态" align="center">
           <template slot-scope="scope">
             <span
-              :style="{color:scope.row.status==='1'?
+              :style="{color:scope.row.status===1?
  '#C5F3FF':'#f00'}"
-            >{{scope.row.status==='1'?'正常':'异常'}}</span>
+            >{{scope.row.status===1?'正常':'失效'}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="isRequired" label="是否引用" align="center">
+        <el-table-column  label="是否引用" align="center">
           <template slot-scope="scope">
             <span
-              :style="{color:scope.row.isRequired==='1'?
+              :style="{color:scope.row.isQuote===1?
  '#C5F3FF': '#999'}"
-            >{{scope.row.isRequired===1?'已引用':'未引用'}}</span>
+            >{{scope.row.isQuote===1?'已引用':'未引用'}}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -117,6 +117,7 @@
 <script>
 import iconUploadDialog from './components/addIconUpload'
 import { iconLibaryApi } from '@/api/iconLibary'
+import globalApi from '@/utils/globalApi'
 export default {
   data () {
     return {
@@ -144,42 +145,42 @@ export default {
           label: '已引用'
         }
       ],
-      isRequired: 'all',
+      isQuote: 'all',
       iconName: '', // 图标名称
       tableData: [
-        {
-          pic: '2016-05-03',
-          name: '王小虎',
-          bigness: '12213321',
-          size: '4X4',
-          date: 20111111,
-          status: '0',
-          isRequired: '0'
-        },
-        {
-          pic: '2016-05-03',
-          name: '王小虎',
-          bigness: '12213321',
-          size: '4X4',
-          date: 20111111,
-          status: '1',
-          isRequired: '1'
-        },
-        {
-          pic: '2016-05-03',
-          name: '王小虎',
-          bigness: '12213321',
-          size: '4X4',
-          date: 20111111,
-          status: '1',
-          isRequired: '1'
-        }
+        // {
+        //   pic: '2016-05-03',
+        //   name: '王小虎',
+        //   bigness: '12213321',
+        //   size: '4X4',
+        //   date: 20111111,
+        //   status: '0',
+        //   isRequired: '0'
+        // },
+        // {
+        //   pic: '2016-05-03',
+        //   name: '王小虎',
+        //   bigness: '12213321',
+        //   size: '4X4',
+        //   date: 20111111,
+        //   status: '1',
+        //   isRequired: '1'
+        // },
+        // {
+        //   pic: '2016-05-03',
+        //   name: '王小虎',
+        //   bigness: '12213321',
+        //   size: '4X4',
+        //   date: 20111111,
+        //   status: '1',
+        //   isRequired: '1'
+        // }
       ],
       multipleSelection: [], // 保存选择的数据
       pageInfo: {
         curPage: 1,
         pageSize: 10,
-        totalCount: 100
+        totalCount: 0
       }
     }
   },
@@ -192,14 +193,18 @@ export default {
     },
     deleteAll () {
       if (this.multipleSelection.length === 0) {
-        return this.$notify.warning('请先进行选择！')
+        return this.$notify({
+          title: '提示',
+          message: '请选择您要删除的图标！',
+          type: 'warning'
+        })
       }
       const params = {
         ids: this.multipleSelection
       }
       this.$axios.post(iconLibaryApi.deleteAll, params).then(res => {
         if (res && res.data && res.data.code === 0) {
-          this.$notify.success('批量删除成功')
+          this.$notify({ title: '提示', message: '删除成功！', type: 'success' })
         }
       })
     },
@@ -212,6 +217,7 @@ export default {
     handleSizeChange (pageSize) {
       console.log(`每页 ${pageSize} 条`)
       this.pageInfo.pageSize = pageSize
+      this.pageInfo.curPage = 1
       this.getAllPic()
     },
     // 切换当前页
@@ -223,17 +229,22 @@ export default {
     // 获取数据
     getAllPic () {
       const params = {
-        status: this.status,
-        isRequired: this.isRequired,
+        status: this.status === 'all' ? '' : this.status,
+        isQuote: this.isQuote === 'all' ? '' : this.isQuote,
         iconName: this.iconName,
-        pageNo: this.pageInfo.curPage,
+        currentPage: this.pageInfo.curPage,
         pageSize: this.pageInfo.pageSize
       }
       this.$axios.post(iconLibaryApi.getAllPic, params).then(res => {
         if (res && res.data && res.data.code === 0) {
           const data = res.data.data
-          this.tableData = data
-          this.totolCount = data.totalCount
+          data.data.forEach(item => {
+            item.iconPath = globalApi.baseUrl + item.iconPath
+          })
+          this.tableData = data.data
+          this.pageInfo.totalCount = data.paginator.totalCount || 0
+        } else {
+          this.tableData = []
         }
       })
     },
@@ -248,10 +259,13 @@ export default {
       this.$refs.multipleTable.clearSelection()
       this.pageInfo.curPage = 1
       this.status = 'all'
-      this.isRequired = 'all'
+      this.isQuote = 'all'
       this.iconName = ''
       this.getAllPic()
     }
+  },
+  mounted () {
+    this.getAllPic()
   }
 }
 </script>
