@@ -263,7 +263,8 @@ export default {
       var param = {
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        deptCode: this.selectedDept.deptCode
+        deptCode: this.selectedDept.deptCode,
+        content: this.peopleSearch
       }
       const _this = this
       this.$axios
@@ -290,13 +291,15 @@ export default {
     // 单击机构时触发
     deptTreeClick (item) {
       this.selectedDept = item
+      this.currentPage = 1
       this.getPeoplePage()
+      this.peopleSearch = ''
     },
 
     // 右击机构时触发
     deptTreeRightCick (event, data, node, obj) {
       this.selectedDept = data
-      this.$refs.insDeptTreeRef.setCurrentKey(data.id)
+      // this.$refs.insDeptTreeRef.setCurrentKey(data.id)
 
       this.showDeptTreeRightMenu = false
       this.showDeptTreeRightMenu = true
@@ -343,10 +346,16 @@ export default {
     },
 
     // 搜索人员时触发
-    peopleSearchClick () {},
+    peopleSearchClick () {
+      this.getPeoplePage()
+    },
 
     // 重置时触发
-    peopleResetClick () {},
+    peopleResetClick () {
+      this.peopleSearch = ''
+      this.currentPage = 1
+      this.getPeoplePage()
+    },
 
     // 点击表格某一行时触发
     clickTableRow () {},
@@ -543,11 +552,10 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      // .el-tree-node__content:hover,
-      // .el-tree-node:focus > .el-tree-node__content {
-      //   color: #1eb0fc;
-      //   background-color: transparent !important;
-      // }
+      .el-tree-node__content:hover,
+      .el-tree-node:focus > .el-tree-node__content {
+        background-color: rgba(15, 95, 134, 0.5) !important;
+      }
 
       // 展开折叠图标
       .el-tree-node__expand-icon.expanded {
@@ -568,7 +576,7 @@ export default {
       }
     }
     /deep/ .el-tree-node.is-current > .el-tree-node__content {
-      background: transparent !important;
+      background: rgba(15, 95, 134, 0.5) !important;
       color: #1eb0fc;
     }
   }
