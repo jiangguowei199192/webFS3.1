@@ -24,7 +24,7 @@
         将文件拖到此处，或
         <em>点击上传</em>
       </div>
-      <div class="el-upload__tip" slot="tip">只能上传jpg/jpeg/png/gif文件,每次最多上传十张图片，且单张图片大小不能超过300kb</div>
+      <div class="el-upload__tip" slot="tip">只能上传jpg/jpeg/png/gif格式,每次最多上传十张图片，单张图片大小不能超过300kb</div>
     </el-upload>
     <span slot="footer" class="dialog-footer">
       <el-button type="primary" @click="confirmAjax">确 定</el-button>
@@ -77,6 +77,7 @@ export default {
       this.$axios.post(iconLibaryApi.uploadImgFiles, formData, config).then(res => {
         if (res && res.data && res.data.code === 0) {
           this.$notify.success('图片上传成功')
+          this.$emit('updatePic')
         }
         //  else {
         //   this.$notify.error('图片上传失败')
@@ -110,6 +111,9 @@ export default {
             width: 33%;
           }
         }
+      .el-upload-list__item:first-child{
+        margin-top:5px;
+      }
       }
     }
   }

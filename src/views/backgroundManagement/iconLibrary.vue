@@ -10,6 +10,7 @@
           v-model="status"
           placeholder="请选择"
           style="width:150px;height:34px;margin-right:20px;"
+          popper-class="pageSelect"
         >
           <el-option label="全部" value="all"></el-option>
           <el-option
@@ -24,6 +25,7 @@
           v-model="isRequired"
           placeholder="请选择"
           style="width:150px;height:34px;margin-right:10px;"
+          popper-class="pageSelect"
         >
           <el-option label="全部" value="all"></el-option>
           <el-option
@@ -39,11 +41,11 @@
           style="width:450px;height:34px;margin-right:10px;"
           placeholder="请输入图标名称进行搜索"
         ></el-input>
-        <div class="btn">
+        <div class="btn" @click.stop="searchPic">
           <img :src="userSerchIcon" alt />
           <span>搜索</span>
         </div>
-        <div class="btn">
+        <div class="btn" @click.stop="resetPic">
           <img :src="userResetIcon" alt />
           <span>重置</span>
         </div>
@@ -55,7 +57,7 @@
         </div>
         <div>
           <el-button class="add" @click.stop="addIcon">添加</el-button>
-          <el-button class="delete">批量删除</el-button>
+          <el-button class="delete" @click.stop="deleteAll">批量删除</el-button>
         </div>
       </div>
       <el-table
@@ -101,13 +103,20 @@
         :page-size="pageInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="pageInfo.totalCount"
+        popper-class="pageSelect"
+        :popper-append-to-body="false"
       ></el-pagination>
     </div>
-    <iconUploadDialog :dialogVisible="dialogVisible" @closeDialog="()=>{this.dialogVisible=false}"></iconUploadDialog>
+    <iconUploadDialog
+      :dialogVisible="dialogVisible"
+      @closeDialog="()=>{this.dialogVisible=false}"
+      @updatePic="resetPic"
+    ></iconUploadDialog>
   </div>
 </template>
 <script>
 import iconUploadDialog from './components/addIconUpload'
+import { iconLibaryApi } from '@/api/iconLibary'
 export default {
   data () {
     return {
@@ -181,6 +190,19 @@ export default {
     addIcon () {
       this.dialogVisible = true
     },
+    deleteAll () {
+      if (this.multipleSelection.length === 0) {
+        return this.$notify.warning('请先进行选择！')
+      }
+      const params = {
+        ids: this.multipleSelection
+      }
+      this.$axios.post(iconLibaryApi.deleteAll, params).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          this.$notify.success('批量删除成功')
+        }
+      })
+    },
     // 表格多选选择方法
     handleSelectionChange (val) {
       console.log(val)
@@ -190,11 +212,45 @@ export default {
     handleSizeChange (pageSize) {
       console.log(`每页 ${pageSize} 条`)
       this.pageInfo.pageSize = pageSize
+      this.getAllPic()
     },
     // 切换当前页
     handleCurrentChange (curPage) {
       console.log(`当前页: ${curPage}`)
       this.pageInfo.curPage = curPage
+      this.getAllPic()
+    },
+    // 获取数据
+    getAllPic () {
+      const params = {
+        status: this.status,
+        isRequired: this.isRequired,
+        iconName: this.iconName,
+        pageNo: this.pageInfo.curPage,
+        pageSize: this.pageInfo.pageSize
+      }
+      this.$axios.post(iconLibaryApi.getAllPic, params).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          const data = res.data.data
+          this.tableData = data
+          this.totolCount = data.totalCount
+        }
+      })
+    },
+    // 搜索
+    searchPic () {
+      this.pageInfo.curPage = 1
+      this.getAllPic()
+    },
+    // 重置
+    resetPic () {
+      // this.multipleSelection = []
+      this.$refs.multipleTable.clearSelection()
+      this.pageInfo.curPage = 1
+      this.status = 'all'
+      this.isRequired = 'all'
+      this.iconName = ''
+      this.getAllPic()
     }
   }
 }
@@ -335,7 +391,7 @@ export default {
       // background-color: #183157;
       border-color: #c5f3ff;
     }
-    .tablePagination {
+    /deep/ .tablePagination {
       position: absolute;
       bottom: 20px;
       right: 20px;
