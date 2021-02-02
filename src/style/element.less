@@ -798,12 +798,23 @@ input[type="number"] {
     position     : relative;
     top          : 10px;
   }
+  .el-textarea__inner:disabled {
+    cursor: default;
+    background   : transparent;
+    border: 1px solid #209cdf55;
+    padding: 5px 15px;
+    top       : 0px;
+  }
 
   .el-textarea.active .el-textarea__inner {
     border    : 1px solid #1eb0fc;
     background: rgba(9, 84, 109, 0.3);
     padding   : 5px 15px;
     top       : 0px;
+  }
+
+  .el-input.is-disabled .el-input__icon {
+    cursor: default;
   }
 
   .el-select .el-input.is-disabled,
@@ -820,6 +831,15 @@ input[type="number"] {
     .el-icon-arrow-down::before {
       content: "";
     }
+  }
+
+  .el-cascader:not(.is-disabled):hover .el-input__inner {
+    cursor: pointer;
+    border-color:#209cdf;
+  }
+
+  .el-cascader.is-disabled .el-input {
+    cursor: default;
   }
 
   .el-input-number {
