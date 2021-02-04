@@ -2,13 +2,13 @@
  * @Descripttion: 出来混迟早是要还的
  * @version: v_2.0
  * @Author: liangkaiLee
- * @Date: 2021-01-22 15:49:43
+ * @Date: 2021-01-26 09:16:43
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-01-26 10:34:37
+ * @LastEditTime: 2021-02-01 12:36:28
 -->
 <template>
   <el-dialog
-    :visible="isShow"
+    :visible.sync="isShow"
     :close-on-click-modal="false"
     @close="$emit('close')"
     width="480px"
@@ -19,14 +19,14 @@
       <div class="header-text">{{ title }}</div>
     </div>
     <el-form
-      ref="addDictRef"
+      ref="addDictForm"
       :model="addDictForm"
       :rules="addDictRules"
       :inline="true"
       label-width="80px"
       class="add-dict-form"
     >
-      <el-form-item label="类型名称: " prop="name">
+      <el-form-item label="类型名称 :" prop="name">
         <el-input
           v-model="addDictForm.name"
           :placeholder="placeholder"
@@ -34,7 +34,7 @@
           :class="{ active: !disabled }"
         ></el-input>
       </el-form-item>
-      <el-form-item label="类型码: " prop="code">
+      <el-form-item label="类型码 :" prop="code">
         <el-input
           v-model="addDictForm.code"
           :placeholder="placeholder"
@@ -42,7 +42,7 @@
           :class="{ active: !disabled }"
         ></el-input>
       </el-form-item>
-      <el-form-item label="状态: " prop="status">
+      <el-form-item label="状态 :" prop="status">
         <el-input
           v-model="addDictForm.status"
           :placeholder="placeholder"
@@ -50,7 +50,7 @@
           :class="{ active: !disabled }"
         ></el-input>
       </el-form-item>
-      <el-form-item label="排序: " prop="order">
+      <el-form-item label="排序 :" prop="order">
         <el-input
           v-model="addDictForm.order"
           :placeholder="placeholder"
@@ -58,7 +58,7 @@
           :class="{ active: !disabled }"
         ></el-input>
       </el-form-item>
-      <el-form-item label="图标: " prop="icon">
+      <el-form-item label="图标 :" prop="icon">
         <div class="iconTool">
           <el-avatar
             :size="30"
@@ -90,7 +90,7 @@
           </el-popover>
         </div>
       </el-form-item>
-      <el-form-item label="备注: " prop="note">
+      <el-form-item label="备注 :" prop="note">
         <el-input
           v-model="addDictForm.note"
           placeholder="请输入"
@@ -100,13 +100,15 @@
       </el-form-item>
     </el-form>
     <div class="handelBtns">
-      <span @click.stop="cancelClick">取消</span>
-      <span @click.stop="confirmClick">确定</span>
+      <span @click.stop="cancelClick('addDictForm')">取消</span>
+      <span @click.stop="confirmClick('addDictForm')">确定</span>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { dataDictApi } from '@/api/dataDict'
+
 export default {
   props: {
     isShow: {
@@ -138,18 +140,57 @@ export default {
         note: ''
       },
       addDictRules: {
-        name: [{ required: true, message: '请输入' }],
-        code: [{ required: true, message: '请输入' }],
-        status: [{ required: true, message: '请输入' }]
+        name: [{ required: true, message: '请输入类型名称', trigger: 'blur' }],
+        code: [{ required: true, message: '请输入类型码', trigger: 'blur' }],
+        status: [{ required: true, message: '请输入状态', trigger: 'blur' }]
       }
     }
   },
   methods: {
-    confirmClick () {
-      this.$emit('confirmClick')
+    confirmClick (formName) {
+      this.$refs[formName].validate(valid => {
+        if (!valid) return
+        const params = {
+          typeName: this.addDictForm.name,
+          typeCode: this.addDictForm.code,
+          status: parseInt(this.addDictForm.status),
+          orderNum: parseInt(this.addDictForm.order),
+          parentId: parseInt(0),
+          icon: this.addDictForm.icon,
+          remark: this.addDictForm.note
+        }
+        this.$axios
+          .post(dataDictApi.addDict, params)
+          .then(res => {
+            console.log('新增数据字典接口返回: ', res)
+            if (res && res.data && res.data.code === 0) {
+              this.$notify.success({
+                title: '提示',
+                message: '新增成功!',
+                duration: 3 * 1000
+              })
+              setTimeout(() => {
+                this.dialogVisible = false
+              }, 300)
+              this.addDictForm = {}
+              return
+            }
+            this.$notify.warning({
+              title: '提示',
+              message: '新增失败!',
+              duration: 3 * 1000
+            })
+          })
+          .catch(err => {
+            console.log('接口错误: ' + err)
+          })
+      })
+      // this.$emit('confirmClick')
     },
 
-    cancelClick () {
+    cancelClick (formName) {
+      this.$refs[formName].resetFields()
+
       this.$emit('update:isShow', false)
     }
   }

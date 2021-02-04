@@ -168,9 +168,12 @@ export default {
     },
     refresh () {
       if (!this.api) return
-      this.getList(this.api)
+      setTimeout(() => {
+        this.getList(this.api)
+      }, 300)
     }
   },
+
   methods: {
     /**
      *  清空选中
@@ -210,6 +213,7 @@ export default {
       // 每次调用接口时都自动绑定最新的数据
       api(this.handleParams())
         .then(res => {
+          console.log('查询子级字典分页接口返回: ', res)
           if (res.data.code === 0) {
             // 使外面可以访问到表格数据
             const arr = res.data.data.data

@@ -2,9 +2,9 @@
  * @Descripttion: 出来混迟早是要还的
  * @version: v_3.0
  * @Author: liangkaiLee
- * @Date: 2021-01-22 13:56:08
+ * @Date: 2021-01-26 13:56:08
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-01-26 10:39:54
+ * @LastEditTime: 2021-02-04 15:40:07
 -->
 <template>
   <div class="dictDetBox">
@@ -34,7 +34,7 @@
         </div>
         <div class="right">
           <span @click.stop="addDict">添加</span>
-          <span>批量删除</span>
+          <span @click.stop="delDict">批量删除</span>
         </div>
       </div>
       <PageTable
@@ -49,6 +49,7 @@
         :api="api"
         :checkedList.sync="checkedList"
       ></PageTable>
+
       <!-- 添加字典弹窗 -->
       <AddDictDialog
         ref="dictDlg"
@@ -58,6 +59,13 @@
         @confirmClick="submitAddDict"
         @cancelClick="cancelAddDict"
       ></AddDictDialog>
+      <!-- 批量删除弹窗 -->
+      <DeleteDialog
+        :isShow.sync="showDeleteTip"
+        @close="showDeleteTip = false"
+        @confirmClick="delTipConfirmClick"
+        @cancelClick="showDeleteTip = false"
+      ></DeleteDialog>
     </div>
   </div>
 </template>
@@ -65,13 +73,15 @@
 <script>
 import PageTable from './pageTable.vue'
 import AddDictDialog from './addDictDialog.vue'
+import DeleteDialog from './deleteDialog.vue'
 
 export default {
   name: 'dictPage',
 
   components: {
     PageTable,
-    AddDictDialog
+    AddDictDialog,
+    DeleteDialog
   },
 
   props: {
@@ -87,10 +97,7 @@ export default {
     query: {
       type: Object,
       default: () => {
-        return {
-          deviceCode: '',
-          deviceName: ''
-        }
+        return {}
       }
     },
     tableInfo: {
@@ -117,7 +124,8 @@ export default {
       organ: '',
       searchStr: '',
       checkedList: [],
-      showAddDict: false
+      showAddDict: false,
+      showDeleteTip: false
     }
   },
 
@@ -136,7 +144,7 @@ export default {
       this.$refs.pageTable.clearSelection()
     },
 
-    //  添加字典
+    //  点击添加字典
     addDict () {
       this.showAddDict = true
     },
@@ -144,11 +152,23 @@ export default {
     // 添加字典提交
     submitAddDict () {
       alert('添加成功!')
+      this.showAddDict = false
     },
 
     // 取消添加
     cancelAddDict () {
       this.showAddDict = false
+    },
+
+    // 点击批量删除
+    delDict () {
+      this.showDeleteTip = true
+    },
+
+    // 批量删除确定
+    delTipConfirmClick () {
+      alert('删除成功!')
+      this.showDeleteTip = false
     }
   }
 }

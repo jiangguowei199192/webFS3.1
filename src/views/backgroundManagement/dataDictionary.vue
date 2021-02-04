@@ -1,9 +1,9 @@
 <template>
-  <div style=" margin: auto 30px;">
+  <div style="margin: auto 30px">
     <!-- 头部面包屑 -->
     <div class="head-title">系统设置 / 数据字典</div>
     <!-- 左侧字典树 -->
-    <div style=" display: flex;">
+    <div style="display: flex">
       <div class="left-tree">
         <div class="tree-title">数据字典树</div>
         <el-input
@@ -16,13 +16,17 @@
         <!-- 字典树 -->
         <el-tree
           class="dict-tree"
+          ref="dictTreeRef"
           :data="dictTree"
           :props="dictTreeProps"
           default-expand-all
-          node-key="dictCode"
-          :current-node-key="selectedDict.dictCode"
+          node-key="id"
+          :expand-on-click-node="false"
+          @node-click="dictTreeClick"
         ></el-tree>
-        <div class="add-dict-btn" @click="addDictClick">十 新增字典</div>
+        <el-button class="add-dict-btn" @click.prevent="addDictClick"
+          >十 新增字典</el-button
+        >
       </div>
       <!-- 右侧字典详情表 -->
       <DictPage
@@ -30,12 +34,13 @@
         :tableInfo="tableInfo"
         :subTitle="subTitle"
         :query="query"
+        :api="getChildDictList"
       ></DictPage>
     </div>
 
     <!-- 新增字典弹窗 -->
     <AddDictDialog
-      ref="dictDlg"
+      ref="addDictRef"
       :isShow.sync="showAddDict"
       title="新增字典"
       :deptTree="dictTree"
@@ -49,6 +54,7 @@
 <script>
 import DictPage from './components/dictPage.vue'
 import AddDictDialog from './components/addDictDialog.vue'
+import { dataDictApi } from '@/api/dataDict'
 
 export default {
   components: {
@@ -58,116 +64,104 @@ export default {
 
   data () {
     return {
-      subTitle: '字典项',
-      // 表格项
-      tableInfo: {
-        refresh: 1,
-        data: [
-          {
-            name: '武昌区',
-            icon:
-              'http://111.47.13.103:40031/cloud-oneMap/combatEvent/1608350408597_1608350408597.png',
-            code: 'wuchangqu',
-            status: false,
-            order: '01'
-          },
-          {
-            name: '汉阳区',
-            icon:
-              'http://111.47.13.103:40031/cloud-oneMap/combatEvent/1608350408597_1608350408597.png',
-            code: 'hanyangqu',
-            status: true,
-            order: '02'
-          },
-          {
-            name: '青山区',
-            icon:
-              'http://111.47.13.103:40031/cloud-oneMap/combatEvent/1608350408597_1608350408597.png',
-            code: '青山区',
-            status: false,
-            order: '03'
-          }
-        ],
-        fieldList: [
-          { label: '子类名称', value: 'name' },
-          { label: '图标', value: 'icon', type: 'image' },
-          { label: '子类编码', value: 'code' },
-          { label: '状态', value: 'status', type: 'switch' },
-          { label: '排序', value: 'order' }
-        ],
-        handle: {
-          label: '操作',
-          width: '130',
-          btList: [
-            {
-              label: '修改'
-            },
-            {
-              label: '查看'
-            }
-          ]
-        }
-      },
-      query: {
-        deviceCode: '',
-        deviceName: ''
-      },
       dictEditIcon: require('../../assets/images/backgroundManagement/deptEdit.png'),
       dictSeeIcon: require('../../assets/images/backgroundManagement/deptSee.png'),
       dictDeleteIcon: require('../../assets/images/backgroundManagement/deptDelete.png'),
       dictSearch: '',
-      dictTree: [
-        {
-          dictName: '辖区类型',
-          dictCode: '1',
-          showSetting: true,
-          children: [
-            {
-              dictName: '省级行政区',
-              dictCode: '1-1',
-              showSetting: false,
-              children: [
-                {
-                  dictName: '地级行政区',
-                  dictCode: '1-1-1',
-                  showSetting: false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          dictName: '点位类型',
-          dictCode: '2',
-          showSetting: false,
-          children: [
-            {
-              dictName: '消防线路',
-              dictCode: '2-1',
-              showSetting: false,
-              children: [
-                {
-                  dictName: '武珞路',
-                  dictCode: '2-1-1',
-                  showSetting: false
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      dictTree: [],
+      dictTreeProps: {
+        children: 'children',
+        label: 'typeName',
+        value: 'typeCode'
+      },
       selectedDict: '',
       showAddDict: false,
 
-      dictTreeProps: {
-        children: 'children',
-        label: 'dictName',
-        value: 'dictCode'
-      }
+      subTitle: '字典项',
+      // 表格项
+      tableInfo: {
+        refresh: 1,
+        data: [],
+        fieldList: [
+          { label: '子类名称', value: 'typeName' },
+          { label: '图标', value: 'icon', type: 'icon' },
+          { label: '子类编码', value: 'typeCode' },
+          { label: '状态', value: 'status', type: 'switch' },
+          { label: '排序', value: 'orderNum' }
+        ],
+        handle: {
+          label: '操作',
+          width: '130',
+          btList: [{ label: '修改' }, { label: '查看' }]
+        }
+      },
+      pageData: {
+        pageSize: 10,
+        currentPage: 1,
+        total: 0
+      },
+      query: {}
     }
   },
 
+  mounted () {
+    this.getDictTree()
+  },
+
   methods: {
+    // 单击字典树
+    dictTreeClick (node) {
+      // console.log(node)
+      this.selectedDict = node
+      this.getChildDictList()
+    },
+
+    // children为空时置为null
+    handleDeptTree (data) {
+      data.forEach(item => {
+        if (item.children) {
+          if (item.children.length <= 0) {
+            item.children = null
+          } else {
+            this.handleDeptTree(item.children)
+          }
+        }
+      })
+      return data
+    },
+
+    // 获取字典树
+    getDictTree () {
+      this.$axios
+        .get(dataDictApi.queryParentDict)
+        .then(res => {
+          console.log('查询字典树接口返回: ', res)
+          if (res && res.data && res.data.code === 0) {
+            this.dictTree = this.handleDeptTree(res.data.data)
+            if (this.dictTree.length > 0) {
+              this.selectedDict = this.dictTree[0]
+              this.getChildDictList()
+            }
+          }
+        })
+        .catch(err => {
+          console.log('接口错误: ' + err)
+        })
+    },
+
+    // 获取子级字典列表
+    getChildDictList () {
+      // console.log('selectedDict:', this.selectedDict)
+      const queryParams = {
+        parentId: parseInt(this.selectedDict ? this.selectedDict.id : 0),
+        currentPage: parseInt(this.pageData.currentPage),
+        pageSize: parseInt(this.pageData.pageSize),
+        typeName: ''
+      }
+      console.log('queryParams:', queryParams)
+      return this.$axios.post(dataDictApi.queryChildDict, queryParams)
+    },
+
     // 搜索字典
     dictSearchChange () {},
 
@@ -178,7 +172,7 @@ export default {
 
     // 新增字典提交
     submitAddDict () {
-      alert('新增成功!')
+      // console.log(this.$refs.addDictRef.addDictForm);
     },
 
     // 取消新增
@@ -195,6 +189,7 @@ export default {
   line-height: 54px;
   font-size: 16px;
 }
+
 .left-tree {
   width: 280px;
   height: 814px;
@@ -219,6 +214,7 @@ export default {
       color: #c5f3ff;
     }
   }
+
   .dict-tree {
     height: 646px;
     overflow: auto;
@@ -235,42 +231,46 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      .el-tree-node__content:hover,
-      .el-tree-node:focus > .el-tree-node__content {
+      .el-tree-node.is-current > .el-tree-node__content {
+        background-color: rgba(11, 119, 158, 0.66);
+        color: rgb(255, 246, 125);
+      }
+      .el-tree-node__content:hover {
         color: #fff;
-        background-color: transparent !important;
+        background-color: rgba(11, 119, 158, 0.66);
       }
-      // 展开折叠图标
-      .el-tree-node__expand-icon.expanded {
-        // 动画取消
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-      }
-      .el-icon-caret-right:before {
-        // 收起
-        content: url("../../assets/images/backgroundManagement/deptTreeUnfold.png");
-      }
-      .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
-        // 展开
-        content: url("../../assets/images/backgroundManagement/deptTreeFold.png");
-      }
+      // // 展开折叠图标
+      // .el-tree-node__expand-icon.expanded {
+      //   // 动画取消
+      //   -webkit-transform: rotate(0deg);
+      //   transform: rotate(0deg);
+      // }
+      // .el-icon-caret-right:before {
+      //   // 收起
+      //   content: url("../../assets/images/backgroundManagement/deptTreeUnfold.png");
+      // }
+      // .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
+      //   // 展开
+      //   content: url("../../assets/images/backgroundManagement/deptTreeFold.png");
+      // }
       .el-tree-node__expand-icon.is-leaf::before {
         display: none;
       }
     }
   }
+
   .add-dict-btn {
-    margin: 20px auto 0 auto;
+    margin: 20px auto 0 62px;
     text-align: center;
     width: 150px;
     height: 38px;
     background-color: #39a4dd;
-    line-height: 38px;
-    border-radius: 4px;
+    color: #fff;
+    border: none;
     font-size: 16px;
-    cursor: pointer;
   }
 }
+
 .right-table {
   margin-top: 0;
   flex-grow: 100;
