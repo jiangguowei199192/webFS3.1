@@ -216,7 +216,7 @@ export default {
           if (res.data.code === 0) {
             // 使外面可以访问到表格数据
             const arr = res.data.data.data
-            arr.forEach((d) => {
+            arr.forEach(d => {
               if (d.deviceStatus === 'enabled') {
                 d.deviceStatus = true
               } else if (d.deviceStatus === 'disabled') {

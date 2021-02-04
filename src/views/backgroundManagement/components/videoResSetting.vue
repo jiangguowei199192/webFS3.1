@@ -211,7 +211,7 @@ export default {
     this.getList()
     EventBus.$on('updateDeviceList', this.getList)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     EventBus.$off('updateDeviceList', this.getList)
   },
   methods: {
@@ -255,17 +255,17 @@ export default {
      * 更新表数据查询条件并查询
      */
     updateTableList (queryParams) {
-      this.query.deviceDept = queryParams.deptCode;
-      this.query.deviceNameOrCode = queryParams.searchStr;
-      this.query.deviceStatus = queryParams.deviceStatus;
-      this.query.deviceTypeCode = queryParams.videoType;
-      this.query.onlineStatus = queryParams.onlineStatus;
+      this.query.deviceDept = queryParams.deptCode
+      this.query.deviceNameOrCode = queryParams.searchStr
+      this.query.deviceStatus = queryParams.deviceStatus
+      this.query.deviceTypeCode = queryParams.videoType
+      this.query.onlineStatus = queryParams.onlineStatus
       if (queryParams.dateRange !== null && queryParams.dateRange !== '') {
-        this.query.timeStart = queryParams.dateRange[0].getTime();
-        this.query.timeEnd = queryParams.dateRange[1].getTime();
+        this.query.timeStart = queryParams.dateRange[0].getTime()
+        this.query.timeEnd = queryParams.dateRange[1].getTime()
       } else {
-        this.query.timeStart = '';
-        this.query.timeEnd = '';
+        this.query.timeStart = ''
+        this.query.timeEnd = ''
       }
       this.getList()
     },
@@ -278,7 +278,7 @@ export default {
     /**
      * 搜索条件改变时查询表数据
      */
-    queryParamsChange() {
+    queryParamsChange () {
       this.updateTableList(this.queryParams)
     },
     /**

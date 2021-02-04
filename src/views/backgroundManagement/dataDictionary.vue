@@ -10,8 +10,7 @@
           class="dict-search-input"
           suffix-icon="el-icon-search"
           v-model="dictSearch"
-          placeholder="请输入搜索条件"
-          @change="dictSearchChange"
+          placeholder="请输入搜索关键字"
         ></el-input>
         <!-- 字典树 -->
         <el-tree
@@ -23,6 +22,7 @@
           node-key="id"
           :expand-on-click-node="false"
           @node-click="dictTreeClick"
+          :filter-node-method="dictSearchChange"
         ></el-tree>
         <el-button class="add-dict-btn" @click.prevent="addDictClick"
           >十 新增字典</el-button
@@ -104,6 +104,12 @@ export default {
     }
   },
 
+  watch: {
+    dictSearch (val) {
+      this.$refs.dictTreeRef.filter(val)
+    }
+  },
+
   mounted () {
     this.getDictTree()
   },
@@ -113,7 +119,8 @@ export default {
     dictTreeClick (node) {
       // console.log(node)
       this.selectedDict = node
-      this.getChildDictList()
+      this.tableInfo.refresh = Math.random()
+      this.dictSearch = ''
     },
 
     // children为空时置为null
@@ -135,7 +142,7 @@ export default {
       this.$axios
         .get(dataDictApi.queryParentDict)
         .then(res => {
-          console.log('查询字典树接口返回: ', res)
+          // console.log('查询字典树接口返回: ', res)
           if (res && res.data && res.data.code === 0) {
             this.dictTree = this.handleDeptTree(res.data.data)
             if (this.dictTree.length > 0) {
@@ -158,12 +165,17 @@ export default {
         pageSize: parseInt(this.pageData.pageSize),
         typeName: ''
       }
-      console.log('queryParams:', queryParams)
+      // console.log('queryParams:', queryParams)
       return this.$axios.post(dataDictApi.queryChildDict, queryParams)
     },
 
     // 搜索字典
-    dictSearchChange () {},
+    dictSearchChange (value, data) {
+      if (!value) {
+        return true
+      }
+      return data.typeName.indexOf(value) !== -1
+    },
 
     // 点击新增按钮
     addDictClick () {
@@ -239,20 +251,6 @@ export default {
         color: #fff;
         background-color: rgba(11, 119, 158, 0.66);
       }
-      // // 展开折叠图标
-      // .el-tree-node__expand-icon.expanded {
-      //   // 动画取消
-      //   -webkit-transform: rotate(0deg);
-      //   transform: rotate(0deg);
-      // }
-      // .el-icon-caret-right:before {
-      //   // 收起
-      //   content: url("../../assets/images/backgroundManagement/deptTreeUnfold.png");
-      // }
-      // .el-tree-node__expand-icon.expanded.el-icon-caret-right:before {
-      //   // 展开
-      //   content: url("../../assets/images/backgroundManagement/deptTreeFold.png");
-      // }
       .el-tree-node__expand-icon.is-leaf::before {
         display: none;
       }

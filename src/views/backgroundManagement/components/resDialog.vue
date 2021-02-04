@@ -128,7 +128,7 @@ export default {
       createTime: '',
       createPeople: '',
       modifyTime: '',
-      modifyPeople: '',
+      modifyPeople: ''
     }
   },
   watch: {
