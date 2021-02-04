@@ -213,10 +213,16 @@ export default {
       // 每次调用接口时都自动绑定最新的数据
       api(this.handleParams())
         .then(res => {
-          console.log('查询子级字典分页接口返回: ', res)
           if (res.data.code === 0) {
             // 使外面可以访问到表格数据
             const arr = res.data.data.data
+            arr.forEach((d) => {
+              if (d.deviceStatus === 'enabled') {
+                d.deviceStatus = true
+              } else if (d.deviceStatus === 'disabled') {
+                d.deviceStatus = false
+              }
+            })
             const paginator = res.data.data.paginator
             this.$emit('update:data', arr)
             if (this.pager) {

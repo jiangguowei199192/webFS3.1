@@ -6,6 +6,7 @@
       :drawType="0"
       :bVideoPoint="true"
       :isShow.sync="isShow"
+      :isRead.sync="readonly"
       :infoTop="infoTop"
       :infoHeight="infoHeight"
       @mapResAddOrModify="mapResAddOrModify"
@@ -29,8 +30,8 @@
               v-model="resForm.type"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !readonly || !disabled }"
-              :disabled="readonly || disabled"
+              :class="{ active: !readonly || !isEdit }"
+              :disabled="readonly || isEdit"
               @change="devTypeChange($event)"
             >
               <el-option
@@ -53,9 +54,9 @@
           <el-form-item label="设备编号 :" prop="devCode">
             <el-input
               v-model="resForm.devCode"
-              :placeholder="readonly || disabled ? '' : placeholder"
-              :disabled="readonly || disabled"
-              :class="{ active: !readonly || !disabled}"
+              :placeholder="readonly || isEdit ? '' : placeholder"
+              :disabled="readonly || isEdit"
+              :class="{ active: !readonly || !isEdit}"
               @input="limitMaxLength($event, 20, resForm, 'devCode')"
             ></el-input>
           </el-form-item>
@@ -142,6 +143,7 @@
               type="date"
               style="width: 150px"
               :disabled="readonly"
+              :editable="false"
             >
             </el-date-picker>
           </el-form-item>
@@ -307,12 +309,16 @@ import {
   latValidate,
   limitMaxLength
 } from '@/utils/formRules'
+import { backApi } from '@/api/back'
+import { settingApi } from '@/api/setting'
+import { Notification } from 'element-ui'
+import { EventBus } from '@/utils/eventBus.js'
 export default {
   props: {
   },
   data () {
     return {
-      disabled: false,
+      isEdit: false,
       readonly: false,
       placeholder: '请输入',
       placeholder2: '请选择',
@@ -321,37 +327,14 @@ export default {
       showPopover: false,
       infoTop: 80,
       infoHeight: 445,
-      organTree: [
-        {
-          deptName: '湖北省应急管理厅',
-          deptCode: '1',
-          showSetting: true,
-          children: [
-            {
-              deptName: '孝感市应急管理局',
-              deptCode: '1-1',
-              showSetting: false
-            },
-            {
-              deptName: '武汉市应急管理局',
-              deptCode: '1-2',
-              showSetting: false,
-              children: [
-                {
-                  deptName: '江夏区应急管理所',
-                  deptCode: '1-2-1',
-                  showSetting: false
-                }
-              ]
-            }
-          ]
-        }
-      ],
+      organTree: [],
       deptTreeProps: {
         expandTrigger: 'hover',
         children: 'children',
         label: 'deptName',
-        value: 'deptCode'
+        value: 'deptCode',
+        emitPath: false,
+        checkStrictly: true
       },
       areaList: [
         {
@@ -375,11 +358,11 @@ export default {
       ],
       enableOptions: [
         {
-          value: 'true',
+          value: true,
           label: '启用'
         },
         {
-          value: 'false',
+          value: false,
           label: '不启用'
         }
       ],
@@ -440,17 +423,75 @@ export default {
       this.placeholder2 = val ? '' : '请选择'
     }
   },
+  created () {
+    this.getDeptTree()
+  },
   components: {
     ResDialog
   },
   methods: {
     limitMaxLength,
     /**
+     * 获取机构树
+     */
+    async getDeptTree () {
+      var _this = this
+      this.$axios.post(backApi.getDeptTree).then((res) => {
+        if (res && res.data && res.data.code === 0) {
+          _this.organTree = this.handleDeptTree(res.data.data)
+        }
+      })
+    },
+    // children为" "时置为null
+    handleDeptTree (tree) {
+      tree.forEach((item) => {
+        if (item.children) {
+          if (item.children.length <= 0) {
+            item.children = null
+          } else {
+            this.handleDeptTree(item.children)
+          }
+        }
+      })
+      return tree
+    },
+    /**
      * 设置表单数据
      */
     setFormData (data) {
       if (data) {
         this.resForm.type = data.deviceTypeCode
+        this.resForm.name = data.deviceName
+        this.resForm.devCode = data.deviceCode
+        this.resForm.address = data.deviceAddress
+        this.resForm.organ = data.deviceDept
+        this.resForm.area = data.deviceDistrict
+        this.resForm.enable = data.deviceStatus
+        this.resForm.brand = data.deviceBrand
+        this.resForm.model = data.deviceModel
+        if (data.deviceExpirationDate !== null &&
+          data.deviceExpirationDate !== '' &&
+          data.deviceExpirationDate !== undefined) {
+          this.resForm.warrantyDate = new Date(data.deviceExpirationDate)
+        }
+        if (data.deviceRotationRange !== null &&
+          data.deviceRotationRange !== '' &&
+          data.deviceRotationRange !== undefined) {
+          const tmpRange = JSON.parse(data.deviceRotationRange)
+          this.resForm.HStart = tmpRange.HStart
+          this.resForm.HEnd = tmpRange.HEnd
+          this.resForm.VStart = tmpRange.VStart
+          this.resForm.VEnd = tmpRange.VEnd
+        }
+        this.resForm.userName = data.deviceUserName
+        this.resForm.userPwd = data.devicePassword
+        this.resForm.longitude = data.deviceLongitude
+        this.resForm.latitude = data.deviceLatitude
+        this.resForm.height = data.deviceHeight
+        this.resForm.baseOrientation = data.deviceSeatAz
+        this.resForm.sort = data.orderNum
+        this.resForm.icon = data.iconUrl
+        this.resForm.note = data.remark
       } else {
         this.resForm = {
           type: 'GDJK',
@@ -489,22 +530,24 @@ export default {
         this.$refs.formCtrl.resetFields()
         this.setFormData()
       })
+
       if (action === 'new') {
         this.$nextTick(() => {
-          this.disabled = false
+          this.isEdit = false
           this.readonly = false
         })
       } else if (action === 'modify') {
         this.$nextTick(() => {
           this.setFormData(data)
-          this.disabled = true
+          this.isEdit = true
           this.readonly = false
         })
       } else if (action === 'readonly') {
         this.$nextTick(() => {
           this.setFormData(data)
-          this.disabled = false
+          this.isEdit = false
           this.readonly = true
+          this.$refs.resDlgCtrl.showInfos(data)
         })
       }
       this.$nextTick(() => {
@@ -540,8 +583,101 @@ export default {
      */
     submitResForm () {
       this.$refs.formCtrl.validate((valid) => {
-        if (!valid) return
-        console.log('videoResDlg commit ...')
+        // if (!valid) return
+
+        let tmpApi = ''
+        let tmpAction = ''
+        let tmpTypeName = ''
+        if (this.isEdit === false && this.resForm.type === 'WRJ') {
+          tmpApi = settingApi.addWRJ
+          tmpAction = '新增'
+          tmpTypeName = '无人机'
+        } else if (this.isEdit === false && this.resForm.type === 'GDJK') {
+          tmpApi = settingApi.addGDJK
+          tmpAction = '新增'
+          tmpTypeName = '高点监控'
+        } else if (this.isEdit === true && this.resForm.type === 'WRJ') {
+          tmpApi = settingApi.updateDevice
+          tmpAction = '修改'
+          tmpTypeName = '无人机'
+        } else if (this.isEdit === true && this.resForm.type === 'GDJK') {
+          tmpApi = settingApi.updateDevice
+          tmpAction = '修改'
+          tmpTypeName = '高点监控'
+        } else {
+          console.log('submitResForm unknown type : ', this.resForm.type)
+          return
+        }
+
+        let expTime = ''
+        if (this.resForm.warrantyDate !== '') {
+          expTime = this.resForm.warrantyDate.getTime()
+        }
+        let tmpDevStatus = 'enabled'
+        if (this.resForm.enable === false) {
+          tmpDevStatus = 'disabled'
+        }
+        const tmpDatas = {
+          deviceAddress: this.resForm.address, // 地点
+          deviceCode: this.resForm.devCode, // 设备编码
+          deviceDept: this.resForm.organ,
+          deviceName: this.resForm.name,
+          deviceStatus: tmpDevStatus,
+          iconUrl: this.resForm.icon,
+          deviceBrand: this.resForm.brand, // 品牌
+          deviceDistrict: this.resForm.area,
+          deviceHeight: this.resForm.height,
+          deviceLatitude: this.resForm.latitude,
+          deviceLongitude: this.resForm.longitude,
+          deviceModel: this.resForm.model,
+          expirationDate: expTime, // 质保期
+          orderNum: this.resForm.sort,
+          remark: this.resForm.note
+        }
+        if (this.resForm.type === 'GDJK') {
+          tmpDatas.deviceUserName = this.resForm.userName
+          tmpDatas.devicePassword = this.resForm.userPwd
+          const tmpRange = {
+            HStart: this.resForm.HStart,
+            HEnd: this.resForm.HEnd,
+            VStart: this.resForm.VStart,
+            VEnd: this.resForm.VEnd
+          }
+          tmpDatas.deviceRotationRange = JSON.stringify(tmpRange)
+          tmpDatas.deviceSeatAz = this.resForm.baseOrientation
+        }
+        if (this.isEdit === true) {
+          tmpDatas.deviceTypeCode = this.resForm.type
+        }
+        console.log('submitResForm.params:', tmpDatas)
+
+        this.$axios.post(tmpApi, tmpDatas)
+          .then((res) => {
+            if (res && res.data && res.data.code === 0) {
+              Notification({
+                title: '提示',
+                message: tmpAction + tmpTypeName + '设备成功',
+                type: 'success',
+                duration: 5 * 1000
+              })
+              EventBus.$emit('updateDeviceList')
+              this.isShow = false
+            }
+            Notification({
+              title: '提示',
+              message: tmpAction + tmpTypeName + '设备失败',
+              type: 'warning',
+              duration: 5 * 1000
+            })
+          })
+          .catch((err) => {
+            Notification({
+              title: '提示',
+              message: tmpAction + tmpTypeName + '设备异常:' + err,
+              type: 'warning',
+              duration: 5 * 1000
+            })
+          })
       })
     },
     /**

@@ -37,19 +37,37 @@
         <div class="fold" v-show="unfold" @click.stop="unfold = false"></div>
       </transition>
     </div>
-    <div class="handelBtns">
+    <div class="handelBtns" v-show="!isRead">
       <span @click.stop="cancel">取消</span>
       <span @click.stop="save">保存</span>
+    </div>
+    <div class="resDlgClose" v-show="isRead">
+      <div>
+        <span>创建时间:</span>
+        <span class="value">{{createTime}}</span>
+        <span class="name">创建人:</span>
+        <span class="value">{{createPeople}}</span>
+        <span class="name">最后修改时间:</span>
+        <span class="value">{{modifyTime}}</span>
+        <span class="name">最后修改人:</span>
+        <span class="value">{{modifyPeople}}</span>
+      </div>
+      <span class="btnClose" @click.stop="cancel">关闭</span>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { timeFormat } from '@/utils/date'
 export default {
   props: {
     isShow: {
       type: Boolean,
       required: true
+    },
+    isRead: {
+      type: Boolean,
+      default: true
     },
     title: {
       type: String
@@ -106,7 +124,11 @@ export default {
         className: 'area',
         isSelect: false
       },
-      bHasInitDrawHelper: false
+      bHasInitDrawHelper: false,
+      createTime: '',
+      createPeople: '',
+      modifyTime: '',
+      modifyPeople: '',
     }
   },
   watch: {
@@ -238,6 +260,15 @@ export default {
      */
     save () {
       this.$emit('submitResForm')
+    },
+    /**
+     * 传入显示信息
+     */
+    showInfos (data) {
+      this.createTime = timeFormat(data.createTime)
+      this.createPeople = data.createPeople
+      this.modifyTime = timeFormat(data.modifyTime)
+      this.modifyPeople = data.modifyPeople
     }
   }
 }

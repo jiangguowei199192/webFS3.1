@@ -6,7 +6,12 @@
       <div>
         <div class="toolBox">
           <span class="txt1">视频类型:</span>
-          <el-select v-model="queryParams.videoType" placeholder="请选择" clearable class="select commSelect">
+          <el-select
+            v-model="queryParams.videoType"
+            placeholder="请选择"
+            clearable class="select commSelect"
+            @change="queryParamsChange"
+          >
             <el-option
               v-for="(item, index) in videoTypeList"
               :key="index"
@@ -21,6 +26,7 @@
             :options="deptTree"
             :props="deptTreeProps"
             :show-all-levels="false"
+            @change="queryParamsChange"
           ></el-cascader>
           <span class="txt2">在线状态:</span>
           <el-select
@@ -28,6 +34,7 @@
             placeholder="请选择"
             clearable
             class="select commSelect"
+            @change="queryParamsChange"
           >
             <el-option
               v-for="(item, index) in statusList"
@@ -46,6 +53,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             class="datePickerStyle"
+            @change="queryParamsChange"
           ></el-date-picker>
           <span class="txt2">搜索内容:</span>
           <el-input
@@ -103,6 +111,8 @@ import PageTable from './pageTable.vue'
 import VideoResDlg from './videoResDlg.vue'
 import { backApi } from '@/api/back'
 import { Notification } from 'element-ui'
+import { settingApi } from '@/api/setting'
+import { EventBus } from '@/utils/eventBus.js'
 export default {
   props: {
     // 对话框组件名称
@@ -123,8 +133,13 @@ export default {
       type: Object,
       default: () => {
         return {
-          deviceCode: '',
-          deviceName: ''
+          deviceDept: '',
+          deviceNameOrCode: '',
+          deviceStatus: '',
+          deviceTypeCode: '',
+          onlineStatus: '',
+          timeStart: '',
+          timeEnd: ''
         }
       }
     },
@@ -160,7 +175,9 @@ export default {
         expandTrigger: 'hover',
         children: 'children',
         label: 'deptName',
-        value: 'deptCode'
+        value: 'deptCode',
+        emitPath: false,
+        checkStrictly: true
       },
       statusList: [
         {
@@ -177,6 +194,7 @@ export default {
         videoType: '',
         deptCode: '',
         onlineStatus: '',
+        deviceStatus: '',
         dateRange: '',
         searchStr: ''
       }
@@ -191,6 +209,10 @@ export default {
   },
   mounted () {
     this.getList()
+    EventBus.$on('updateDeviceList', this.getList)
+  },
+  beforeDestroy() {
+    EventBus.$off('updateDeviceList', this.getList)
   },
   methods: {
     /**
@@ -230,10 +252,34 @@ export default {
       this.$refs.pageTable.clearSelection()
     },
     /**
+     * 更新表数据查询条件并查询
+     */
+    updateTableList (queryParams) {
+      this.query.deviceDept = queryParams.deptCode;
+      this.query.deviceNameOrCode = queryParams.searchStr;
+      this.query.deviceStatus = queryParams.deviceStatus;
+      this.query.deviceTypeCode = queryParams.videoType;
+      this.query.onlineStatus = queryParams.onlineStatus;
+      if (queryParams.dateRange !== null && queryParams.dateRange !== '') {
+        this.query.timeStart = queryParams.dateRange[0].getTime();
+        this.query.timeEnd = queryParams.dateRange[1].getTime();
+      } else {
+        this.query.timeStart = '';
+        this.query.timeEnd = '';
+      }
+      this.getList()
+    },
+    /**
      * 搜索视频设备
      */
     searchVideoDatas () {
-      console.log('searchVideoDatas:', this.queryParams)
+      this.updateTableList(this.queryParams)
+    },
+    /**
+     * 搜索条件改变时查询表数据
+     */
+    queryParamsChange() {
+      this.updateTableList(this.queryParams)
     },
     /**
      * 重置搜索条件
@@ -243,9 +289,11 @@ export default {
         videoType: '',
         deptCode: '',
         onlineStatus: '',
+        deviceStatus: '',
         dateRange: '',
         searchStr: ''
       }
+      this.updateTableList(this.queryParams)
     },
     /**
      *  添加资源
@@ -264,7 +312,41 @@ export default {
           type: 'warning',
           duration: 2 * 1000
         })
+        return
       }
+
+      const tmpDatas = {
+        deviceCodeList: []
+      }
+      this.checkedList.forEach((d) => {
+        tmpDatas.deviceCodeList.push(d.deviceCode)
+      })
+      this.$axios.post(settingApi.deleteDeviceList, tmpDatas)
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            Notification({
+              title: '提示',
+              message: '删除设备成功',
+              type: 'success',
+              duration: 5 * 1000
+            })
+            this.getList()
+          }
+          Notification({
+            title: '提示',
+            message: '删除设备失败',
+            type: 'warning',
+            duration: 5 * 1000
+          })
+        })
+        .catch((err) => {
+          Notification({
+            title: '提示',
+            message: '删除设备异常:' + err,
+            type: 'warning',
+            duration: 5 * 1000
+          })
+        })
     },
     /**
      * 点击表单操作按钮
@@ -276,8 +358,15 @@ export default {
      * 点击表单开关操作按钮
      */
     switchClick (event, data) {
-      console.log('switchClick.event:', event)
-      console.log('switchClick.data:', data)
+      var param = {
+        deviceCode: data.deviceCode,
+        deviceStatus: event ? 'enabled' : 'disabled'
+      }
+      this.$axios.post(settingApi.changeDeviceStatus, param).then((res) => {
+        if (res && res.data && res.data.code === 0) {
+          this.getList()
+        }
+      })
     }
   }
 }

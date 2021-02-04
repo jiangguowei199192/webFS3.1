@@ -756,14 +756,14 @@ input[type="number"] {
   .active .el-input__inner {
     border    : 1px solid #209cdf;
     background: rgba(9, 84, 109, 0.3);
-    padding   : 0px 15px;
+    padding   : 0px 8px;
   }
 
   .el-input .el-input__inner:disabled,
   .el-select .el-input.is-disabled .el-input__inner:hover {
     background: transparent;
     border: 1px solid #209cdf55;
-    padding: 0px 15px;
+    padding: 0px 8px;
   }
   .el-input__inner:disabled {
     cursor: default;
@@ -777,12 +777,15 @@ input[type="number"] {
 
     border    : 1px solid #209cdf;
     background: rgba(9, 84, 109, 0.3);
-    padding   : 0px 5px;
+    padding   : 0px 8px;
   }
 
   .el-date-editor .el-input__inner {
     border    : 1px solid #209cdf;
     background: rgba(9, 84, 109, 0.3);
+    padding   : 0px 0px 0px 32px;
+  }
+  .el-date-editor.is-disabled .el-input__inner {
     padding   : 0px 0px 0px 32px;
   }
 
@@ -802,14 +805,14 @@ input[type="number"] {
     cursor: default;
     background   : transparent;
     border: 1px solid #209cdf55;
-    padding: 5px 15px;
+    padding: 5px 8px;
     top       : 0px;
   }
 
   .el-textarea.active .el-textarea__inner {
     border    : 1px solid #1eb0fc;
     background: rgba(9, 84, 109, 0.3);
-    padding   : 5px 15px;
+    padding   : 5px 8px;
     top       : 0px;
   }
   .el-textarea .el-textarea__inner {
@@ -1100,6 +1103,39 @@ input[type="number"] {
 }
 
 /* 取消/确定按钮 */
+.resDlgClose {
+  text-align: center;
+  div {
+    font-size    : 14px;
+    line-height  : 30px;
+    text-align   : center;
+    color      : #fff;
+    .name {
+      margin-left: 45px;
+    }
+    .value {
+      margin-left: 5px;
+    }
+  }
+  .btnClose {
+    cursor       : pointer;
+    box-sizing   : border-box;
+    display      : inline-block;
+    width        : 66px;
+    height       : 30px;
+    border       : 1px solid #1eb0fc;
+    border-radius: 4px;
+    font-size    : 14px;
+    line-height  : 30px;
+    text-align   : center;
+    margin-left: 20px;
+    background : #1eb0fc;
+    color      : #fff;
+  }
+  .btnClose:active {
+    opacity: 0.8;
+  }
+}
 .handelBtns {
   margin    : 25px 20px 20px 0;
   text-align: right;
