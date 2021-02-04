@@ -6,6 +6,7 @@
         handleType="devMap"
         :bShowAllTools="false"
         :baseMapIndex="2"
+        :bAutoLocate="true"
         class="map"
       ></gMap>
       <div class="title">
@@ -248,6 +249,9 @@ export default {
      */
     addOrUpdateFeature (data) {
       this.$refs.gduMap.map2D.customDrawHelper.addOrUpdateFeature(data)
+      setTimeout(() => { //待自动定位结束后定位到指定图形
+        this.$refs.gduMap.map2D.customDrawHelper.locateFeatureByID(data.drawId)
+      }, 500)
     },
     /**
      *  清除绘制

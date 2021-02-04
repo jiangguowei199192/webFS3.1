@@ -521,6 +521,19 @@ export default {
       }
     },
     /**
+     * 地图中显示设备位置
+     */
+    showDataInMap (data) {
+      const tmpData = {
+        drawId: data.deviceCode,
+        drawType: 0,
+        coordinates: [data.deviceLongitude, data.deviceLatitude]
+      }
+      setTimeout(() => {
+        this.$refs.resDlgCtrl.addOrUpdateFeature(tmpData)
+      },100)
+    },
+    /**
      *  添加资源
      */
     showResDlg (action, data = null) {
@@ -541,12 +554,14 @@ export default {
           this.setFormData(data)
           this.isEdit = true
           this.readonly = false
+          this.showDataInMap(data)
         })
       } else if (action === 'readonly') {
         this.$nextTick(() => {
           this.setFormData(data)
           this.isEdit = false
           this.readonly = true
+          this.showDataInMap(data)
           this.$refs.resDlgCtrl.showInfos(data)
         })
       }
