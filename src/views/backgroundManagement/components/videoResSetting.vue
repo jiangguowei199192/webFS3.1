@@ -315,13 +315,16 @@ export default {
         return
       }
 
-      const tmpDatas = {
-        deviceCodeList: []
-      }
+      const ids = []
       this.checkedList.forEach((d) => {
-        tmpDatas.deviceCodeList.push(d.deviceCode)
+        ids.push(d.deviceCode)
       })
-      this.$axios.post(settingApi.deleteDeviceList, tmpDatas)
+      const tmpConfig1 = { headers: { 'Content-Type': 'application/json;charset=UTF-8' } }
+      const tmpConfig2 = { headers: { 'Content-Type': 'multipart/form-data' } }
+      const formData = new FormData()
+      formData.append('deviceCodeList', ids)
+      //this.$axios.post(settingApi.deleteDeviceList, { deviceCodeList: ids}, tmpConfig1)
+      this.$axios.post(settingApi.deleteDeviceList, formData, tmpConfig2)
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
             Notification({
