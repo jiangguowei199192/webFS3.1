@@ -62,8 +62,9 @@
         :data.sync="tableInfo.data"
         :tableHeight="610"
         :query="query"
-        :api="api"
+        :api="getListApi"
         :checkedList.sync="checkedList"
+        @look="lookDetail"
       ></PageTable>
     </div>
     <component ref="dlg" :is="dlgView"></component>
@@ -75,6 +76,7 @@ import PageTable from './pageTable.vue'
 import PointResDlg from './pointResDlg.vue'
 import LineResDlg from './lineResDlg.vue'
 import SurfaceResDlg from './surfaceResDlg.vue'
+import { mapResApi } from '@/api/mapRes'
 export default {
   props: {
     // 对话框组件名称
@@ -86,30 +88,10 @@ export default {
     subTitle: {
       type: String
     },
-    // 获取数据的接口
-    api: {
-      type: Function
-    },
-    // 查询条件
-    query: {
-      type: Object,
-      default: () => {
-        return {
-          deviceCode: '',
-          deviceName: ''
-        }
-      }
-    },
-    tableInfo: {
-      type: Object,
-      default: () => {
-        return {
-          refresh: 1,
-          data: [],
-          fieldList: [],
-          handle: {}
-        }
-      }
+    // 数据资源(0点资源 1线资源 2面资源)
+    resourcesDataType: {
+      type: String,
+      default: '0'
     }
   },
   data () {
@@ -122,7 +104,38 @@ export default {
       organList: [],
       organ: '',
       searchStr: '',
-      checkedList: []
+      checkedList: [],
+      query: {
+        belongOrg: '',
+        resourcesDataType: 0,
+        resourcesType: '',
+        searchContent: ''
+      }, // 表格相关
+      tableInfo: {
+        refresh: 1,
+        data: [],
+        fieldList: [
+          { label: '资源名称', value: 'resourcesName' },
+          { label: '地址', value: 'resourcesAddr' },
+          { label: '类型', value: 'resourcesType' },
+          { label: '所属机构', value: 'deptName' },
+          { label: '排序', value: 'resourcesSort' }
+        ],
+        handle: {
+          label: '操作',
+          width: '130',
+          btList: [
+            {
+              label: '修改',
+              event: 'modify'
+            },
+            {
+              label: '查看',
+              event: 'look'
+            }
+          ]
+        }
+      }
     }
   },
   components: {
@@ -132,9 +145,15 @@ export default {
     SurfaceResDlg
   },
   mounted () {
+    this.query.resourcesDataType = this.resourcesDataType
     this.getList()
   },
   methods: {
+    getListApi (params) {
+      return this.$axios.post(mapResApi.selectPage, params, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      })
+    },
     /**
      *  获取列表
      */
@@ -152,6 +171,23 @@ export default {
      */
     addRes () {
       this.$refs.dlg.addRes()
+    },
+    /**
+     *  查看详情
+     */
+    lookDetail (row) {
+      this.$axios
+        .get(mapResApi.selectDetail, {
+          params: { resourcesId: row.id }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+
+          }
+        })
+        .catch((err) => {
+          console.log('mapResApi.selectDetail Err : ' + err)
+        })
     }
   }
 }

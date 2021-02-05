@@ -215,20 +215,31 @@ export default {
         .then(res => {
           if (res.data.code === 0) {
             // 使外面可以访问到表格数据
-            const arr = res.data.data.data
-            arr.forEach(d => {
-              if (d.deviceStatus === 'enabled') {
-                d.deviceStatus = true
-              } else if (d.deviceStatus === 'disabled') {
-                d.deviceStatus = false
+            if (res.data.data.data) {
+              const arr = res.data.data.data
+              arr.forEach(d => {
+                if (d.deviceStatus === 'enabled') {
+                  d.deviceStatus = true
+                } else if (d.deviceStatus === 'disabled') {
+                  d.deviceStatus = false
+                }
+              })
+              const paginator = res.data.data.paginator
+              this.$emit('update:data', arr)
+              if (this.pager) {
+                this.listInfo.total = paginator.totalCount
+                this.listInfo.query.currentPage = paginator.page
+                this.listInfo.query.pageSize = paginator.limit
               }
-            })
-            const paginator = res.data.data.paginator
-            this.$emit('update:data', arr)
-            if (this.pager) {
-              this.listInfo.total = paginator.totalCount
-              this.listInfo.query.currentPage = paginator.page
-              this.listInfo.query.pageSize = paginator.limit
+            } else if (res.data.data.records) {
+              const arr = res.data.data.records
+              const paginator = res.data.data
+              this.$emit('update:data', arr)
+              if (this.pager) {
+                this.listInfo.total = paginator.total
+                this.listInfo.query.currentPage = paginator.current
+                this.listInfo.query.pageSize = paginator.size
+              }
             }
           }
         })

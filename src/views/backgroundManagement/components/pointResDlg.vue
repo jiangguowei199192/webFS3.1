@@ -21,25 +21,25 @@
           style="margin-top: 17px"
           :rules="formRules"
         >
-          <el-form-item label="资源名称 :" prop="name">
+          <el-form-item label="资源名称 :" prop="resourcesName">
             <el-input
-              v-model="resForm.name"
+              v-model="resForm.resourcesName"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="资源地址 :" prop="addr">
+          <el-form-item label="资源地址 :" prop="resourcesAddr">
             <el-input
-              v-model="resForm.addr"
+              v-model="resForm.resourcesAddr"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="资源类型 :" prop="type">
+          <el-form-item label="资源类型 :" prop="resourcesType">
             <el-select
-              v-model="resForm.type"
+              v-model="resForm.resourcesType"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -47,39 +47,34 @@
             >
               <el-option
                 v-for="item in resTypes"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="联系电话 :">
             <el-input
-              v-model="resForm.phone"
+              v-model="resForm.contactTel"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属机构 :" prop="organ">
-            <el-select
-              v-model="resForm.organ"
-              :popper-append-to-body="false"
+          <el-form-item label="所属机构 :" prop="belongOrg">
+            <el-cascader
+              v-model="resForm.belongOrg"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
+              :options="organs"
+              :props="deptTreeProps"
+              :show-all-levels="false"
               :disabled="disabled"
-            >
-              <el-option
-                v-for="item in organs"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+              :class="{ active: !disabled }"
+            ></el-cascader>
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
-              v-model="resForm.area"
+              v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -87,24 +82,24 @@
             >
               <el-option
                 v-for="item in areas"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="经度 :" prop="lon">
+          <el-form-item label="经度 :" prop="resourcesLongitude">
             <el-input
-              v-model="resForm.lon"
+              v-model="resForm.resourcesLongitude"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
               @change="lanChange()"
             ></el-input>
           </el-form-item>
-          <el-form-item label="纬度 :" prop="lat">
+          <el-form-item label="纬度 :" prop="resourcesLatitude">
             <el-input
-              v-model="resForm.lat"
+              v-model="resForm.resourcesLatitude"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -113,7 +108,7 @@
           </el-form-item>
           <el-form-item label="管理人员 :">
             <el-input
-              v-model="resForm.people"
+              v-model="resForm.resourcesManager"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -121,17 +116,17 @@
           </el-form-item>
           <el-form-item label="人员电话 :">
             <el-input
-              v-model="resForm.mobile"
+              v-model="resForm.managerTel"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图标 :" style="line-height: 40px" prop="icon">
+          <el-form-item label="图标 :" style="line-height: 40px" prop="resourcesIcon">
             <div class="iconTool">
               <el-avatar
                 :size="30"
-                :src="resForm.icon"
+                :src="resForm.resourcesIcon"
                 style="margin-top: 5px"
               ></el-avatar>
               <el-popover
@@ -162,7 +157,7 @@
           </el-form-item>
           <el-form-item label="排序 :">
             <el-input
-              v-model="resForm.sort"
+              v-model="resForm.resourcesSort"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -170,7 +165,7 @@
           </el-form-item>
           <el-form-item label="备注 :">
             <el-input
-              v-model="resForm.note"
+              v-model="resForm.resourcesRemark"
               :placeholder="placeholder"
               type="textarea"
               resize="none"
@@ -212,9 +207,9 @@
                   >
                     <el-option
                       v-for="item in resTypes"
-                      :key="item.id"
-                      :label="item.label"
-                      :value="item.id"
+                      :key="item.typeCode"
+                      :label="item.typeName"
+                      :value="item.typeCode"
                     ></el-option>
                   </el-select>
                 </el-form-item>
@@ -284,7 +279,9 @@
 <script>
 import ResDialog from './resDialog.vue'
 import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
-
+import { mapResApi } from '@/api/mapRes'
+import { settingApi } from '@/api/setting'
+import { backApi } from '@/api/back'
 export default {
   props: {
     // 是否禁止编辑
@@ -305,6 +302,13 @@ export default {
       areas: [],
       resTypes: [],
       showPopover: false,
+      deptTreeProps: {
+        expandTrigger: 'hover',
+        children: 'children',
+        label: 'deptName',
+        value: 'deptCode',
+        emitPath: false
+      },
       area: {
         id: '',
         name: '',
@@ -325,28 +329,29 @@ export default {
         lineWidth: [{ required: true, message: '请输入线宽' }]
       },
       formRules: {
-        name: [{ required: true, message: '请输入资源名称' }],
-        addr: [{ required: true, message: '请输入资源地址' }],
-        type: [{ required: true, message: '请选择资源类型' }],
-        organ: [{ required: true, message: '请选择所属机构' }],
-        icon: [{ required: true, message: '请选择图标' }],
-        lon: isNotNull('请输入经度').concat(lonValidate()),
-        lat: isNotNull('请输入纬度').concat(latValidate())
+        resourcesName: [{ required: true, message: '请输入资源名称' }],
+        resourcesAddr: [{ required: true, message: '请输入资源地址' }],
+        resourcesType: [{ required: true, message: '请选择资源类型' }],
+        belongOrg: [{ required: true, message: '请选择所属机构' }],
+        resourcesIcon: [{ required: true, message: '请选择图标' }],
+        resourcesLongitude: isNotNull('请输入经度').concat(lonValidate()),
+        resourcesLatitude: isNotNull('请输入纬度').concat(latValidate())
       },
       resForm: {
-        name: '',
-        addr: '',
-        type: '',
-        phone: '',
-        organ: '',
-        area: '',
-        lon: '',
-        lat: '',
-        people: '',
-        mobile: '',
-        sort: '',
-        note: '',
-        icon:
+        resourcesName: '',
+        resourcesAddr: '',
+        resourcesType: '',
+        contactTel: '',
+        belongOrg: '',
+        belongArea: '',
+        resourcesLongitude: '',
+        resourcesLatitude: '',
+        resourcesManager: '',
+        resourcesDataType: 0,
+        managerTel: '',
+        resourcesSort: '',
+        resourcesRemark: '',
+        resourcesIcon:
           'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       },
       pointId: ''
@@ -376,8 +381,8 @@ export default {
           drawId: this.pointId,
           drawType: 0,
           coordinates: [
-            parseFloat(this.resForm.lon),
-            parseFloat(this.resForm.lat)
+            parseFloat(this.resForm.resourcesLongitude),
+            parseFloat(this.resForm.resourcesLatitude)
           ]
         }
         this.$refs.resDlg.addOrUpdateFeature(data)
@@ -394,6 +399,71 @@ export default {
         this.pointId = ''
         this.ctlAreas = []
       })
+      this.getPointResources()
+      this.getAreaResources()
+      this.getOrgans()
+    },
+    /**
+     * 获取点资源类型
+     */
+    getPointResources () {
+      this.$axios
+        .get(settingApi.queryByTypeCode, {
+          params: { typeCode: 'point_resources' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.resTypes = res.data.data
+          }
+        })
+        .catch((err) => {
+          console.log('settingApi.queryByTypeCode Err : ' + err)
+        })
+    },
+    /**
+     * 获取辖区资源类型
+     */
+    getAreaResources () {
+      this.$axios
+        .get(settingApi.queryByTypeCode, {
+          params: { typeCode: 'wuhan_city' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.areas = res.data.data
+          }
+        })
+        .catch((err) => {
+          console.log('settingApi.queryByTypeCode Err : ' + err)
+        })
+    },
+    /**
+     * 获取机构树
+     */
+    getOrgans () {
+      this.$axios
+        .post(backApi.getDeptTree)
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.organs = this.handleDeptTree(res.data.data)
+          }
+        })
+        .catch((err) => {
+          console.log('backApi.getDeptTree Err : ' + err)
+        })
+    },
+    // children为" "时置为null
+    handleDeptTree (tree) {
+      tree.forEach((item) => {
+        if (item.children) {
+          if (item.children.length <= 0) {
+            item.children = null
+          } else {
+            this.handleDeptTree(item.children)
+          }
+        }
+      })
+      return tree
     },
     /**
      *  管辖区域线段宽度改变
@@ -452,8 +522,8 @@ export default {
     mapResAddOrModify (data) {
       if (data.drawType === 0) {
         this.pointId = data.drawId
-        this.resForm.lon = data.coordinates[0].toFixed(7)
-        this.resForm.lat = data.coordinates[1].toFixed(7)
+        this.resForm.resourcesLongitude = data.coordinates[0].toFixed(7)
+        this.resForm.resourcesLatitude = data.coordinates[1].toFixed(7)
       } else if (data.drawType === 2) {
         const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {
@@ -481,8 +551,22 @@ export default {
         })
       }
       const result = vList.every((v) => v === true)
-      if (result) {
-      }
+      if (!result) return
+
+      this.resForm.resourcesLongitude = parseFloat(this.resForm.resourcesLongitude)
+      this.resForm.resourcesLatitude = parseFloat(this.resForm.resourcesLatitude)
+      this.$axios
+        .post(mapResApi.mapResAdd, this.resForm, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.isShow = false
+          }
+        })
+        .catch((err) => {
+          console.log('mapResApi.mapResAdd Err : ' + err)
+        })
     }
   }
 }
