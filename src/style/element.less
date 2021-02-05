@@ -762,9 +762,10 @@ input[type="number"] {
   .el-input .el-input__inner:disabled,
   .el-select .el-input.is-disabled .el-input__inner:hover {
     background: transparent;
-    border: 1px solid #209cdf55;
-    padding: 0px 8px;
+    border    : 1px solid #209cdf55;
+    padding   : 0px 8px;
   }
+
   .el-input__inner:disabled {
     cursor: default;
   }
@@ -785,8 +786,9 @@ input[type="number"] {
     background: rgba(9, 84, 109, 0.3);
     padding   : 0px 0px 0px 32px;
   }
+
   .el-date-editor.is-disabled .el-input__inner {
-    padding   : 0px 0px 0px 32px;
+    padding: 0px 0px 0px 32px;
   }
 
   .el-textarea__inner {
@@ -801,11 +803,12 @@ input[type="number"] {
     position     : relative;
     top          : 10px;
   }
+
   .el-textarea__inner:disabled {
-    cursor: default;
-    background   : transparent;
-    border: 1px solid #209cdf55;
-    padding: 5px 8px;
+    cursor    : default;
+    background: transparent;
+    border    : 1px solid #209cdf55;
+    padding   : 5px 8px;
     top       : 0px;
   }
 
@@ -815,8 +818,9 @@ input[type="number"] {
     padding   : 5px 8px;
     top       : 0px;
   }
+
   .el-textarea .el-textarea__inner {
-    font-size : 13.33px;
+    font-size  : 13.33px;
     font-weight: 400;
     font-family: Arial;
   }
@@ -826,7 +830,7 @@ input[type="number"] {
   }
 
   .el-select .el-input.is-disabled,
-  .el-cascader .el-input.is-disabled{
+  .el-cascader .el-input.is-disabled {
 
     .el-input__inner,
     .el-input__icon {
@@ -836,14 +840,15 @@ input[type="number"] {
     .el-icon-arrow-up:before {
       content: "";
     }
+
     .el-icon-arrow-down::before {
       content: "";
     }
   }
 
   .el-cascader:not(.is-disabled):hover .el-input__inner {
-    cursor: pointer;
-    border-color:#209cdf;
+    cursor      : pointer;
+    border-color: #209cdf;
   }
 
   .el-cascader.is-disabled .el-input {
@@ -956,11 +961,16 @@ input[type="number"] {
       width : 150px;
       height: 34px;
 
-      /deep/.el-input__inner {
+      .el-input__inner {
         background   : rgba(9, 84, 109, 0.3);
         border-radius: 0px;
         border       : 1px solid #1eb0fc;
+        color        : #c5f3ff;
       }
+    }
+
+    .el-cascader {
+      line-height: 34px;
     }
 
     .search {
@@ -1106,24 +1116,28 @@ input[type="number"] {
 .resDlgClose {
   margin    : 15px 20px 20px 0;
   text-align: center;
-  position: relative;
+  position  : relative;
+
   .infos {
-    display: inline-block;
-    font-size    : 14px;
-    line-height  : 30px;
-    text-align   : center;
+    display    : inline-block;
+    font-size  : 14px;
+    line-height: 30px;
+    text-align : center;
     color      : #fff;
+
     .name {
       margin-left: 45px;
     }
+
     .value {
       margin-left: 5px;
     }
   }
+
   .btnClose {
-    position: absolute;
-    top: 10px;
-    right: 0px;
+    position     : absolute;
+    top          : 10px;
+    right        : 0px;
     cursor       : pointer;
     box-sizing   : border-box;
     display      : inline-block;
@@ -1135,13 +1149,15 @@ input[type="number"] {
     font-size    : 14px;
     line-height  : 30px;
     text-align   : center;
-    margin-left: 20px;
+    margin-left  : 20px;
     color        : #1eb0fc;
   }
+
   .btnClose:active {
     opacity: 0.8;
   }
 }
+
 .handelBtns {
   margin    : 25px 20px 20px 0;
   text-align: right;

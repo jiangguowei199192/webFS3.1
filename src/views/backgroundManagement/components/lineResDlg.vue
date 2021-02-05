@@ -21,18 +21,18 @@
           :rules="formRules"
           ref="lineForm"
         >
-          <el-form-item label="资源名称 :" prop="name">
+          <el-form-item label="资源名称 :" prop="resourcesName">
             <el-input
-              v-model="resForm.name"
+              v-model="resForm.resourcesName"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
               class="lineName"
             ></el-input>
           </el-form-item>
-          <el-form-item label="资源类型 :" prop="type">
+          <el-form-item label="资源类型 :" prop="resourcesType">
             <el-select
-              v-model="resForm.type"
+              v-model="resForm.resourcesType"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -48,15 +48,15 @@
           </el-form-item>
           <el-form-item label="联系电话 :">
             <el-input
-              v-model="resForm.phone"
+              v-model="resForm.contactTel"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属机构 :" prop="organ">
+          <el-form-item label="所属机构 :" prop="belongOrg">
             <el-select
-              v-model="resForm.organ"
+              v-model="resForm.belongOrg"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -72,7 +72,7 @@
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
-              v-model="resForm.area"
+              v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -88,7 +88,7 @@
           </el-form-item>
           <el-form-item label="起点 :">
             <el-input
-              v-model="resForm.start"
+              v-model="resForm.lineOrigin"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -96,15 +96,15 @@
           </el-form-item>
           <el-form-item label="终点 :">
             <el-input
-              v-model="resForm.end"
+              v-model="resForm.lineDestination"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="总长度 :" prop="totalLen">
+          <el-form-item label="总长度 :" prop="totalLength">
             <el-input
-              v-model="resForm.totalLen"
+              v-model="resForm.totalLength"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -112,7 +112,7 @@
           </el-form-item>
           <el-form-item label="排序 :">
             <el-input
-              v-model="resForm.sort"
+              v-model="resForm.resourcesSort"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -140,7 +140,7 @@
           </el-form-item>
           <el-form-item label="备注 :" class="note">
             <el-input
-              v-model="resForm.note"
+              v-model="resForm.resourcesRemark"
               :placeholder="placeholder"
               type="textarea"
               resize="none"
@@ -182,29 +182,32 @@ export default {
       areas: [],
       resTypes: [],
       formRules: {
-        name: [{ required: true, message: '请输入资源名称' }],
-        type: [{ required: true, message: '请选择资源类型' }],
-        organ: [{ required: true, message: '请选择所属机构' }],
+        resourcesName: [{ required: true, message: '请输入资源名称' }],
+        resourcesType: [{ required: true, message: '请选择资源类型' }],
+        belongOrg: [{ required: true, message: '请选择所属机构' }],
         lineWidth: [{ required: true, message: '请输入线宽' }],
         lineColor: [{ required: true, message: '请选择线段颜色' }],
-        totalLen: numberValidate('请输入正确的总长度')
+        totalLength: numberValidate('请输入正确的总长度')
       },
       resForm: {
-        name: '',
-        type: '',
-        phone: '',
-        organ: '',
-        area: '',
-        start: '',
-        end: '',
-        totalLen: '',
-        sort: '',
-        note: '',
+        resourcesName: '',
+        resourcesType: '',
+        contactTel: '',
+        belongOrg: '',
+        belongArea: '',
+        lineOrigin: '',
+        lineDestination: '',
+        resourcesDataType: 1,
+        totalLength: '',
+        resourcesSort: '',
+        resourcesRemark: '',
         lineWidth: 2,
         lineColor: 'rgba(0, 204, 255, 1)',
-        coordinates: []
+        resourcesLatitude: '',
+        resourcesLongitude: ''
       },
-      lineId: ''
+      lineId: '',
+      coordinates: []
     }
   },
   watch: {
@@ -254,8 +257,8 @@ export default {
         this.$refs.markerForm.addOrModifyPoint(data)
       } else if (data.drawType === 1) {
         this.lineId = data.drawId
-        this.resForm.coordinates = data.coordinates
-        this.resForm.totalLen = data.length.toFixed(2)
+        this.coordinates = data.coordinates
+        this.resForm.totalLength = data.length.toFixed(2)
         // 重新画线资源的时候，需要设置样式
         if (data.bIsAdd) {
           const me = this

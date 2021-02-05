@@ -14,9 +14,9 @@
           :rules="formRules"
           ref="markerForm"
         >
-          <el-form-item label="名称 :" prop="name">
+          <el-form-item label="名称 :" prop=" pointName">
             <el-input
-              v-model="item.name"
+              v-model="item.pointName"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -30,9 +30,9 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属机构 :" prop="organ">
+          <el-form-item label="所属机构 :" prop="belongOrg">
             <el-select
-              v-model="item.organ"
+              v-model="item.belongOrg"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -78,11 +78,11 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图标 :" style="line-height: 40px" prop="icon">
+          <el-form-item label="图标 :" style="line-height: 40px" prop="iconUrl">
             <div class="iconTool">
               <el-avatar
                 :size="30"
-                :src="item.icon"
+                :src="item.iconUrl"
                 style="margin-top: 5px"
               ></el-avatar>
               <el-popover
@@ -113,7 +113,7 @@
           </el-form-item>
           <el-form-item label="排序 :">
             <el-input
-              v-model="item.sort"
+              v-model="item.pointSort"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -121,7 +121,7 @@
           </el-form-item>
           <el-form-item label="备注 :">
             <el-input
-              v-model="item.note"
+              v-model="item.pointRemark"
               :placeholder="placeholder"
               type="textarea"
               resize="none"
@@ -156,22 +156,23 @@ export default {
       showPopover: false,
       point: {
         id: '',
-        name: '',
+        pointName: '',
         addr: '',
         type: '',
-        organ: '',
-        note: '',
-        sort: '',
+        belongOrg: '',
+        pointRemark: '',
+        pointSort: '',
+        longitudeLatitudeArray: [],
         lon: '',
         lat: '',
-        icon:
+        iconUrl:
           'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       },
       list: [],
       formRules: {
-        name: [{ required: true, message: '请输入资源名称' }],
-        organ: [{ required: true, message: '请选择所属机构' }],
-        icon: [{ required: true, message: '请选择图标' }],
+        pointName: [{ required: true, message: '请输入资源名称' }],
+        belongOrg: [{ required: true, message: '请选择所属机构' }],
+        iconUrl: [{ required: true, message: '请选择图标' }],
         lon: isNotNull('请输入经度').concat(lonValidate()),
         lat: isNotNull('请输入纬度').concat(latValidate())
       }

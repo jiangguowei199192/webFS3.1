@@ -2,5 +2,6 @@
 export const mapResApi = {
   mapResAdd: '/cloud-fms/resourcesInfo/add', // 添加地图资源
   selectDetail: '/cloud-fms/resourcesInfo/selectDetail', // 添加地图资源
-  selectPage: '/cloud-fms/resourcesInfo/selectPage' // 查询地图资源
+  selectPage: '/cloud-fms/resourcesInfo/selectPage', // 查询地图资源
+  batchDel: '/cloud-fms/resourcesInfo/batchDel' // 批量删除资源
 }

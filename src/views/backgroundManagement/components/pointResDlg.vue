@@ -66,7 +66,7 @@
               v-model="resForm.belongOrg"
               :placeholder="placeholder2"
               :options="organs"
-              :props="deptTreeProps"
+              :props="organsProps"
               :show-all-levels="false"
               :disabled="disabled"
               :class="{ active: !disabled }"
@@ -122,7 +122,11 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图标 :" style="line-height: 40px" prop="resourcesIcon">
+          <el-form-item
+            label="图标 :"
+            style="line-height: 40px"
+            prop="resourcesIcon"
+          >
             <div class="iconTool">
               <el-avatar
                 :size="30"
@@ -189,9 +193,9 @@
                 :rules="areaRules"
                 ref="areaForm"
               >
-                <el-form-item label="名称 :" prop="name">
+                <el-form-item label="名称 :" prop="pointName">
                   <el-input
-                    v-model="item.name"
+                    v-model="item.pointName"
                     :placeholder="placeholder"
                     :readonly="disabled"
                     :class="{ active: !disabled }"
@@ -199,35 +203,30 @@
                 </el-form-item>
                 <el-form-item label="类型 :">
                   <el-select
-                    v-model="item.type"
+                    v-model="item.pointType"
                     :popper-append-to-body="false"
                     :placeholder="placeholder2"
                     :class="{ active: !disabled }"
                     :disabled="disabled"
                   >
                     <el-option
-                      v-for="item in resTypes"
+                      v-for="item in controlAreas"
                       :key="item.typeCode"
                       :label="item.typeName"
                       :value="item.typeCode"
                     ></el-option>
                   </el-select>
                 </el-form-item>
-                <el-form-item label="所属机构 :" prop="organ">
-                  <el-select
-                    v-model="item.organ"
-                    :popper-append-to-body="false"
+                <el-form-item label="所属机构 :" prop="belongOrg">
+                  <el-cascader
+                    v-model="item.belongOrg"
                     :placeholder="placeholder2"
-                    :class="{ active: !disabled }"
+                    :options="organs"
+                    :props="organsProps"
+                    :show-all-levels="false"
                     :disabled="disabled"
-                  >
-                    <el-option
-                      v-for="item in organs"
-                      :key="item.id"
-                      :label="item.label"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
+                    :class="{ active: !disabled }"
+                  ></el-cascader>
                 </el-form-item>
                 <el-form-item label="线宽 :" prop="lineWidth">
                   <el-input-number
@@ -259,7 +258,7 @@
                 </el-form-item>
                 <el-form-item label="备注 :" class="note">
                   <el-input
-                    v-model="item.note"
+                    v-model="item.pointRemark"
                     :placeholder="placeholder"
                     type="textarea"
                     resize="none"
@@ -281,7 +280,7 @@ import ResDialog from './resDialog.vue'
 import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 import { mapResApi } from '@/api/mapRes'
 import { settingApi } from '@/api/setting'
-import { backApi } from '@/api/back'
+import mapResMixin from './mixins/mapResMixin'
 export default {
   props: {
     // 是否禁止编辑
@@ -290,6 +289,7 @@ export default {
       default: false
     }
   },
+  mixins: [mapResMixin],
   data () {
     return {
       placeholder: '请输入',
@@ -298,33 +298,25 @@ export default {
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       title: '新增点资源',
       isShow: false,
-      organs: [],
-      areas: [],
-      resTypes: [],
+      areas: [], // 辖区类型
+      controlAreas: [], // 管控范围
       showPopover: false,
-      deptTreeProps: {
-        expandTrigger: 'hover',
-        children: 'children',
-        label: 'deptName',
-        value: 'deptCode',
-        emitPath: false
-      },
       area: {
         id: '',
-        name: '',
-        type: '',
-        organ: '',
+        pointName: '',
+        pointType: '',
+        belongOrg: '',
         lineWidth: 2,
-        note: '',
+        pointRemark: '',
         lineColor: 'rgba(0, 204, 255, 1)',
         fillColor: 'rgba(0, 204, 255, 0.4)',
-        coordinates: []
+        longitudeLatitudeArray: []
       },
-      ctlAreas: [], // 管辖范围
+      ctlAreas: [], // 管控范围
       areaRules: {
-        name: [{ required: true, message: '请输入名称' }],
+        pointName: [{ required: true, message: '请输入名称' }],
         lineColor: [{ required: true, message: '请选择线段颜色' }],
-        organ: [{ required: true, message: '请选择所属机构' }],
+        belongOrg: [{ required: true, message: '请选择所属机构' }],
         fillColor: [{ required: true, message: '请选择填充颜色' }],
         lineWidth: [{ required: true, message: '请输入线宽' }]
       },
@@ -402,23 +394,7 @@ export default {
       this.getPointResources()
       this.getAreaResources()
       this.getOrgans()
-    },
-    /**
-     * 获取点资源类型
-     */
-    getPointResources () {
-      this.$axios
-        .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'point_resources' }
-        })
-        .then((res) => {
-          if (res && res.data && res.data.code === 0) {
-            this.resTypes = res.data.data
-          }
-        })
-        .catch((err) => {
-          console.log('settingApi.queryByTypeCode Err : ' + err)
-        })
+      this.getControlAreas()
     },
     /**
      * 获取辖区资源类型
@@ -438,32 +414,21 @@ export default {
         })
     },
     /**
-     * 获取机构树
+     * 获取管控范围类型
      */
-    getOrgans () {
+    getControlAreas () {
       this.$axios
-        .post(backApi.getDeptTree)
+        .get(settingApi.queryByTypeCode, {
+          params: { typeCode: 'control_areas' }
+        })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
-            this.organs = this.handleDeptTree(res.data.data)
+            this.controlAreas = res.data.data
           }
         })
         .catch((err) => {
-          console.log('backApi.getDeptTree Err : ' + err)
+          console.log('settingApi.queryByTypeCode Err : ' + err)
         })
-    },
-    // children为" "时置为null
-    handleDeptTree (tree) {
-      tree.forEach((item) => {
-        if (item.children) {
-          if (item.children.length <= 0) {
-            item.children = null
-          } else {
-            this.handleDeptTree(item.children)
-          }
-        }
-      })
-      return tree
     },
     /**
      *  管辖区域线段宽度改变
@@ -527,14 +492,37 @@ export default {
       } else if (data.drawType === 2) {
         const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {
-          a.coordinates = data.coordinates
+          a.longitudeLatitudeArray = this.arrToStr(data.coordinates)
           return
         }
         var area = JSON.parse(JSON.stringify(this.area))
         area.id = data.drawId
-        area.coordinates = data.coordinates
+        area.longitudeLatitudeArray = this.arrToStr(data.coordinates)
         this.ctlAreas.push(area)
+        console.log(this.ctlAreas)
       }
+    },
+    /**
+     *  二维数组转字符串
+     */
+    arrToStr (objarr) {
+      var arrLen = objarr.length
+      var row = '['
+      for (var i = 0; i < arrLen; i++) {
+        row += '['
+        for (var j = 0; j < objarr[i].length; j++) {
+          row += objarr[i][j]
+          if (j < objarr[i].length - 1) {
+            row += ','
+          }
+        }
+        row += ']'
+        if (i < arrLen - 1) {
+          row += ','
+        }
+      }
+      row += ']'
+      return row
     },
     /**
      *  提交点资源数据
@@ -553,8 +541,18 @@ export default {
       const result = vList.every((v) => v === true)
       if (!result) return
 
-      this.resForm.resourcesLongitude = parseFloat(this.resForm.resourcesLongitude)
-      this.resForm.resourcesLatitude = parseFloat(this.resForm.resourcesLatitude)
+      this.resForm.resourcesLongitude = parseFloat(
+        this.resForm.resourcesLongitude
+      )
+      this.resForm.resourcesLatitude = parseFloat(
+        this.resForm.resourcesLatitude
+      )
+      if (this.ctlAreas.length > 0) {
+        this.ctlAreas.forEach((c) => {
+          delete c.id
+        })
+        this.resForm.resourcesPointAddDTOS = this.ctlAreas
+      }
       this.$axios
         .post(mapResApi.mapResAdd, this.resForm, {
           headers: { 'Content-Type': 'application/json;charset=UTF-8' }
@@ -562,6 +560,7 @@ export default {
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
             this.isShow = false
+            this.$emit('refreshTable')
           }
         })
         .catch((err) => {

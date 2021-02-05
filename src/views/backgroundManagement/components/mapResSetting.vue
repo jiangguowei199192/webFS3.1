@@ -5,38 +5,40 @@
       <div>{{ subTitle }}</div>
       <div class="toolBox">
         <span class="txt1">资源类型:</span>
-        <el-select v-model="res" placeholder="请选择" clearable class="select">
-          <el-option
-            v-for="(item, index) in resList"
-            :key="index"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <span class="txt2">所属机构:</span>
         <el-select
-          v-model="organ"
+          v-model="query.resourcesType"
           placeholder="请选择"
           clearable
           class="select"
+          @change="getList"
         >
           <el-option
-            v-for="(item, index) in organList"
-            :key="index"
-            :label="item.label"
-            :value="item.value"
+            v-for="item in resTypes"
+            :key="item.typeCode"
+            :label="item.typeName"
+            :value="item.typeCode"
           ></el-option>
         </el-select>
+        <span class="txt2">所属机构:</span>
+        <el-cascader
+          v-model="query.belongOrg"
+          placeholder="请选择"
+          :options="organs"
+          :props="organsProps"
+          :show-all-levels="false"
+          class="select"
+          @change="getList"
+        ></el-cascader>
         <el-input
           class="search"
-          v-model="searchStr"
+          v-model="query.searchContent"
           placeholder="请输入资源名称/地址进行搜索"
         ></el-input>
-        <div class="btn">
+        <div class="btn" @click.stop="getList">
           <img :src="searchIcon" />
           <span>搜索</span>
         </div>
-        <div class="btn resetBtn">
+        <div class="btn resetBtn" @click.stop="reset">
           <img :src="resetIcon" />
           <span>重置</span>
         </div>
@@ -50,7 +52,7 @@
         </div>
         <div class="right">
           <span @click.stop="addRes">添加</span>
-          <span>批量删除</span>
+          <span @click.stop="deleteRes">批量删除</span>
         </div>
       </div>
       <PageTable
@@ -64,10 +66,10 @@
         :query="query"
         :api="getListApi"
         :checkedList.sync="checkedList"
-        @look="lookDetail"
+        @handleClick="handleClick"
       ></PageTable>
     </div>
-    <component ref="dlg" :is="dlgView"></component>
+    <component ref="dlg" :is="dlgView" @refreshTable="getList"></component>
   </div>
 </template>
 
@@ -77,6 +79,7 @@ import PointResDlg from './pointResDlg.vue'
 import LineResDlg from './lineResDlg.vue'
 import SurfaceResDlg from './surfaceResDlg.vue'
 import { mapResApi } from '@/api/mapRes'
+import mapResMixin from './mixins/mapResMixin'
 export default {
   props: {
     // 对话框组件名称
@@ -94,16 +97,12 @@ export default {
       default: '0'
     }
   },
+  mixins: [mapResMixin],
   data () {
     return {
       selectCount: 0,
       searchIcon: require('../../../assets/images/backgroundManagement/searchIcon.png'),
       resetIcon: require('../../../assets/images/backgroundManagement/resetIcon.png'),
-      resList: [],
-      res: '',
-      organList: [],
-      organ: '',
-      searchStr: '',
       checkedList: [],
       query: {
         belongOrg: '',
@@ -117,7 +116,7 @@ export default {
         fieldList: [
           { label: '资源名称', value: 'resourcesName' },
           { label: '地址', value: 'resourcesAddr' },
-          { label: '类型', value: 'resourcesType' },
+          { label: '类型', value: 'resourcesTypeName' },
           { label: '所属机构', value: 'deptName' },
           { label: '排序', value: 'resourcesSort' }
         ],
@@ -147,6 +146,8 @@ export default {
   mounted () {
     this.query.resourcesDataType = this.resourcesDataType
     this.getList()
+    this.getOrgans()
+    this.getResType()
   },
   methods: {
     getListApi (params) {
@@ -173,6 +174,54 @@ export default {
       this.$refs.dlg.addRes()
     },
     /**
+     *  获取资源类型
+     */
+    getResType () {
+      if (this.resourcesDataType === '0') {
+        this.getPointResources()
+      }
+    },
+    /**
+     *  重置
+     */
+    reset () {
+      this.query.belongOrg = ''
+      this.query.resourcesType = ''
+      this.query.searchContent = ''
+      this.getList()
+    },
+    /**
+     *  批量删除资源
+     */
+    deleteRes () {
+      if (this.checkedList.length <= 0) return
+      const ids = []
+      this.checkedList.forEach((item) => {
+        ids.push(item.id)
+      })
+      const param = { ids: ids }
+      this.$axios
+        .post(mapResApi.batchDel, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.getList()
+          }
+        })
+        .catch((err) => {
+          console.log('mapResApi.batchDel Err : ' + err)
+        })
+    },
+    /**
+     *  点击操作按钮
+     */
+    handleClick (event, data) {
+      if (event === 'look') {
+        this.lookDetail(data)
+      }
+    },
+    /**
      *  查看详情
      */
     lookDetail (row) {
@@ -182,7 +231,6 @@ export default {
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
-
           }
         })
         .catch((err) => {
