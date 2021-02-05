@@ -661,12 +661,14 @@ export default {
           tmpDatas.deviceRotationRange = JSON.stringify(tmpRange)
           tmpDatas.deviceSeatAz = this.resForm.baseOrientation
         }
+        const tmpConfig = {}
         if (this.isEdit === true) {
           tmpDatas.deviceTypeCode = this.resForm.type
+          tmpConfig['headers'] = { 'Content-Type': 'application/json;charset=UTF-8' }
         }
         console.log('submitResForm.params:', tmpDatas)
 
-        this.$axios.post(tmpApi, tmpDatas)
+        this.$axios.post(tmpApi, tmpDatas, tmpConfig)
           .then((res) => {
             if (res && res.data && res.data.code === 0) {
               Notification({
@@ -677,13 +679,14 @@ export default {
               })
               EventBus.$emit('updateDeviceList')
               this.isShow = false
+              return
             }
-            Notification({
-              title: '提示',
-              message: tmpAction + tmpTypeName + '设备失败',
-              type: 'warning',
-              duration: 5 * 1000
-            })
+            // Notification({
+            //   title: '提示',
+            //   message: tmpAction + tmpTypeName + '设备失败',
+            //   type: 'warning',
+            //   duration: 5 * 1000
+            // })
           })
           .catch((err) => {
             Notification({

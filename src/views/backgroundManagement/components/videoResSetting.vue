@@ -331,13 +331,14 @@ export default {
               duration: 5 * 1000
             })
             this.getList()
+            return
           }
-          Notification({
-            title: '提示',
-            message: '删除设备失败',
-            type: 'warning',
-            duration: 5 * 1000
-          })
+          // Notification({
+          //   title: '提示',
+          //   message: '删除设备失败',
+          //   type: 'warning',
+          //   duration: 5 * 1000
+          // })
         })
         .catch((err) => {
           Notification({

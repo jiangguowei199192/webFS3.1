@@ -47,11 +47,11 @@
         <span>创建时间:</span>
         <span class="value">{{createTime}}</span>
         <span class="name">创建人:</span>
-        <span class="value">{{createPeople}}</span>
+        <span class="value">{{createUser}}</span>
         <span class="name">最后修改时间:</span>
-        <span class="value">{{modifyTime}}</span>
+        <span class="value">{{updateTime}}</span>
         <span class="name">最后修改人:</span>
-        <span class="value">{{modifyPeople}}</span>
+        <span class="value">{{updateUser}}</span>
       </div>
       <span class="btnClose" @click.stop="cancel">关闭</span>
     </div>
@@ -127,9 +127,9 @@ export default {
       },
       bHasInitDrawHelper: false,
       createTime: '',
-      createPeople: '',
-      modifyTime: '',
-      modifyPeople: ''
+      createUser: '',
+      updateTime: '',
+      updateUser: ''
     }
   },
   watch: {
@@ -270,9 +270,9 @@ export default {
      */
     showInfos (data) {
       this.createTime = timeFormat(data.createTime)
-      this.createPeople = data.createPeople
-      this.modifyTime = timeFormat(data.modifyTime)
-      this.modifyPeople = data.modifyPeople
+      this.createUser = data.createUser
+      this.updateTime = timeFormat(data.updateTime)
+      this.updateUser = data.updateUser
     }
   }
 }
