@@ -2,8 +2,8 @@
   <div style="margin: auto 30px">
     <!-- 头部面包屑 -->
     <div class="head-title">系统设置 / 数据字典</div>
-    <!-- 左侧字典树 -->
     <div style="display: flex">
+      <!-- 左侧字典树 -->
       <div class="left-tree">
         <div class="tree-title">数据字典树</div>
         <el-input
@@ -12,7 +12,6 @@
           v-model="dictSearch"
           placeholder="请输入搜索关键字"
         ></el-input>
-        <!-- 字典树 -->
         <el-tree
           class="dict-tree"
           ref="dictTreeRef"
@@ -123,7 +122,7 @@ export default {
       this.dictSearch = ''
     },
 
-    // children为空时置为null
+    // children为''时置为null
     handleDeptTree (data) {
       data.forEach(item => {
         if (item.children) {
@@ -169,11 +168,9 @@ export default {
       return this.$axios.post(dataDictApi.queryChildDict, queryParams)
     },
 
-    // 搜索字典
+    // 搜索字典树
     dictSearchChange (value, data) {
-      if (!value) {
-        return true
-      }
+      if (!value) return true
       return data.typeName.indexOf(value) !== -1
     },
 
@@ -183,8 +180,8 @@ export default {
     },
 
     // 新增字典提交
-    submitAddDict () {
-      // console.log(this.$refs.addDictRef.addDictForm);
+    submitAddDict (data) {
+      // console.log('data:', data)
     },
 
     // 取消新增
@@ -226,7 +223,6 @@ export default {
       color: #c5f3ff;
     }
   }
-
   .dict-tree {
     height: 646px;
     overflow: auto;
@@ -256,7 +252,6 @@ export default {
       }
     }
   }
-
   .add-dict-btn {
     margin: 20px auto 0 62px;
     text-align: center;

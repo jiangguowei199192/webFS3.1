@@ -4,7 +4,7 @@
  * @Author: liangkaiLee
  * @Date: 2021-01-26 09:16:43
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-02-01 12:36:28
+ * @LastEditTime: 2021-02-05 11:33:29
 -->
 <template>
   <el-dialog
@@ -135,8 +135,7 @@ export default {
         code: '',
         status: '',
         order: '',
-        icon:
-          'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+        icon: '',
         note: ''
       },
       addDictRules: {
@@ -169,9 +168,7 @@ export default {
                 message: '新增成功!',
                 duration: 3 * 1000
               })
-              setTimeout(() => {
-                this.dialogVisible = false
-              }, 300)
+              this.dialogVisible = false
               this.addDictForm = {}
               return
             }
@@ -185,7 +182,7 @@ export default {
             console.log('接口错误: ' + err)
           })
       })
-      // this.$emit('confirmClick')
+      // this.$emit("confirmClick", this.addDictForm);
     },
 
     cancelClick (formName) {

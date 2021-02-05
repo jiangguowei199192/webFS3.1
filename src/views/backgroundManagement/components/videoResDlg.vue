@@ -531,7 +531,7 @@ export default {
       }
       setTimeout(() => {
         this.$refs.resDlgCtrl.addOrUpdateFeature(tmpData)
-      },100)
+      }, 100)
     },
     /**
      *  添加资源
