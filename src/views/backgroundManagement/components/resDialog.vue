@@ -43,7 +43,7 @@
       <span @click.stop="save">保存</span>
     </div>
     <div class="resDlgClose" v-show="isRead">
-      <div>
+      <div class="infos">
         <span>创建时间:</span>
         <span class="value">{{createTime}}</span>
         <span class="name">创建人:</span>
