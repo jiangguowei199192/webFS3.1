@@ -4,7 +4,7 @@
  * @Author: liangkaiLee
  * @Date: 2021-01-26 09:16:43
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-02-05 11:33:29
+ * @LastEditTime: 2021-02-05 13:59:08
 -->
 <template>
   <el-dialog
@@ -108,6 +108,7 @@
 
 <script>
 import { dataDictApi } from '@/api/dataDict'
+import { isNotNull, numberValidate, checkStatus } from '@/utils/formRules'
 
 export default {
   props: {
@@ -139,9 +140,10 @@ export default {
         note: ''
       },
       addDictRules: {
-        name: [{ required: true, message: '请输入类型名称', trigger: 'blur' }],
-        code: [{ required: true, message: '请输入类型码', trigger: 'blur' }],
-        status: [{ required: true, message: '请输入状态', trigger: 'blur' }]
+        name: isNotNull('请输入类型名称'),
+        code: isNotNull('请输入类型码'),
+        status: isNotNull('请输入状态').concat(checkStatus('状态只能为0/1的数字')),
+        order: numberValidate('请输入数字')
       }
     }
   },
@@ -152,8 +154,8 @@ export default {
         const params = {
           typeName: this.addDictForm.name,
           typeCode: this.addDictForm.code,
-          status: parseInt(this.addDictForm.status),
-          orderNum: parseInt(this.addDictForm.order),
+          status: this.addDictForm.status,
+          orderNum: this.addDictForm.order,
           parentId: parseInt(0),
           icon: this.addDictForm.icon,
           remark: this.addDictForm.note

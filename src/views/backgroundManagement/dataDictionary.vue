@@ -23,7 +23,9 @@
           @node-click="dictTreeClick"
           :filter-node-method="dictSearchChange"
         ></el-tree>
-        <el-button class="add-dict-btn" @click.prevent="addDictClick"
+        <el-button
+          class="add-dict-btn"
+          @click.prevent="addDictClick('addParent')"
           >十 新增字典</el-button
         >
       </div>
@@ -175,8 +177,10 @@ export default {
     },
 
     // 点击新增按钮
-    addDictClick () {
+    addDictClick (type) {
       this.showAddDict = true
+      console.log('handelType:', type)
+      this.$emit('handelType')
     },
 
     // 新增字典提交

@@ -148,3 +148,17 @@ export function floatFormat (str) {
   }
   return str
 }
+
+// 验证status
+export function checkStatus (msg) {
+  const rules = []
+  rules.push({
+    validator: (rule, value, callback) => {
+      if (!value) callback()
+      else if (!(/^[0|1]*$/).test(value)) { callback(new Error(msg)) } else { callback() }
+    },
+    message: '',
+    trigger: 'blur'
+  })
+  return rules
+}
