@@ -15,6 +15,7 @@
       </div>
       <div class="toolBox">
         <div
+          v-show="item.isShow"
           v-for="(item, index) in toolItems"
           :key="index"
           class="toolBtn"
@@ -23,13 +24,20 @@
         ></div>
       </div>
       <transition name="hideContent">
-        <div class="contentBox" :style="'top:' + infoTop + 'px;'" v-show="!unfold">
+        <div
+          class="contentBox"
+          :style="'top:' + infoTop + 'px;'"
+          v-show="!unfold"
+        >
           <div
             class="unfold"
             v-show="!unfold"
             @click.stop="unfold = true"
           ></div>
-          <div class="content" :style="'height:' + infoHeight + 'px;width:' + infoWidth + 'px;'">
+          <div
+            class="content"
+            :style="'height:' + infoHeight + 'px;width:' + infoWidth + 'px;'"
+          >
             <slot name="content"></slot>
           </div>
         </div>
@@ -45,7 +53,7 @@
     <div class="resDlgClose" v-show="isRead">
       <div class="infos">
         <span>创建时间:</span>
-        <span class="value">{{createTime}}</span>
+        <span class="value">{{ createTime }}</span>
         <span class="name">创建人:</span>
         <span class="value">{{createUser}}</span>
         <span class="name">最后修改时间:</span>
@@ -102,28 +110,33 @@ export default {
         {
           name: 'zoomIn',
           className: 'zoomIn',
-          isSelect: false
+          isSelect: false,
+          isShow: true
         },
         {
           name: 'zoomOut',
           className: 'zoomOut',
-          isSelect: false
+          isSelect: false,
+          isShow: true
         }
       ],
       pointItem: {
         name: 'point',
         className: 'point',
-        isSelect: false
+        isSelect: false,
+        isShow: true
       },
       lineItem: {
         name: 'line',
         className: 'line',
-        isSelect: false
+        isSelect: false,
+        isShow: true
       },
       areaItem: {
         name: 'area',
         className: 'area',
-        isSelect: false
+        isSelect: false,
+        isShow: true
       },
       bHasInitDrawHelper: false,
       createTime: '',
@@ -142,6 +155,17 @@ export default {
           this.$refs.gduMap.map2D.customDrawHelper.clear()
           this.$refs.gduMap.map2D.customDrawHelper.stop()
         })
+      }
+    },
+    isRead (val) {
+      if (val) {
+        this.pointItem.isShow = false
+        this.lineItem.isShow = false
+        this.areaItem.isShow = false
+      } else {
+        this.pointItem.isShow = true
+        this.lineItem.isShow = true
+        this.areaItem.isShow = true
       }
     }
   },
@@ -249,7 +273,8 @@ export default {
      */
     addOrUpdateFeature (data) {
       this.$refs.gduMap.map2D.customDrawHelper.addOrUpdateFeature(data)
-      setTimeout(() => { // 待自动定位结束后定位到指定图形
+      setTimeout(() => {
+        // 待自动定位结束后定位到指定图形
         this.$refs.gduMap.map2D.customDrawHelper.locateFeatureByID(data.drawId)
       }, 500)
     },

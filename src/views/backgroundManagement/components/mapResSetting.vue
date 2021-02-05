@@ -231,6 +231,7 @@ export default {
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
+            this.$refs.dlg.lookRes(res.data.data)
           }
         })
         .catch((err) => {

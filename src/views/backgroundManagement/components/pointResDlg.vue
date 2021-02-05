@@ -7,6 +7,7 @@
       @mapResAddOrModify="mapResAddOrModify"
       @submitResForm="submitResForm"
       ref="resDlg"
+      :isRead="disabled"
     >
       <div slot="content" class="pointContent mapResForm">
         <div class="pTitle">
@@ -25,7 +26,7 @@
             <el-input
               v-model="resForm.resourcesName"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -33,7 +34,7 @@
             <el-input
               v-model="resForm.resourcesAddr"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -53,11 +54,11 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="联系电话 :">
+          <el-form-item label="联系电话 :" prop="contactTel">
             <el-input
               v-model="resForm.contactTel"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -72,7 +73,7 @@
               :class="{ active: !disabled }"
             ></el-cascader>
           </el-form-item>
-          <el-form-item label="所属辖区 :">
+          <el-form-item label="所属辖区 :" prop="belongArea">
             <el-select
               v-model="resForm.belongArea"
               :popper-append-to-body="false"
@@ -92,7 +93,7 @@
             <el-input
               v-model="resForm.resourcesLongitude"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
               @change="lanChange()"
             ></el-input>
@@ -101,24 +102,24 @@
             <el-input
               v-model="resForm.resourcesLatitude"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
               @change="lanChange()"
             ></el-input>
           </el-form-item>
-          <el-form-item label="管理人员 :">
+          <el-form-item label="管理人员 :" prop="resourcesManager">
             <el-input
               v-model="resForm.resourcesManager"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="人员电话 :">
+          <el-form-item label="人员电话 :" prop="managerTel">
             <el-input
               v-model="resForm.managerTel"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -159,21 +160,21 @@
               </el-popover>
             </div>
           </el-form-item>
-          <el-form-item label="排序 :">
+          <el-form-item label="排序 :" prop="resourcesSort">
             <el-input
               v-model="resForm.resourcesSort"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="备注 :">
+          <el-form-item label="备注 :" prop="resourcesRemark">
             <el-input
               v-model="resForm.resourcesRemark"
               :placeholder="placeholder"
               type="textarea"
               resize="none"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -197,7 +198,7 @@
                   <el-input
                     v-model="item.pointName"
                     :placeholder="placeholder"
-                    :readonly="disabled"
+                    :disabled="disabled"
                     :class="{ active: !disabled }"
                   ></el-input>
                 </el-form-item>
@@ -262,7 +263,7 @@
                     :placeholder="placeholder"
                     type="textarea"
                     resize="none"
-                    :readonly="disabled"
+                    :disabled="disabled"
                     :class="{ active: !disabled }"
                   ></el-input>
                 </el-form-item>
@@ -281,17 +282,13 @@ import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 import { mapResApi } from '@/api/mapRes'
 import { settingApi } from '@/api/setting'
 import mapResMixin from './mixins/mapResMixin'
+import { copyData, uuid } from '@/utils/public'
+
 export default {
-  props: {
-    // 是否禁止编辑
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
   mixins: [mapResMixin],
   data () {
     return {
+      disabled: false, // 是否禁止编辑
       placeholder: '请输入',
       placeholder2: '请选择',
       icons: [],
@@ -384,17 +381,79 @@ export default {
      *  添加资源
      */
     addRes () {
+      this.disabled = false
       this.isShow = true
       this.$nextTick(() => {
-        // 重置数据
-        this.$refs.pointForm.resetFields()
-        this.pointId = ''
-        this.ctlAreas = []
+        this.resetData()
       })
+      delete this.resForm.resourcesPointAddDTOS
       this.getPointResources()
       this.getAreaResources()
       this.getOrgans()
       this.getControlAreas()
+    },
+    /**
+     *  重置数据
+     */
+    resetData () {
+      this.$refs.pointForm.resetFields()
+      this.pointId = ''
+      this.ctlAreas = []
+    },
+    /**
+     *  查看资源
+     */
+    lookRes (data) {
+      delete this.resForm.resourcesPointAddDTOS
+      this.disabled = true
+      this.isShow = true
+      const info = {
+        createTime: data.createTime,
+        createUser: data.createUserName,
+        updateTime: data.updateTime,
+        updateUser: data.updateUser
+      }
+      this.$refs.resDlg.showInfos(info)
+      const addDTOS = data.resourcesPointAddDTOS
+      this.$nextTick(() => {
+        this.resetData()
+        copyData(data, this.resForm)
+        if (addDTOS && addDTOS.length > 0) {
+          addDTOS.forEach((c) => {
+            var area = JSON.parse(JSON.stringify(this.area))
+            copyData(c, area)
+            this.ctlAreas.push(area)
+          })
+        }
+      })
+      // 在地图上添加点
+      setTimeout(() => {
+        const d = {
+          drawId: uuid(12, 16),
+          drawType: 0,
+          coordinates: [
+            this.resForm.resourcesLongitude,
+            this.resForm.resourcesLatitude
+          ]
+        }
+        this.$refs.resDlg.addOrUpdateFeature(d)
+        if (addDTOS && addDTOS.length > 0) {
+          addDTOS.forEach((c) => {
+            const area = {
+              drawId: uuid(12, 16),
+              drawType: 2,
+              fillStyle: { color: c.fillColor },
+              strokeStyle: {
+                color: c.lineColor,
+                width: c.lineWidth
+              },
+              // eslint-disable-next-line no-eval
+              coordinates: eval(c.longitudeLatitudeArray)
+            }
+            this.$refs.resDlg.addOrUpdateFeature(area)
+          })
+        }
+      }, 100)
     },
     /**
      * 获取辖区资源类型
@@ -499,7 +558,6 @@ export default {
         area.id = data.drawId
         area.longitudeLatitudeArray = this.arrToStr(data.coordinates)
         this.ctlAreas.push(area)
-        console.log(this.ctlAreas)
       }
     },
     /**
