@@ -70,10 +70,16 @@
       >
         <el-table-column type="selection" align="center"></el-table-column>
         <el-table-column label="图片" align="center">
-          <template slot-scope="scope"><img  :src="scope.row.iconPath"></template>
+          <template slot-scope="scope">
+            <img :src="scope.row.iconPath" />
+          </template>
         </el-table-column>
-        <el-table-column prop="iconName" label="名称" align="center"  show-overflow-tooltip></el-table-column>
-        <el-table-column prop="iconLength" label="大小" align="center"></el-table-column>
+        <el-table-column prop="iconName" label="名称" align="center" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="iconLength" label="大小" align="center">
+          <template slot-scope="scope">
+            <span>{{scope.row.iconLength|filterB}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="iconSize" label="尺寸" align="center"></el-table-column>
         <el-table-column prop="updateTime" label="时间" align="center"></el-table-column>
         <el-table-column label="状态" align="center">
@@ -84,7 +90,7 @@
             >{{scope.row.status===1?'正常':'失效'}}</span>
           </template>
         </el-table-column>
-        <el-table-column  label="是否引用" align="center">
+        <el-table-column label="是否引用" align="center">
           <template slot-scope="scope">
             <span
               :style="{color:scope.row.isQuote===1?
@@ -94,7 +100,7 @@
         </el-table-column>
       </el-table>
       <el-pagination
-        class="tablePagination webFsScroll"
+        class="tablePagination "
         style="text-align: right;padding-right: 47px;"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -147,39 +153,11 @@ export default {
       ],
       isQuote: 'all',
       iconName: '', // 图标名称
-      tableData: [
-        // {
-        //   pic: '2016-05-03',
-        //   name: '王小虎',
-        //   bigness: '12213321',
-        //   size: '4X4',
-        //   date: 20111111,
-        //   status: '0',
-        //   isRequired: '0'
-        // },
-        // {
-        //   pic: '2016-05-03',
-        //   name: '王小虎',
-        //   bigness: '12213321',
-        //   size: '4X4',
-        //   date: 20111111,
-        //   status: '1',
-        //   isRequired: '1'
-        // },
-        // {
-        //   pic: '2016-05-03',
-        //   name: '王小虎',
-        //   bigness: '12213321',
-        //   size: '4X4',
-        //   date: 20111111,
-        //   status: '1',
-        //   isRequired: '1'
-        // }
-      ],
+      tableData: [],
       multipleSelection: [], // 保存选择的数据
       pageInfo: {
         curPage: 1,
-        pageSize: 10,
+        pageSize: 20,
         totalCount: 0
       }
     }
@@ -199,14 +177,38 @@ export default {
           type: 'warning'
         })
       }
-      const params = {
-        ids: this.multipleSelection
-      }
-      this.$axios.post(iconLibaryApi.deleteAll, params).then(res => {
-        if (res && res.data && res.data.code === 0) {
-          this.$notify({ title: '提示', message: '删除成功！', type: 'success' })
-        }
+      this.$confirm('此操作将永久删除该图片, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false
       })
+        .then(() => {
+          const ids = []
+          this.multipleSelection.forEach(element => {
+            ids.push(element.id)
+          })
+          const params = { ids: JSON.stringify(ids) }
+          this.$axios
+            .post(iconLibaryApi.deleteAll, params)
+            .then(res => {
+              if (res && res.data && res.data.code === 0) {
+                this.$notify({
+                  title: '提示',
+                  message: '删除成功！',
+                  type: 'success'
+                })
+                this.pageInfo.curPage = 1
+                this.getAllPic()
+              }
+            })
+        })
+        .catch(() => {
+          this.$notify({
+            title: '提示',
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
     // 表格多选选择方法
     handleSelectionChange (val) {
@@ -264,6 +266,11 @@ export default {
       this.getAllPic()
     }
   },
+  filters: {
+    filterB (v) {
+      return Math.round(v / 1024 * 10) / 10 + 'kb'
+    }
+  },
   mounted () {
     this.getAllPic()
   }
@@ -284,7 +291,7 @@ export default {
     box-sizing: border-box;
     margin-top: 16px;
     padding: 12px 14px;
-    height: 814px;
+    height: 800px;
     background: #183157;
     position: relative;
     .selectBox {
@@ -407,7 +414,7 @@ export default {
     }
     /deep/ .tablePagination {
       position: absolute;
-      bottom: 20px;
+      bottom:10px;
       right: 20px;
     }
   }

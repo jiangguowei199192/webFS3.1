@@ -53,7 +53,9 @@ export default {
       this.$refs.upload.clearFiles()
     },
     beforeRemove (file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`)
+      return this.$confirm(`确定移除 ${file.name}？`, {
+        showClose: false
+      })
     },
     handleRemove (file, fileList) {
       // console.log(file, fileList)
