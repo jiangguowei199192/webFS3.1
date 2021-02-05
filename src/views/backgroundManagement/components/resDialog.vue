@@ -64,11 +64,11 @@ export default {
   props: {
     isShow: {
       type: Boolean,
-      required: true
+      required: false
     },
     isRead: {
       type: Boolean,
-      default: true
+      default: false
     },
     title: {
       type: String
@@ -249,7 +249,7 @@ export default {
      */
     addOrUpdateFeature (data) {
       this.$refs.gduMap.map2D.customDrawHelper.addOrUpdateFeature(data)
-      setTimeout(() => { //待自动定位结束后定位到指定图形
+      setTimeout(() => { // 待自动定位结束后定位到指定图形
         this.$refs.gduMap.map2D.customDrawHelper.locateFeatureByID(data.drawId)
       }, 500)
     },

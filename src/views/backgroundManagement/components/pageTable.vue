@@ -93,7 +93,8 @@ export default {
     },
     // 刷新
     refresh: {
-      type: Number
+      type: Number,
+      default: 0
     },
     // 表格高度
     tableHeight: {
@@ -168,9 +169,7 @@ export default {
     },
     refresh () {
       if (!this.api) return
-      setTimeout(() => {
-        this.getList(this.api)
-      }, 300)
+      this.getList(this.api)
     }
   },
 

@@ -80,7 +80,7 @@ export default {
       subTitle: '字典项',
       // 表格项
       tableInfo: {
-        refresh: 1,
+        refresh: 0,
         data: [],
         fieldList: [
           { label: '子类名称', value: 'typeName' },
@@ -147,7 +147,7 @@ export default {
             this.dictTree = this.handleDeptTree(res.data.data)
             if (this.dictTree.length > 0) {
               this.selectedDict = this.dictTree[0]
-              this.getChildDictList()
+              this.tableInfo.refresh = Math.random()
             }
           }
         })
