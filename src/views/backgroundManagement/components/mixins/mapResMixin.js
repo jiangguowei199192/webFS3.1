@@ -18,12 +18,12 @@ const mapResMixin = {
   },
   methods: {
     /**
-     * 获取点资源类型
+     * 获取资源类型
      */
-    getPointResources () {
+    getResources (typeCode) {
       this.$axios
         .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'point_resources' }
+          params: { typeCode: typeCode }
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
@@ -68,7 +68,7 @@ const mapResMixin = {
     getAreaResources () {
       this.$axios
         .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'areas' }
+          params: { typeCode: 'area_resources' }
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {

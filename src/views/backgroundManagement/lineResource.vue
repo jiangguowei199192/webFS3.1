@@ -4,6 +4,7 @@
       :dlgView="dlgView"
       :resourcesDataType="resourcesDataType"
       :subTitle="subTitle"
+      :fieldList="fieldList"
     ></MapResSetting>
   </div>
 </template>
@@ -15,7 +16,16 @@ export default {
     return {
       dlgView: 'LineResDlg',
       subTitle: '面资源设置',
-      resourcesDataType: '1'
+      resourcesDataType: '1',
+      fieldList: [
+        { label: '资源名称', value: 'resourcesName' },
+        { label: '类型', value: 'resourcesTypeName' },
+        { label: '起点', value: 'lineOrigin' },
+        { label: '终点', value: 'lineDestination' },
+        { label: '长度', value: 'totalLength' },
+        { label: '所属机构', value: 'deptName' },
+        { label: '排序', value: 'resourcesSort' }
+      ]
     }
   },
   components: {

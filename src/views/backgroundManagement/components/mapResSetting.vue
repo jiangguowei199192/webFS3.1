@@ -95,6 +95,19 @@ export default {
     resourcesDataType: {
       type: String,
       default: '0'
+    },
+    // 表格字段配置
+    fieldList: {
+      type: Array,
+      default: () => {
+        return [
+          { label: '资源名称', value: 'resourcesName' },
+          { label: '地址', value: 'resourcesAddr' },
+          { label: '类型', value: 'resourcesTypeName' },
+          { label: '所属机构', value: 'deptName' },
+          { label: '排序', value: 'resourcesSort' }
+        ]
+      }
     }
   },
   mixins: [mapResMixin],
@@ -113,13 +126,7 @@ export default {
       tableInfo: {
         refresh: 1,
         data: [],
-        fieldList: [
-          { label: '资源名称', value: 'resourcesName' },
-          { label: '地址', value: 'resourcesAddr' },
-          { label: '类型', value: 'resourcesTypeName' },
-          { label: '所属机构', value: 'deptName' },
-          { label: '排序', value: 'resourcesSort' }
-        ],
+        fieldList: [],
         handle: {
           label: '操作',
           width: '130',
@@ -144,6 +151,7 @@ export default {
     SurfaceResDlg
   },
   mounted () {
+    this.tableInfo.fieldList = this.fieldList
     this.query.resourcesDataType = this.resourcesDataType
     this.getList()
     this.getOrgans()
@@ -178,7 +186,9 @@ export default {
      */
     getResType () {
       if (this.resourcesDataType === '0') {
-        this.getPointResources()
+        this.getResources('point_resources')
+      } else if (this.resourcesDataType === '1') {
+        this.getResources('line_resources')
       }
     },
     /**

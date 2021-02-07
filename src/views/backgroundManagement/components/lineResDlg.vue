@@ -7,6 +7,7 @@
       @mapResAddOrModify="mapResAddOrModify"
       @submitResForm="submitResForm"
       ref="resDlg"
+      :isRead="disabled"
     >
       <div slot="content" class="lineContent mapResForm">
         <div class="pTitle">
@@ -25,53 +26,63 @@
             <el-input
               v-model="resForm.resourcesName"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
               class="lineName"
             ></el-input>
           </el-form-item>
           <el-form-item label="资源类型 :" prop="resourcesType">
             <el-select
+              v-show="!disabled"
               v-model="resForm.resourcesType"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
-              :disabled="disabled"
             >
               <el-option
                 v-for="item in resTypes"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
+            <el-input
+              v-show="disabled"
+              v-model="resourcesTypeName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="联系电话 :">
             <el-input
               v-model="resForm.contactTel"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
           <el-form-item label="所属机构 :" prop="belongOrg">
-            <el-select
+            <el-cascader
+              v-show="!disabled"
               v-model="resForm.belongOrg"
-              :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :options="organs"
+              :props="organsProps"
+              :show-all-levels="false"
               :class="{ active: !disabled }"
-              :disabled="disabled"
-            >
-              <el-option
-                v-for="item in organs"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+            ></el-cascader>
+            <el-input
+              v-show="disabled"
+              v-model="deptName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
+              v-show="!disabled"
               v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
@@ -80,17 +91,24 @@
             >
               <el-option
                 v-for="item in areas"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
+            <el-input
+              v-show="disabled"
+              v-model="belongAreaName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="起点 :">
             <el-input
               v-model="resForm.lineOrigin"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -98,7 +116,7 @@
             <el-input
               v-model="resForm.lineDestination"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -106,7 +124,7 @@
             <el-input
               v-model="resForm.totalLength"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -114,7 +132,7 @@
             <el-input
               v-model="resForm.resourcesSort"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -128,7 +146,7 @@
           </el-form-item>
           <el-form-item label="线宽 :" prop="lineWidth">
             <el-input-number
-              v-if="!disabled"
+              v-show="!disabled"
               v-model="resForm.lineWidth"
               :min="1"
               :max="10"
@@ -136,7 +154,13 @@
               step-strictly
               @change="lineStyleChange()"
             ></el-input-number>
-            <span v-else>{{ resForm.lineWidth }}</span>
+            <el-input
+              v-show="disabled"
+              v-model="resForm.lineWidth"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="备注 :" class="note">
             <el-input
@@ -144,7 +168,7 @@
               :placeholder="placeholder"
               type="textarea"
               resize="none"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -152,7 +176,10 @@
         <div>
           <PointMarkerForm
             ref="markerForm"
+            :areas="areas"
+            :organs="organs"
             @removeFeature="removeMarker"
+            :disabled="disabled"
           ></PointMarkerForm>
         </div>
       </div>
@@ -164,23 +191,18 @@
 import ResDialog from './resDialog.vue'
 import PointMarkerForm from './pointMarkerForm.vue'
 import { numberValidate } from '@/utils/formRules'
+import mapResMixin from './mixins/mapResMixin'
+import { copyData, uuid, arrToStr } from '@/utils/public'
+import { mapResApi } from '@/api/mapRes'
 export default {
-  props: {
-    // 是否禁止编辑
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
+  mixins: [mapResMixin],
   data () {
     return {
+      disabled: false, // 是否禁止编辑
       placeholder: '请输入',
       placeholder2: '请选择',
       title: '新增线资源',
       isShow: false,
-      organs: [],
-      areas: [],
-      resTypes: [],
       formRules: {
         resourcesName: [{ required: true, message: '请输入资源名称' }],
         resourcesType: [{ required: true, message: '请选择资源类型' }],
@@ -203,11 +225,14 @@ export default {
         resourcesRemark: '',
         lineWidth: 2,
         lineColor: 'rgba(0, 204, 255, 1)',
-        resourcesLatitude: '',
-        resourcesLongitude: ''
+        longitudeLatitudeArray: ''
       },
       lineId: '',
-      coordinates: []
+      isUpdate: false,
+      deptName: '',
+      resourcesTypeName: '',
+      belongAreaName: '',
+      pointIds: [] // 标识点
     }
   },
   watch: {
@@ -226,12 +251,107 @@ export default {
      */
     addRes () {
       this.isShow = true
+      this.isUpdate = false
       this.$nextTick(() => {
-        // 重置数据
-        this.$refs.lineForm.resetFields()
-        this.$refs.markerForm.resetData()
-        this.lineId = ''
+        this.disabled = false
+        this.resetData()
       })
+      this.getResources('line_resources')
+      this.getAreaResources()
+      this.getOrgans()
+    },
+    /**
+     *  重置数据
+     */
+    resetData () {
+      this.$refs.lineForm.resetFields()
+      this.$refs.markerForm.resetData()
+      this.lineId = ''
+    },
+    /**
+     *  修改资源
+     */
+    updateRes (data) {
+      this.isShow = true
+      this.isUpdate = true
+      this.pointIds = []
+      this.getResources('line_resources')
+      this.getAreaResources()
+      this.getOrgans()
+      const addDTOS = data.resourcesPointAddDTOS
+      this.$nextTick(() => {
+        this.disabled = false
+        this.resetData()
+        // 设置线资源信息
+        copyData(data, this.resForm)
+        this.resForm.id = data.id
+        // 设置标记点信息
+        if (addDTOS && addDTOS.length > 0) {
+          addDTOS.forEach((c) => {
+            this.pointIds.push(c.id)
+          })
+          this.$refs.markerForm.addPoints(addDTOS, true)
+        }
+      })
+      // 在地图上添加线
+      this.addLineAndMarkersInMap(addDTOS)
+    },
+    /**
+     *  在地图上添加线和标记点
+     */
+    addLineAndMarkersInMap (addDTOS) {
+      setTimeout(() => {
+        const d = {
+          drawId: uuid(12, 16),
+          drawType: 1,
+          // eslint-disable-next-line no-eval
+          coordinates: eval(this.resForm.longitudeLatitudeArray),
+          strokeStyle: {
+            color: this.resForm.lineColor,
+            width: this.resForm.lineWidth
+          }
+        }
+        this.$refs.resDlg.addOrUpdateFeature(d)
+        if (addDTOS && addDTOS.length > 0) {
+          addDTOS.forEach((c) => {
+            const point = {
+              drawId: c.id,
+              drawType: 0,
+              coordinates: [c.longitude, c.latitude]
+            }
+            this.$refs.resDlg.addOrUpdateFeature(point)
+          })
+        }
+      }, 100)
+    },
+    /**
+     *  查看资源
+     */
+    lookRes (data) {
+      this.isShow = true
+      const info = {
+        createTime: data.createTime,
+        createUser: data.createUserName,
+        updateTime: data.updateTime,
+        updateUser: data.updateUserName
+      }
+      this.$refs.resDlg.showInfos(info)
+      const addDTOS = data.resourcesPointAddDTOS
+      this.$nextTick(() => {
+        this.disabled = true
+        this.resetData()
+        // 设置线资源信息
+        copyData(data, this.resForm)
+        this.belongAreaName = data.belongAreaName
+        this.deptName = data.deptName
+        this.resourcesTypeName = data.resourcesTypeName
+        // 设置标记点信息
+        if (addDTOS && addDTOS.length > 0) {
+          this.$refs.markerForm.addPoints(addDTOS)
+        }
+      })
+      // 在地图上添加线
+      this.addLineAndMarkersInMap(addDTOS)
     },
     /**
      *  线段样式改变
@@ -257,7 +377,7 @@ export default {
         this.$refs.markerForm.addOrModifyPoint(data)
       } else if (data.drawType === 1) {
         this.lineId = data.drawId
-        this.coordinates = data.coordinates
+        this.resForm.longitudeLatitudeArray = arrToStr(data.coordinates)
         this.resForm.totalLength = data.length.toFixed(2)
         // 重新画线资源的时候，需要设置样式
         if (data.bIsAdd) {
@@ -277,6 +397,63 @@ export default {
       }
     },
     /**
+     *  更新线资源
+     */
+    updateLineRes () {
+      // 删除管控范围
+      if (this.pointIds.length > 0) {
+        const param = { ids: this.pointIds }
+        this.$axios
+          .post(mapResApi.batchDelPoint, param, {
+            headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+          })
+          .then((res) => {
+            if (res && res.data && res.data.code === 0) {
+              this.addOrUpdate()
+            }
+          })
+          .catch((err) => {
+            console.log('mapResApi.batchDelPoint Err : ' + err)
+          })
+      } else this.addOrUpdate()
+    },
+    /**
+     *  添加或修改线资源
+     */
+    addOrUpdate () {
+      let url = mapResApi.lineResUpdate
+      if (!this.isUpdate) {
+        delete this.resForm.id
+        url = mapResApi.lineResAdd
+      }
+      delete this.resForm.resourcesPointAddDTOS
+      delete this.resForm.linePointUpdateDTOS
+      const pointList = this.$refs.markerForm.list
+      if (pointList.length > 0) {
+        pointList.forEach((c) => {
+          delete c.id
+          c.longitude = parseFloat(c.longitude)
+          c.latitude = parseFloat(c.latitude)
+        })
+        if (this.isUpdate) {
+          this.resForm.linePointUpdateDTOS = pointList
+        } else this.resForm.resourcesPointAddDTOS = pointList
+      }
+      this.$axios
+        .post(url, this.resForm, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.isShow = false
+            this.$emit('refreshTable')
+          }
+        })
+        .catch((err) => {
+          console.log(url + ' Err : ' + err)
+        })
+    },
+    /**
      *  提交点资源数据
      */
     submitResForm () {
@@ -286,6 +463,9 @@ export default {
       })
       const vMarker = this.$refs.markerForm.formValid()
       if (vLine && vMarker) {
+        if (this.isUpdate) {
+          this.updateLineRes()
+        } else this.addOrUpdate()
       }
     },
     /**

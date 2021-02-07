@@ -100,3 +100,26 @@ export function replaceStreamUrl (streamUrl, baseUrl) {
     // return 'ws://' + url + ':40007/' + stream // 长江大保护视频端口
   }
 }
+
+/**
+ *  二维数组转字符串
+ */
+export function arrToStr (objarr) {
+  var arrLen = objarr.length
+  var row = '['
+  for (var i = 0; i < arrLen; i++) {
+    row += '['
+    for (var j = 0; j < objarr[i].length; j++) {
+      row += objarr[i][j]
+      if (j < objarr[i].length - 1) {
+        row += ','
+      }
+    }
+    row += ']'
+    if (i < arrLen - 1) {
+      row += ','
+    }
+  }
+  row += ']'
+  return row
+}

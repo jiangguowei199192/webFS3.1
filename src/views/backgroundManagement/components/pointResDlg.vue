@@ -207,7 +207,11 @@
           </div>
           <template v-for="item in ctlAreas">
             <div :key="item.id">
-              <span class="del" @click.stop="deleteArea(item)" v-show="!disabled"></span>
+              <span
+                class="del"
+                @click.stop="deleteArea(item)"
+                v-show="!disabled"
+              ></span>
               <el-form
                 :model="item"
                 :inline="true"
@@ -324,7 +328,7 @@ import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 import { mapResApi } from '@/api/mapRes'
 import { settingApi } from '@/api/setting'
 import mapResMixin from './mixins/mapResMixin'
-import { copyData, uuid } from '@/utils/public'
+import { copyData, uuid, arrToStr } from '@/utils/public'
 
 export default {
   mixins: [mapResMixin],
@@ -435,7 +439,7 @@ export default {
       this.$nextTick(() => {
         this.resetData()
       })
-      this.getPointResources()
+      this.getResources('point_resources')
       this.getAreaResources()
       this.getOrgans()
       this.getControlAreas()
@@ -456,7 +460,7 @@ export default {
       this.isShow = true
       this.isUpdate = true
       this.areaIds = []
-      this.getPointResources()
+      this.getResources('point_resources')
       this.getAreaResources()
       this.getOrgans()
       this.getControlAreas()
@@ -489,7 +493,7 @@ export default {
         createTime: data.createTime,
         createUser: data.createUserName,
         updateTime: data.updateTime,
-        updateUser: data.updateUser
+        updateUser: data.updateUserName
       }
       this.$refs.resDlg.showInfos(info)
       const addDTOS = data.resourcesPointAddDTOS
@@ -625,36 +629,14 @@ export default {
       } else if (data.drawType === 2) {
         const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {
-          a.longitudeLatitudeArray = this.arrToStr(data.coordinates)
+          a.longitudeLatitudeArray = arrToStr(data.coordinates)
           return
         }
         var area = JSON.parse(JSON.stringify(this.area))
         area.id = data.drawId
-        area.longitudeLatitudeArray = this.arrToStr(data.coordinates)
+        area.longitudeLatitudeArray = arrToStr(data.coordinates)
         this.ctlAreas.push(area)
       }
-    },
-    /**
-     *  二维数组转字符串
-     */
-    arrToStr (objarr) {
-      var arrLen = objarr.length
-      var row = '['
-      for (var i = 0; i < arrLen; i++) {
-        row += '['
-        for (var j = 0; j < objarr[i].length; j++) {
-          row += objarr[i][j]
-          if (j < objarr[i].length - 1) {
-            row += ','
-          }
-        }
-        row += ']'
-        if (i < arrLen - 1) {
-          row += ','
-        }
-      }
-      row += ']'
-      return row
     },
     /**
      *  添加或修改点资源

@@ -6,7 +6,11 @@
     </div>
     <template v-for="(item, index) in list">
       <div :key="index">
-        <span class="del" @click.stop="deleteMarker(item)"></span>
+        <span
+          class="del"
+          @click.stop="deleteMarker(item)"
+          v-show="!disabled"
+        ></span>
         <el-form
           :model="item"
           :inline="true"
@@ -14,11 +18,11 @@
           :rules="formRules"
           ref="markerForm"
         >
-          <el-form-item label="名称 :" prop=" pointName">
+          <el-form-item label="名称 :" prop="pointName">
             <el-input
               v-model="item.pointName"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -26,28 +30,31 @@
             <el-input
               v-model="item.pointAddr"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
           <el-form-item label="所属机构 :" prop="belongOrg">
-            <el-select
+            <el-cascader
+              v-show="!disabled"
               v-model="item.belongOrg"
-              :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :options="organs"
+              :props="organsProps"
+              :show-all-levels="false"
               :class="{ active: !disabled }"
-              :disabled="disabled"
-            >
-              <el-option
-                v-for="item in organs"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
-              ></el-option>
-            </el-select>
+            ></el-cascader>
+            <el-input
+              v-show="disabled"
+              v-model="item.deptName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
+              v-show="!disabled"
               v-model="item.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
@@ -56,17 +63,24 @@
             >
               <el-option
                 v-for="item in areas"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
+            <el-input
+              v-show="disabled"
+              v-model="item.belongAreaName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
-          <el-form-item label="经度 :" prop=" longitude">
+          <el-form-item label="经度 :" prop="longitude">
             <el-input
               v-model="item.longitude"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -74,7 +88,7 @@
             <el-input
               v-model="item.latitude"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -115,7 +129,7 @@
             <el-input
               v-model="item.pointSort"
               :placeholder="placeholder"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -125,7 +139,7 @@
               :placeholder="placeholder"
               type="textarea"
               resize="none"
-              :readonly="disabled"
+              :disabled="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
@@ -137,12 +151,27 @@
 
 <script>
 import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
+import { copyData } from '@/utils/public'
 export default {
   props: {
     // 是否禁止编辑
     disabled: {
       type: Boolean,
       default: false
+    },
+    // 所属辖区
+    areas: {
+      type: Array,
+      default: () => {
+        return []
+      }
+    },
+    // 所属机构
+    organs: {
+      type: Array,
+      default: () => {
+        return []
+      }
     }
   },
   data () {
@@ -151,8 +180,6 @@ export default {
       placeholder2: '请选择',
       icons: [],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
-      organs: [],
-      areas: [],
       showPopover: false,
       point: {
         id: '',
@@ -164,16 +191,22 @@ export default {
         pointSort: '',
         longitude: '',
         latitude: '',
-        iconUrl:
-          'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        iconUrl: 'https://cube.elemecdn.com/3/7c/1epng.png'
       },
       list: [],
+      organsProps: {
+        expandTrigger: 'hover',
+        children: 'children',
+        label: 'deptName',
+        value: 'deptCode',
+        emitPath: false
+      },
       formRules: {
         pointName: [{ required: true, message: '请输入资源名称' }],
         belongOrg: [{ required: true, message: '请选择所属机构' }],
         iconUrl: [{ required: true, message: '请选择图标' }],
-        lon: isNotNull('请输入经度').concat(lonValidate()),
-        lat: isNotNull('请输入纬度').concat(latValidate())
+        longitude: isNotNull('请输入经度').concat(lonValidate()),
+        latitude: isNotNull('请输入纬度').concat(latValidate())
       }
     }
   },
@@ -198,9 +231,23 @@ export default {
       }
       var point = JSON.parse(JSON.stringify(this.point))
       point.id = data.drawId
-      point.lon = lon
-      point.lat = lat
+      point.longitude = lon
+      point.latitude = lat
       this.list.push(point)
+    },
+    /**
+     *  添加标记点
+     */
+    addPoints (addDTOS, isUpdate = false) {
+      addDTOS.forEach((c) => {
+        var pt = JSON.parse(JSON.stringify(this.point))
+        copyData(c, pt)
+        if (!isUpdate) {
+          pt.deptName = c.deptName
+          pt.belongAreaName = c.belongAreaName
+        }
+        this.list.push(pt)
+      })
     },
     /**
      *  删除标记点
