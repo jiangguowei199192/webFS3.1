@@ -44,6 +44,7 @@
               v-model="resForm.resourcesType"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :class="{ active: !disabled }"
             >
               <el-option
                 v-for="item in resTypes"
@@ -76,6 +77,7 @@
               :options="organs"
               :props="organsProps"
               :show-all-levels="false"
+              :class="{ active: !disabled }"
             ></el-cascader>
             <el-input
               v-show="disabled"
@@ -91,6 +93,7 @@
               v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
+              :class="{ active: !disabled }"
             >
               <el-option
                 v-for="item in areas"
@@ -204,7 +207,7 @@
           </div>
           <template v-for="item in ctlAreas">
             <div :key="item.id">
-              <span class="del" @click.stop="deleteArea(item)"></span>
+              <span class="del" @click.stop="deleteArea(item)" v-show="!disabled"></span>
               <el-form
                 :model="item"
                 :inline="true"
@@ -222,6 +225,7 @@
                 </el-form-item>
                 <el-form-item label="类型 :">
                   <el-select
+                    v-show="!disabled"
                     v-model="item.pointType"
                     :popper-append-to-body="false"
                     :placeholder="placeholder2"
@@ -235,17 +239,31 @@
                       :value="item.typeCode"
                     ></el-option>
                   </el-select>
+                  <el-input
+                    v-show="disabled"
+                    v-model="item.pointTypeName"
+                    :placeholder="placeholder"
+                    :disabled="true"
+                    class="disabled"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="所属机构 :" prop="belongOrg">
                   <el-cascader
+                    v-show="!disabled"
                     v-model="item.belongOrg"
                     :placeholder="placeholder2"
                     :options="organs"
                     :props="organsProps"
                     :show-all-levels="false"
-                    :disabled="disabled"
                     :class="{ active: !disabled }"
                   ></el-cascader>
+                  <el-input
+                    v-show="disabled"
+                    v-model="item.deptName"
+                    :placeholder="placeholder"
+                    :disabled="true"
+                    class="disabled"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="线宽 :" prop="lineWidth">
                   <el-input-number
@@ -255,9 +273,15 @@
                     :max="10"
                     :step="1"
                     step-strictly
-                    @change="lineWidthChange()"
+                    @change="lineWidthChange(item)"
                   ></el-input-number>
-                  <span v-else>{{ item.lineWidth }}</span>
+                  <el-input
+                    v-show="disabled"
+                    v-model="item.lineWidth"
+                    :placeholder="placeholder"
+                    :disabled="true"
+                    class="disabled"
+                  ></el-input>
                 </el-form-item>
                 <el-form-item label="线段颜色 :" prop="lineColor">
                   <el-color-picker
@@ -313,7 +337,6 @@ export default {
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       title: '新增点资源',
       isShow: false,
-      areas: [], // 辖区类型
       controlAreas: [], // 管控范围
       showPopover: false,
       area: {
@@ -348,6 +371,8 @@ export default {
       belongAreaName: '',
       deptName: '',
       resForm: {
+        resourcesPointAddDTOS: [],
+        id: '',
         resourcesName: '',
         resourcesAddr: '',
         resourcesType: '',
@@ -364,7 +389,9 @@ export default {
         resourcesIcon:
           'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       },
-      pointId: ''
+      pointId: '',
+      isUpdate: false,
+      areaIds: [] // 管辖范围的id集合
     }
   },
   watch: {
@@ -404,10 +431,10 @@ export default {
     addRes () {
       this.disabled = false
       this.isShow = true
+      this.isUpdate = false
       this.$nextTick(() => {
         this.resetData()
       })
-      delete this.resForm.resourcesPointAddDTOS
       this.getPointResources()
       this.getAreaResources()
       this.getOrgans()
@@ -422,10 +449,40 @@ export default {
       this.ctlAreas = []
     },
     /**
+     *  修改资源
+     */
+    updateRes (data) {
+      this.disabled = false
+      this.isShow = true
+      this.isUpdate = true
+      this.areaIds = []
+      this.getPointResources()
+      this.getAreaResources()
+      this.getOrgans()
+      this.getControlAreas()
+      const addDTOS = data.resourcesPointAddDTOS
+      this.$nextTick(() => {
+        this.resetData()
+        // 设置点资源信息
+        copyData(data, this.resForm)
+        this.resForm.id = data.id
+        // 设置管辖范围信息
+        if (addDTOS && addDTOS.length > 0) {
+          addDTOS.forEach((c) => {
+            var area = JSON.parse(JSON.stringify(this.area))
+            copyData(c, area)
+            this.areaIds.push(c.id)
+            this.ctlAreas.push(area)
+          })
+        }
+      })
+      // 在地图上添加点
+      this.addPointAndAreaInMap(addDTOS)
+    },
+    /**
      *  查看资源
      */
     lookRes (data) {
-      delete this.resForm.resourcesPointAddDTOS
       this.disabled = true
       this.isShow = true
       const info = {
@@ -448,11 +505,19 @@ export default {
           addDTOS.forEach((c) => {
             var area = JSON.parse(JSON.stringify(this.area))
             copyData(c, area)
+            area.pointTypeName = c.pointTypeName
+            area.deptName = c.deptName
             this.ctlAreas.push(area)
           })
         }
       })
       // 在地图上添加点
+      this.addPointAndAreaInMap(addDTOS)
+    },
+    /**
+     *  在地图上添加点和管辖区域
+     */
+    addPointAndAreaInMap (addDTOS) {
       setTimeout(() => {
         const d = {
           drawId: uuid(12, 16),
@@ -466,7 +531,7 @@ export default {
         if (addDTOS && addDTOS.length > 0) {
           addDTOS.forEach((c) => {
             const area = {
-              drawId: uuid(12, 16),
+              drawId: c.id,
               drawType: 2,
               fillStyle: { color: c.fillColor },
               strokeStyle: {
@@ -480,23 +545,6 @@ export default {
           })
         }
       }, 100)
-    },
-    /**
-     * 获取辖区资源类型
-     */
-    getAreaResources () {
-      this.$axios
-        .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'wuhan_city' }
-        })
-        .then((res) => {
-          if (res && res.data && res.data.code === 0) {
-            this.areas = res.data.data
-          }
-        })
-        .catch((err) => {
-          console.log('settingApi.queryByTypeCode Err : ' + err)
-        })
     },
     /**
      * 获取管控范围类型
@@ -609,6 +657,60 @@ export default {
       return row
     },
     /**
+     *  添加或修改点资源
+     */
+    addOrUpdate () {
+      let url = mapResApi.pointResUpdate
+      if (!this.isUpdate) {
+        delete this.resForm.id
+        url = mapResApi.pointResAdd
+      }
+      delete this.resForm.resourcesPointAddDTOS
+      delete this.resForm.resourcesPointUpdateDTOS
+      if (this.ctlAreas.length > 0) {
+        this.ctlAreas.forEach((c) => {
+          delete c.id
+        })
+        if (this.isUpdate) {
+          this.resForm.resourcesPointUpdateDTOS = this.ctlAreas
+        } else this.resForm.resourcesPointAddDTOS = this.ctlAreas
+      }
+      this.$axios
+        .post(url, this.resForm, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.isShow = false
+            this.$emit('refreshTable')
+          }
+        })
+        .catch((err) => {
+          console.log(url + ' Err : ' + err)
+        })
+    },
+    /**
+     *  更新点资源
+     */
+    updatePointRes () {
+      // 删除管控范围
+      if (this.areaIds.length > 0) {
+        const param = { ids: this.areaIds }
+        this.$axios
+          .post(mapResApi.batchDelPoint, param, {
+            headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+          })
+          .then((res) => {
+            if (res && res.data && res.data.code === 0) {
+              this.addOrUpdate()
+            }
+          })
+          .catch((err) => {
+            console.log('mapResApi.batchDelPoint Err : ' + err)
+          })
+      } else this.addOrUpdate()
+    },
+    /**
      *  提交点资源数据
      */
     submitResForm () {
@@ -631,25 +733,9 @@ export default {
       this.resForm.resourcesLatitude = parseFloat(
         this.resForm.resourcesLatitude
       )
-      if (this.ctlAreas.length > 0) {
-        this.ctlAreas.forEach((c) => {
-          delete c.id
-        })
-        this.resForm.resourcesPointAddDTOS = this.ctlAreas
-      }
-      this.$axios
-        .post(mapResApi.mapResAdd, this.resForm, {
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
-        })
-        .then((res) => {
-          if (res && res.data && res.data.code === 0) {
-            this.isShow = false
-            this.$emit('refreshTable')
-          }
-        })
-        .catch((err) => {
-          console.log('mapResApi.mapResAdd Err : ' + err)
-        })
+      if (this.isUpdate) {
+        this.updatePointRes()
+      } else this.addOrUpdate()
     }
   }
 }

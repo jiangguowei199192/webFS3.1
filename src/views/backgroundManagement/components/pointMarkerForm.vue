@@ -24,7 +24,7 @@
           </el-form-item>
           <el-form-item label="地址 :">
             <el-input
-              v-model="item.addr"
+              v-model="item.pointAddr"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -48,7 +48,7 @@
           </el-form-item>
           <el-form-item label="所属辖区 :">
             <el-select
-              v-model="item.area"
+              v-model="item.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
@@ -62,17 +62,17 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="经度 :" prop="lon">
+          <el-form-item label="经度 :" prop=" longitude">
             <el-input
-              v-model="item.lon"
+              v-model="item.longitude"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="纬度 :" prop="lat">
+          <el-form-item label="纬度 :" prop="latitude">
             <el-input
-              v-model="item.lat"
+              v-model="item.latitude"
               :placeholder="placeholder"
               :readonly="disabled"
               :class="{ active: !disabled }"
@@ -157,14 +157,13 @@ export default {
       point: {
         id: '',
         pointName: '',
-        addr: '',
-        type: '',
+        pointAddr: '',
         belongOrg: '',
+        belongArea: '',
         pointRemark: '',
         pointSort: '',
-        longitudeLatitudeArray: [],
-        lon: '',
-        lat: '',
+        longitude: '',
+        latitude: '',
         iconUrl:
           'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
       },

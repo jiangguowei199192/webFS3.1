@@ -219,19 +219,23 @@ export default {
     handleClick (event, data) {
       if (event === 'look') {
         this.lookDetail(data)
+      } else if (event === 'modify') {
+        this.lookDetail(data, true)
       }
     },
     /**
      *  查看详情
      */
-    lookDetail (row) {
+    lookDetail (row, update = false) {
       this.$axios
         .get(mapResApi.selectDetail, {
           params: { resourcesId: row.id }
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
-            this.$refs.dlg.lookRes(res.data.data)
+            if (update) {
+              this.$refs.dlg.updateRes(res.data.data)
+            } else this.$refs.dlg.lookRes(res.data.data)
           }
         })
         .catch((err) => {

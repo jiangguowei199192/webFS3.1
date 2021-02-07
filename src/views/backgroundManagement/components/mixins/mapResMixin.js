@@ -4,6 +4,7 @@ import { backApi } from '@/api/back'
 const mapResMixin = {
   data () {
     return {
+      areas: [], // 辖区类型
       resTypes: [], // 资源类型
       organs: [], // 所属机构
       organsProps: {
@@ -60,6 +61,23 @@ const mapResMixin = {
         }
       })
       return tree
+    },
+    /**
+     * 获取辖区资源类型
+     */
+    getAreaResources () {
+      this.$axios
+        .get(settingApi.queryByTypeCode, {
+          params: { typeCode: 'areas' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.areas = res.data.data
+          }
+        })
+        .catch((err) => {
+          console.log('settingApi.queryByTypeCode Err : ' + err)
+        })
     }
   }
 }
