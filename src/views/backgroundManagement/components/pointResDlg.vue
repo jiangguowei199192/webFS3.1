@@ -40,11 +40,10 @@
           </el-form-item>
           <el-form-item label="资源类型 :" prop="resourcesType">
             <el-select
+              v-show="!disabled"
               v-model="resForm.resourcesType"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
             >
               <el-option
                 v-for="item in resTypes"
@@ -53,6 +52,13 @@
                 :value="item.typeCode"
               ></el-option>
             </el-select>
+            <el-input
+              v-show="disabled"
+              v-model="resourcesTypeName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="联系电话 :" prop="contactTel">
             <el-input
@@ -64,22 +70,27 @@
           </el-form-item>
           <el-form-item label="所属机构 :" prop="belongOrg">
             <el-cascader
+              v-show="!disabled"
               v-model="resForm.belongOrg"
               :placeholder="placeholder2"
               :options="organs"
               :props="organsProps"
               :show-all-levels="false"
-              :disabled="disabled"
-              :class="{ active: !disabled }"
             ></el-cascader>
+            <el-input
+              v-show="disabled"
+              v-model="deptName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="所属辖区 :" prop="belongArea">
             <el-select
+              v-show="!disabled"
               v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
-              :class="{ active: !disabled }"
-              :disabled="disabled"
             >
               <el-option
                 v-for="item in areas"
@@ -88,6 +99,13 @@
                 :value="item.typeCode"
               ></el-option>
             </el-select>
+            <el-input
+              v-show="disabled"
+              v-model="belongAreaName"
+              :placeholder="placeholder"
+              :disabled="true"
+              class="disabled"
+            ></el-input>
           </el-form-item>
           <el-form-item label="经度 :" prop="resourcesLongitude">
             <el-input
@@ -326,6 +344,9 @@ export default {
         resourcesLongitude: isNotNull('请输入经度').concat(lonValidate()),
         resourcesLatitude: isNotNull('请输入纬度').concat(latValidate())
       },
+      resourcesTypeName: '',
+      belongAreaName: '',
+      deptName: '',
       resForm: {
         resourcesName: '',
         resourcesAddr: '',
@@ -417,7 +438,12 @@ export default {
       const addDTOS = data.resourcesPointAddDTOS
       this.$nextTick(() => {
         this.resetData()
+        // 设置点资源信息
         copyData(data, this.resForm)
+        this.belongAreaName = data.belongAreaName
+        this.deptName = data.deptName
+        this.resourcesTypeName = data.resourcesTypeName
+        // 设置管辖范围信息
         if (addDTOS && addDTOS.length > 0) {
           addDTOS.forEach((c) => {
             var area = JSON.parse(JSON.stringify(this.area))
