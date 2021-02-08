@@ -696,7 +696,7 @@ export default {
       if (!this.pointId) {
         this.$notify.closeAll()
         this.$notify.warning({
-          title: '警告',
+          title: '提示',
           message: '图上未标注资源，请标注后进行保存'
         })
         return

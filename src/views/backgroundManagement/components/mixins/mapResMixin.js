@@ -27,7 +27,6 @@ const mapResMixin = {
         updateTime: data.updateTime,
         updateUser: data.updateUserName
       }
-
       return info
     },
     /**

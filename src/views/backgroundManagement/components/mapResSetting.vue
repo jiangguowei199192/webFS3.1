@@ -206,23 +206,47 @@ export default {
      *  批量删除资源
      */
     deleteRes () {
-      if (this.checkedList.length <= 0) return
-      const ids = []
-      this.checkedList.forEach((item) => {
-        ids.push(item.id)
+      if (this.checkedList.length <= 0) {
+        this.$notify.closeAll()
+        this.$notify.warning({
+          title: '提示',
+          message: '请选择您要删除的资源'
+        })
+        return
+      }
+      const confirmText = ['您确认删除这些资源吗？', '删除后无法撤销，您还要继续吗？']
+      const newDatas = []
+      const h = this.$createElement
+      for (const i in confirmText) {
+        newDatas.push(h('p', null, confirmText[i]))
+      }
+      this.$confirm('提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false,
+        message: h('div', null, newDatas)
       })
-      const param = { ids: ids }
-      this.$axios
-        .post(mapResApi.batchDel, param, {
-          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        .then(() => {
+          const ids = []
+          this.checkedList.forEach((item) => {
+            ids.push(item.id)
+          })
+          const param = { ids: ids }
+          this.$axios
+            .post(mapResApi.batchDel, param, {
+              headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+            })
+            .then((res) => {
+              if (res && res.data && res.data.code === 0) {
+                this.getList()
+              }
+            })
+            .catch((err) => {
+              console.log('mapResApi.batchDel Err : ' + err)
+            })
         })
-        .then((res) => {
-          if (res && res.data && res.data.code === 0) {
-            this.getList()
-          }
-        })
-        .catch((err) => {
-          console.log('mapResApi.batchDel Err : ' + err)
+        .catch(() => {
+
         })
     },
     /**
