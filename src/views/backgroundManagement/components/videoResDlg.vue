@@ -664,7 +664,7 @@ export default {
         const tmpConfig = {}
         if (this.isEdit === true) {
           tmpDatas.deviceTypeCode = this.resForm.type
-          tmpConfig['headers'] = { 'Content-Type': 'application/json;charset=UTF-8' }
+          tmpConfig.headers = { 'Content-Type': 'application/json;charset=UTF-8' }
         }
         console.log('submitResForm.params:', tmpDatas)
 
@@ -679,7 +679,6 @@ export default {
               })
               EventBus.$emit('updateDeviceList')
               this.isShow = false
-              return
             }
             // Notification({
             //   title: '提示',
