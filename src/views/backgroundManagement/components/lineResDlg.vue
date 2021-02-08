@@ -192,7 +192,7 @@ import ResDialog from './resDialog.vue'
 import PointMarkerForm from './pointMarkerForm.vue'
 import { numberValidate } from '@/utils/formRules'
 import mapResMixin from './mixins/mapResMixin'
-import { copyData, uuid, arrToStr } from '@/utils/public'
+import { copyData, arrToStr } from '@/utils/public'
 import { mapResApi } from '@/api/mapRes'
 export default {
   mixins: [mapResMixin],
@@ -285,6 +285,7 @@ export default {
         // 设置线资源信息
         copyData(data, this.resForm)
         this.resForm.id = data.id
+        this.lineId = data.id
         // 设置标记点信息
         if (addDTOS && addDTOS.length > 0) {
           addDTOS.forEach((c) => {
@@ -302,7 +303,7 @@ export default {
     addLineAndMarkersInMap (addDTOS) {
       setTimeout(() => {
         const d = {
-          drawId: uuid(12, 16),
+          drawId: this.lineId,
           drawType: 1,
           // eslint-disable-next-line no-eval
           coordinates: eval(this.resForm.longitudeLatitudeArray),
@@ -329,12 +330,7 @@ export default {
      */
     lookRes (data) {
       this.isShow = true
-      const info = {
-        createTime: data.createTime,
-        createUser: data.createUserName,
-        updateTime: data.updateTime,
-        updateUser: data.updateUserName
-      }
+      const info = this.getUpdateInfo(data)
       this.$refs.resDlg.showInfos(info)
       const addDTOS = data.resourcesPointAddDTOS
       this.$nextTick(() => {
@@ -342,6 +338,7 @@ export default {
         this.resetData()
         // 设置线资源信息
         copyData(data, this.resForm)
+        this.lineId = data.id
         this.belongAreaName = data.belongAreaName
         this.deptName = data.deptName
         this.resourcesTypeName = data.resourcesTypeName
@@ -400,7 +397,7 @@ export default {
      *  更新线资源
      */
     updateLineRes () {
-      // 删除管控范围
+      // 删除标记点
       if (this.pointIds.length > 0) {
         const param = { ids: this.pointIds }
         this.$axios
@@ -457,6 +454,14 @@ export default {
      *  提交点资源数据
      */
     submitResForm () {
+      if (!this.lineId) {
+        this.$notify.closeAll()
+        this.$notify.warning({
+          title: '警告',
+          message: '图上未标注资源，请标注后进行保存'
+        })
+        return
+      }
       let vLine = ''
       this.$refs.lineForm.validate((valid) => {
         vLine = valid

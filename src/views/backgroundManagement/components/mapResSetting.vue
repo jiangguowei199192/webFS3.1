@@ -189,6 +189,8 @@ export default {
         this.getResources('point_resources')
       } else if (this.resourcesDataType === '1') {
         this.getResources('line_resources')
+      } else if (this.resourcesDataType === '2') {
+        this.getResources('surface_resources')
       }
     },
     /**

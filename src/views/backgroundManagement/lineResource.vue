@@ -18,7 +18,7 @@ export default {
       subTitle: '面资源设置',
       resourcesDataType: '1',
       fieldList: [
-        { label: '资源名称', value: 'resourcesName' },
+        { label: '线路名称', value: 'resourcesName' },
         { label: '类型', value: 'resourcesTypeName' },
         { label: '起点', value: 'lineOrigin' },
         { label: '终点', value: 'lineDestination' },

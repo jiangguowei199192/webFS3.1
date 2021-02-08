@@ -18,6 +18,19 @@ const mapResMixin = {
   },
   methods: {
     /**
+     * 获取资源修改信息
+     */
+    getUpdateInfo (data) {
+      const info = {
+        createTime: data.createTime,
+        createUser: data.createUserName,
+        updateTime: data.updateTime,
+        updateUser: data.updateUserName
+      }
+
+      return info
+    },
+    /**
      * 获取资源类型
      */
     getResources (typeCode) {

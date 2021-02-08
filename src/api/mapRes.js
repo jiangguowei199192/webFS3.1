@@ -7,5 +7,7 @@ export const mapResApi = {
   pointResUpdate: '/cloud-fms/resourcesInfo/update', // 修改点资源信息
   batchDelPoint: '/cloud-fms/resourcesInfo/batchDelPoint', // 批量删除标识点信息
   lineResAdd: '/cloud-fms/resourcesInfo/addLineResources', // 添加线资源
-  lineResUpdate: '/cloud-fms/resourcesInfo/updateLine' // 修改线资源信息
+  lineResUpdate: '/cloud-fms/resourcesInfo/updateLine', // 修改线资源信息
+  areaResAdd: '/cloud-fms/resourcesInfo/addAreaResources', // 添加面资源
+  areaResUpdate: '/cloud-fms/resourcesInfo/updateArea'// 修改面资源信息
 }

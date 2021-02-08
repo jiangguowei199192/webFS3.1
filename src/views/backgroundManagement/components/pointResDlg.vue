@@ -328,7 +328,7 @@ import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 import { mapResApi } from '@/api/mapRes'
 import { settingApi } from '@/api/setting'
 import mapResMixin from './mixins/mapResMixin'
-import { copyData, uuid, arrToStr } from '@/utils/public'
+import { copyData, arrToStr } from '@/utils/public'
 
 export default {
   mixins: [mapResMixin],
@@ -470,6 +470,7 @@ export default {
         // 设置点资源信息
         copyData(data, this.resForm)
         this.resForm.id = data.id
+        this.pointId = data.id
         // 设置管辖范围信息
         if (addDTOS && addDTOS.length > 0) {
           addDTOS.forEach((c) => {
@@ -489,18 +490,14 @@ export default {
     lookRes (data) {
       this.disabled = true
       this.isShow = true
-      const info = {
-        createTime: data.createTime,
-        createUser: data.createUserName,
-        updateTime: data.updateTime,
-        updateUser: data.updateUserName
-      }
+      const info = this.getUpdateInfo(data)
       this.$refs.resDlg.showInfos(info)
       const addDTOS = data.resourcesPointAddDTOS
       this.$nextTick(() => {
         this.resetData()
         // 设置点资源信息
         copyData(data, this.resForm)
+        this.pointId = data.id
         this.belongAreaName = data.belongAreaName
         this.deptName = data.deptName
         this.resourcesTypeName = data.resourcesTypeName
@@ -524,7 +521,7 @@ export default {
     addPointAndAreaInMap (addDTOS) {
       setTimeout(() => {
         const d = {
-          drawId: uuid(12, 16),
+          drawId: this.pointId,
           drawType: 0,
           coordinates: [
             this.resForm.resourcesLongitude,
@@ -696,6 +693,14 @@ export default {
      *  提交点资源数据
      */
     submitResForm () {
+      if (!this.pointId) {
+        this.$notify.closeAll()
+        this.$notify.warning({
+          title: '警告',
+          message: '图上未标注资源，请标注后进行保存'
+        })
+        return
+      }
       const vList = []
       this.$refs.pointForm.validate((valid) => {
         vList.push(valid)
