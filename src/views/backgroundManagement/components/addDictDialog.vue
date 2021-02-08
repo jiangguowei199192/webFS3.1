@@ -4,13 +4,12 @@
  * @Author: liangkaiLee
  * @Date: 2021-01-26 09:16:43
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-02-05 13:59:08
+ * @LastEditTime: 2021-02-08 10:44:43
 -->
 <template>
   <el-dialog
     :visible.sync="isShow"
     :close-on-click-modal="false"
-    @close="$emit('close')"
     width="480px"
     class="add-dict-dlg dialog-wrap"
   >
@@ -30,32 +29,39 @@
         <el-input
           v-model="addDictForm.name"
           :placeholder="placeholder"
-          :readonly="disabled"
-          :class="{ active: !disabled }"
+          :readonly="isDisabled"
+          :disabled="isDisabled"
         ></el-input>
       </el-form-item>
       <el-form-item label="类型码 :" prop="code">
         <el-input
           v-model="addDictForm.code"
           :placeholder="placeholder"
-          :readonly="disabled"
-          :class="{ active: !disabled }"
+          :readonly="isDisabled"
+          :disabled="isDisabled"
         ></el-input>
       </el-form-item>
       <el-form-item label="状态 :" prop="status">
-        <el-input
+        <el-select
           v-model="addDictForm.status"
-          :placeholder="placeholder"
-          :readonly="disabled"
-          :class="{ active: !disabled }"
-        ></el-input>
+          :popper-append-to-body="false"
+          placeholder="请选择"
+          :disabled="isDisabled"
+        >
+          <el-option
+            v-for="item in statusType"
+            :key="item.id"
+            :label="item.label"
+            :value="item.id"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item label="排序 :" prop="order">
         <el-input
           v-model="addDictForm.order"
           :placeholder="placeholder"
-          :readonly="disabled"
-          :class="{ active: !disabled }"
+          :readonly="isDisabled"
+          :disabled="isDisabled"
         ></el-input>
       </el-form-item>
       <el-form-item label="图标 :" prop="icon">
@@ -70,7 +76,7 @@
             trigger="click"
             popper-class="iconPopover"
             v-model="showPopover"
-            v-if="!disabled"
+            v-if="!isDisabled"
           >
             <div class="iconBox">
               <span class="close" @click.stop="showPopover = false"></span>
@@ -96,10 +102,30 @@
           placeholder="请输入"
           type="textarea"
           resize="none"
+          :readonly="isDisabled"
+          :disabled="isDisabled"
         ></el-input>
       </el-form-item>
     </el-form>
-    <div class="handelBtns">
+    <!-- 操作信息log -->
+    <div class="handelNote" v-if="handelType == 'checkParentDict'">
+      <div>
+        <span>创建时间：{{ addDictForm.createTime }}</span>
+        <span>创建人：{{ addDictForm.createUserName }}</span>
+      </div>
+      <div style="margin-top: 15px">
+        <span>最后修改时间：{{ addDictForm.updateTime }}</span>
+        <span>最后修改人：{{ addDictForm.updateUserName }}</span>
+      </div>
+    </div>
+    <div v-if="handelType == 'checkParentDict'" class="handelBtns">
+      <span
+        style="margin-right: 190px;"
+        @click.stop="cancelClick('addDictForm')"
+        >关闭</span
+      >
+    </div>
+    <div v-else class="handelBtns">
       <span @click.stop="cancelClick('addDictForm')">取消</span>
       <span @click.stop="confirmClick('addDictForm')">确定</span>
     </div>
@@ -107,8 +133,8 @@
 </template>
 
 <script>
-import { dataDictApi } from '@/api/dataDict'
-import { isNotNull, numberValidate, checkStatus } from '@/utils/formRules'
+import { isNotNull, numberValidate } from '@/utils/formRules'
+import { EventBus } from '@/utils/eventBus.js'
 
 export default {
   props: {
@@ -123,8 +149,13 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    dictInfo: {
+      type: Object,
+      required: false
     }
   },
+
   data () {
     return {
       placeholder: '请输入',
@@ -137,59 +168,74 @@ export default {
         status: '',
         order: '',
         icon: '',
-        note: ''
+        note: '',
+        createTime: '',
+        createUserName: '',
+        updateTime: '',
+        updateUserName: ''
       },
       addDictRules: {
         name: isNotNull('请输入类型名称'),
         code: isNotNull('请输入类型码'),
-        status: isNotNull('请输入状态').concat(checkStatus('状态只能为0/1的数字')),
-        order: numberValidate('请输入数字')
+        status: isNotNull('请选择状态'),
+        order: numberValidate('输入必须为数字')
+      },
+      statusType: [
+        {
+          id: 0,
+          label: '0'
+        },
+        {
+          id: 1,
+          label: '1'
+        }
+      ],
+      handelType: '',
+      isDisabled: false
+    }
+  },
+
+  watch: {
+    dictInfo (info) {
+      if (!info) return false
+      else {
+        this.addDictForm.name = info.typeName
+        this.addDictForm.code = info.typeCode
+        this.addDictForm.status = info.status
+        this.addDictForm.order = info.orderNum
+        this.addDictForm.icon = info.icon
+        this.addDictForm.note = info.remark
+        this.addDictForm.createTime = info.createTime
+        this.addDictForm.createUserName = info.createUserName
+        this.addDictForm.updateTime = info.updateTime
+        this.addDictForm.updateUserName = info.updateUserName
       }
     }
   },
+
+  created () {
+    const _this = this
+    EventBus.$on('handelType', data => {
+      _this.handelType = data
+      if (_this.handelType === 'checkParentDict') this.isDisabled = true
+    })
+  },
+
   methods: {
     confirmClick (formName) {
       this.$refs[formName].validate(valid => {
-        if (!valid) return
-        const params = {
-          typeName: this.addDictForm.name,
-          typeCode: this.addDictForm.code,
-          status: this.addDictForm.status,
-          orderNum: this.addDictForm.order,
-          parentId: parseInt(0),
-          icon: this.addDictForm.icon,
-          remark: this.addDictForm.note
+        if (!valid) {
+          return
         }
-        this.$axios
-          .post(dataDictApi.addDict, params)
-          .then(res => {
-            console.log('新增数据字典接口返回: ', res)
-            if (res && res.data && res.data.code === 0) {
-              this.$notify.success({
-                title: '提示',
-                message: '新增成功!',
-                duration: 3 * 1000
-              })
-              this.dialogVisible = false
-              this.addDictForm = {}
-              return
-            }
-            this.$notify.warning({
-              title: '提示',
-              message: '新增失败!',
-              duration: 3 * 1000
-            })
-          })
-          .catch(err => {
-            console.log('接口错误: ' + err)
-          })
+        this.$emit('confirmClick', this.addDictForm)
       })
-      // this.$emit("confirmClick", this.addDictForm);
     },
 
     cancelClick (formName) {
       this.$refs[formName].resetFields()
-
+      // this.addDictForm = {}
+      this.handelType = ''
+      this.isDisabled = false
       this.$emit('update:isShow', false)
     }
   }
@@ -233,8 +279,21 @@ export default {
         margin-top: 8px;
       }
     }
+    .handelNote {
+      margin-top: 20px;
+      font-size: 12px;
+      color: rgba($color: #fff, $alpha: 0.7);
+      div {
+        display: flex;
+        justify-content: space-around;
+      }
+    }
     .handelBtns {
       margin-right: 0;
+      span {
+        background: #1eb0fc;
+        color: #fff;
+      }
     }
   }
 }

@@ -12,6 +12,24 @@
           v-model="dictSearch"
           placeholder="请输入搜索关键字"
         ></el-input>
+        <!-- 右键操作菜单 -->
+        <div v-show="treeRightMenuShow">
+          <el-menu id="menu" @select="handleSelect" text-color="#fff">
+            <el-menu-item index="1">
+              <el-image :src="dictEditIcon"></el-image>
+              <span>修改</span>
+            </el-menu-item>
+            <el-menu-item index="2">
+              <el-image :src="dictSeeIcon"></el-image>
+              <span>查看</span>
+            </el-menu-item>
+            <el-menu-item index="3">
+              <el-image :src="dictDeleteIcon"></el-image>
+              <span>删除</span>
+            </el-menu-item>
+          </el-menu>
+        </div>
+        <!-- 字典树 -->
         <el-tree
           class="dict-tree"
           ref="dictTreeRef"
@@ -22,10 +40,9 @@
           :expand-on-click-node="false"
           @node-click="dictTreeClick"
           :filter-node-method="dictSearchChange"
+          @node-contextmenu="dictTreeRightCick"
         ></el-tree>
-        <el-button
-          class="add-dict-btn"
-          @click.prevent="addDictClick('addParent')"
+        <el-button class="add-dict-btn" @click.prevent="addDictClick"
           >十 新增字典</el-button
         >
       </div>
@@ -39,28 +56,41 @@
       ></DictPage>
     </div>
 
-    <!-- 新增字典弹窗 -->
+    <!-- 新增/修改/查看字典弹窗 -->
     <AddDictDialog
       ref="addDictRef"
-      :isShow.sync="showAddDict"
-      title="新增字典"
+      :isShow.sync="isShow"
+      :title="
+        `${handelType == 'addParentDict' ? '新增字典' : ''}${
+          handelType == 'editParentDict' ? '修改字典' : ''
+        }${handelType == 'checkParentDict' ? '查看字典' : ''}`
+      "
       :deptTree="dictTree"
-      @close="showAddDict = false"
-      @confirmClick="submitAddDict"
-      @cancelClick="cancelAddDict"
+      :dictInfo="dictInfo"
+      @confirmClick="confirmClickSubmit"
     ></AddDictDialog>
+    <!-- 删除字典弹窗 -->
+    <DeleteDialog
+      :isShow.sync="showDeleteTip"
+      @close="showDeleteTip = false"
+      @confirmClick="delDictClickSubmit"
+      @cancelClick="showDeleteTip = false"
+    ></DeleteDialog>
   </div>
 </template>
 
 <script>
 import DictPage from './components/dictPage.vue'
 import AddDictDialog from './components/addDictDialog.vue'
+import DeleteDialog from './components/deleteDialog.vue'
 import { dataDictApi } from '@/api/dataDict'
+import { EventBus } from '@/utils/eventBus.js'
 
 export default {
   components: {
     DictPage,
-    AddDictDialog
+    AddDictDialog,
+    DeleteDialog
   },
 
   data () {
@@ -76,7 +106,13 @@ export default {
         value: 'typeCode'
       },
       selectedDict: '',
-      showAddDict: false,
+      rightClickDict: '',
+      isShow: false,
+      treeRightMenuShow: false,
+      dictInfo: {},
+      handelType: '',
+      selectedDictIds: [],
+      showDeleteTip: false,
 
       subTitle: '字典项',
       // 表格项
@@ -159,7 +195,6 @@ export default {
 
     // 获取子级字典列表
     getChildDictList () {
-      // console.log('selectedDict:', this.selectedDict)
       const queryParams = {
         parentId: parseInt(this.selectedDict ? this.selectedDict.id : 0),
         currentPage: parseInt(this.pageData.currentPage),
@@ -177,20 +212,142 @@ export default {
     },
 
     // 点击新增按钮
-    addDictClick (type) {
-      this.showAddDict = true
-      console.log('handelType:', type)
-      this.$emit('handelType')
+    addDictClick () {
+      this.isShow = true
+      this.handelType = 'addParentDict'
     },
 
-    // 新增字典提交
-    submitAddDict (data) {
-      // console.log('data:', data)
+    // 新增父级字典提交
+    submitAddDict (formData) {
+      const params = {
+        parentId: parseInt(0),
+        typeName: formData.name,
+        typeCode: formData.code,
+        status: formData.status,
+        orderNum: formData.order,
+        icon: formData.icon,
+        remark: formData.note
+      }
+      this.$axios
+        .post(dataDictApi.addDict, params)
+        .then(res => {
+          // console.log('新增数据字典接口返回: ', res)
+          if (res && res.data && res.data.code === 0) {
+            this.$notify.success({
+              title: '提示',
+              message: '新增成功!',
+              duration: 3 * 1000
+            })
+            this.getDictTree()
+            this.isShow = false
+          }
+        })
+        .catch(err => {
+          console.log('接口错误: ' + err)
+        })
     },
 
-    // 取消新增
-    cancelAddDict () {
-      this.showAddDict = false
+    // 修改父级字典提交
+    submitEditDict (formData) {
+      const params = {
+        id: this.rightClickDict.id,
+        typeName: formData.name,
+        typeCode: formData.code,
+        status: formData.status,
+        orderNum: formData.order,
+        icon: formData.icon,
+        remark: formData.note
+      }
+      this.$axios
+        .post(dataDictApi.editDict, params)
+        .then(res => {
+          // console.log('修改字典接口返回: ', res)
+          if (res && res.data && res.data.code === 0) {
+            this.$notify.success({
+              title: '提示',
+              message: '修改成功!',
+              duration: 3 * 1000
+            })
+            this.getDictTree()
+            this.isShow = false
+          }
+        })
+        .catch(err => {
+          console.log('接口错误: ' + err)
+        })
+    },
+
+    // 删除父级字典提交
+    delDictClickSubmit () {
+      const arr = []
+      arr.push(this.rightClickDict.id)
+      const params = { ids: arr }
+      // console.log("params:", params);
+      this.$axios
+        .delete(dataDictApi.deleteDict, params, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then(res => {
+          // console.log("删除字典接口返回: ", res);
+          if (res && res.data && res.data.code === 0) {
+            this.$notify.success({
+              title: '提示',
+              message: '删除成功!',
+              duration: 3 * 1000
+            })
+            this.getDictTree()
+            this.showDeleteTip = false
+            return
+          }
+          this.$notify.warning({
+            title: '提示',
+            message: '删除失败!',
+            duration: 3 * 1000
+          })
+        })
+    },
+
+    // 新增/修改字典确定
+    confirmClickSubmit (data) {
+      // console.log(data, this.handelType)
+      if (this.handelType === 'addParentDict') this.submitAddDict(data)
+      else if (this.handelType === 'editParentDict') this.submitEditDict(data)
+    },
+
+    // 字典树操作
+    handleSelect (key) {
+      if (key === '1') {
+        // 修改字典
+        this.isShow = true
+        this.handelType = 'editParentDict'
+        this.dictInfo = this.rightClickDict
+      } else if (key === '2') {
+        // 查看字典
+        this.isShow = true
+        this.handelType = 'checkParentDict'
+        this.dictInfo = this.rightClickDict
+        EventBus.$emit('handelType', this.handelType)
+      } else if (key === '3') {
+        // 删除字典
+        this.showDeleteTip = true
+      }
+    },
+
+    // 鼠标右键点击字典树
+    dictTreeRightCick (event, data, node, obj) {
+      this.treeRightMenuShow = true
+      this.rightClickDict = data
+      const menu = document.querySelector('#menu')
+      menu.style.left = event.pageX + 'px'
+      menu.style.top = event.pageY + 'px'
+      document.addEventListener('click', this.closeRightMenu)
+    },
+
+    // 关闭菜单
+    closeRightMenu () {
+      this.rightClickDict = ''
+      this.treeRightMenuShow = false
+      document.removeEventListener('click', this.closeRightMenu)
     }
   }
 }
@@ -265,6 +422,36 @@ export default {
     color: #fff;
     border: none;
     font-size: 16px;
+  }
+  /deep/.el-menu {
+    z-index: 1;
+    position: absolute;
+    width: 80px;
+    height: 81px;
+    border-radius: 2px;
+    background-color: #183157;
+    border: 1px solid #00ccff;
+    border-bottom: 0;
+    overflow: hidden;
+    .el-menu-item {
+      height: 27px;
+      line-height: 27px;
+      text-align: center;
+      font-size: 12px;
+      border-bottom: 1px solid rgba($color: #00ccff, $alpha: 0.8);
+      cursor: pointer;
+      .el-image {
+        width: 14px;
+        height: 14px;
+        right: 8px;
+        margin-left: 3px;
+      }
+    }
+    .el-menu-item.is-active,
+    .el-menu-item:hover {
+      background-color: rgba(11, 119, 158, 0.66) !important;
+      color: #fff;
+    }
   }
 }
 
