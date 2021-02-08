@@ -47,8 +47,8 @@
       </transition>
     </div>
     <div class="handelBtns" v-show="!isRead">
-      <span @click.stop="cancel">取消</span>
-      <span @click.stop="save">保存</span>
+      <span @click="cancel">取消</span>
+      <span @click="save">保存</span>
     </div>
     <div class="resDlgClose" v-show="isRead">
       <div class="infos">

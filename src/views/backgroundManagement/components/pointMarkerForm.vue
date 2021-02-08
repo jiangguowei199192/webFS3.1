@@ -92,29 +92,35 @@
               :class="{ active: !disabled }"
             ></el-input>
           </el-form-item>
-          <el-form-item label="图标 :" style="line-height: 40px" prop="iconUrl">
+          <el-form-item
+            label="图标 :"
+            style="line-height: 40px; margin-bottom: 11px"
+            prop="iconUrl"
+          >
             <div class="iconTool">
               <el-avatar
                 :size="30"
-                :src="item.iconUrl"
+                :src="item.iconPath"
                 style="margin-top: 5px"
+                :key="item.iconPath"
               ></el-avatar>
               <el-popover
                 placement="top"
                 trigger="click"
                 popper-class="iconPopover"
-                v-model="showPopover"
+                v-model="item.showPopover"
                 v-if="!disabled"
               >
-                <div class="iconBox">
-                  <span class="close" @click.stop="showPopover = false"></span>
+                <div class="iconBox webFsScroll">
+                  <!-- <span class="close" @click.stop="showPopover = false"></span> -->
                   <span
+                    @click.stop="selectIcon(item, icon, index)"
                     class="icon"
-                    v-for="(item, index) in icons"
-                    :key="index"
+                    v-for="(icon, index2) in icons"
+                    :key="index2"
                     :style="{
                       background:
-                        'url(' + serverUrl + item.path + ') no-repeat',
+                        'url(' + serverUrl + icon.iconPath + ') no-repeat',
                     }"
                   ></span>
                 </div>
@@ -152,6 +158,7 @@
 <script>
 import { isNotNull, lonValidate, latValidate } from '@/utils/formRules'
 import { copyData } from '@/utils/public'
+import globalApi from '@/utils/globalApi'
 export default {
   props: {
     // 是否禁止编辑
@@ -172,15 +179,21 @@ export default {
       default: () => {
         return []
       }
+    },
+    // 图标库
+    icons: {
+      type: Array,
+      default: () => {
+        return []
+      }
     }
   },
   data () {
     return {
+      serverUrl: globalApi.headImg,
       placeholder: '请输入',
       placeholder2: '请选择',
-      icons: [],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
-      showPopover: false,
       point: {
         id: '',
         pointName: '',
@@ -191,7 +204,8 @@ export default {
         pointSort: '',
         longitude: '',
         latitude: '',
-        iconUrl: 'https://cube.elemecdn.com/3/7c/1epng.png'
+        iconUrl: '',
+        showPopover: false
       },
       list: [],
       organsProps: {
@@ -236,18 +250,45 @@ export default {
       this.list.push(point)
     },
     /**
+     *  选择图标
+     */
+    selectIcon (item, icon, index) {
+      item.showPopover = false
+      item.iconUrl = icon.iconPath
+      item.iconPath = this.serverUrl + icon.iconPath
+      this.$refs.markerForm[index].validateField('iconUrl', (valid) => {})
+    },
+    /**
      *  添加标记点
      */
     addPoints (addDTOS, isUpdate = false) {
       addDTOS.forEach((c) => {
         var pt = JSON.parse(JSON.stringify(this.point))
         copyData(c, pt)
+        if (pt.iconUrl) {
+          pt.iconPath = this.serverUrl + pt.iconUrl
+        }
         if (!isUpdate) {
           pt.deptName = c.deptName
           pt.belongAreaName = c.belongAreaName
         }
         this.list.push(pt)
       })
+    },
+    /**
+     *  获取标记点列表
+     */
+    getList () {
+      if (this.list.length > 0) {
+        this.list.forEach((c) => {
+          delete c.id
+          delete c.iconPath
+          delete c.showPopover
+          c.longitude = parseFloat(c.longitude)
+          c.latitude = parseFloat(c.latitude)
+        })
+      }
+      return this.list
     },
     /**
      *  删除标记点
@@ -293,6 +334,9 @@ export default {
 
 <style lang="scss" scoped>
 .iconTool {
-  margin-bottom: 11px;
+  margin-bottom: 4px;
+  /deep/ .el-avatar {
+    background: transparent;
+  }
 }
 </style>

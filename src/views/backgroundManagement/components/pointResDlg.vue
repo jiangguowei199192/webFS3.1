@@ -146,14 +146,15 @@
           </el-form-item>
           <el-form-item
             label="图标 :"
-            style="line-height: 40px"
+            style="line-height: 40px; margin-bottom: 11px"
             prop="resourcesIcon"
           >
             <div class="iconTool">
               <el-avatar
                 :size="30"
-                :src="resForm.resourcesIcon"
+                :src="avatarUrl"
                 style="margin-top: 5px"
+                :key="avatarUrl"
               ></el-avatar>
               <el-popover
                 placement="top"
@@ -162,15 +163,16 @@
                 v-model="showPopover"
                 v-if="!disabled"
               >
-                <div class="iconBox">
-                  <span class="close" @click.stop="showPopover = false"></span>
+                <div class="iconBox webFsScroll">
+                  <!-- <span class="close" @click.stop="showPopover = false"></span> -->
                   <span
+                    @click.stop="selectIcon(item)"
                     class="icon"
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
                       background:
-                        'url(' + serverUrl + item.path + ') no-repeat',
+                        'url(' + serverUrl + item.iconPath + ') no-repeat',
                     }"
                   ></span>
                 </div>
@@ -329,15 +331,16 @@ import { mapResApi } from '@/api/mapRes'
 import { settingApi } from '@/api/setting'
 import mapResMixin from './mixins/mapResMixin'
 import { copyData, arrToStr } from '@/utils/public'
+import globalApi from '@/utils/globalApi'
 
 export default {
   mixins: [mapResMixin],
   data () {
     return {
+      serverUrl: globalApi.headImg,
       disabled: false, // 是否禁止编辑
       placeholder: '请输入',
       placeholder2: '请选择',
-      icons: [],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       title: '新增点资源',
       isShow: false,
@@ -390,18 +393,28 @@ export default {
         managerTel: '',
         resourcesSort: '',
         resourcesRemark: '',
-        resourcesIcon:
-          'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+        resourcesIcon: ''
       },
       pointId: '',
       isUpdate: false,
+      avatarUrl: '',
       areaIds: [] // 管辖范围的id集合
+    }
+  },
+  computed: {
+    resourcesIcon () {
+      return this.resForm.resourcesIcon
     }
   },
   watch: {
     disabled (val) {
       this.placeholder = val ? '' : '请输入'
       this.placeholder2 = val ? '' : '请选择'
+    },
+    resourcesIcon (val) {
+      if (val) {
+        this.avatarUrl = this.serverUrl + val
+      } else this.avatarUrl = ''
     }
   },
   components: {
@@ -430,6 +443,14 @@ export default {
       }
     },
     /**
+     *  选择图标
+     */
+    selectIcon (item) {
+      this.showPopover = false
+      this.resForm.resourcesIcon = item.iconPath
+      this.$refs.pointForm.validateField('resourcesIcon', (valid) => {})
+    },
+    /**
      *  添加资源
      */
     addRes () {
@@ -443,6 +464,7 @@ export default {
       this.getAreaResources()
       this.getOrgans()
       this.getControlAreas()
+      this.getIconList()
     },
     /**
      *  重置数据
@@ -464,6 +486,7 @@ export default {
       this.getAreaResources()
       this.getOrgans()
       this.getControlAreas()
+      this.getIconList()
       const addDTOS = data.resourcesPointAddDTOS
       this.$nextTick(() => {
         this.resetData()
@@ -730,6 +753,9 @@ export default {
 
 <style lang="scss" scoped>
 .iconTool {
-  margin-bottom: 11px;
+  margin-bottom: 4px;
+  /deep/ .el-avatar {
+    background: transparent;
+  }
 }
 </style>

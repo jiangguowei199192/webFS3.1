@@ -1,12 +1,14 @@
 
 import { settingApi } from '@/api/setting'
 import { backApi } from '@/api/back'
+import { iconLibaryApi } from '@/api/iconLibary'
 const mapResMixin = {
   data () {
     return {
       areas: [], // 辖区类型
       resTypes: [], // 资源类型
       organs: [], // 所属机构
+      icons: [], // 图标
       organsProps: {
         expandTrigger: 'hover',
         children: 'children',
@@ -17,6 +19,24 @@ const mapResMixin = {
     }
   },
   methods: {
+    /**
+     *  获取图标库
+     */
+    getIconList () {
+      const params = {
+        pageSize: 1000
+      }
+      this.$axios
+        .post(iconLibaryApi.getAllPic, params)
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.icons = res.data.data.data
+          }
+        })
+        .catch((err) => {
+          console.log('iconLibaryApi.getAllPic Err : ' + err)
+        })
+    },
     /**
      * 获取资源修改信息
      */

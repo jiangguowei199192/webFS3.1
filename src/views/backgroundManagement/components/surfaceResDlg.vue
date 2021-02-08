@@ -162,6 +162,7 @@
             ref="markerForm"
             :areas="areas"
             :organs="organs"
+            :icons="icons"
             @removeFeature="removeMarker"
             :disabled="disabled"
           ></PointMarkerForm>
@@ -238,6 +239,7 @@ export default {
       this.getResources('surface_resources')
       this.getAreaResources()
       this.getOrgans()
+      this.getIconList()
     },
     /**
      *  重置数据
@@ -257,6 +259,7 @@ export default {
       this.getResources('surface_resources')
       this.getAreaResources()
       this.getOrgans()
+      this.getIconList()
       const addDTOS = data.resourcesPointAddDTOS
       this.$nextTick(() => {
         this.disabled = false
@@ -422,13 +425,8 @@ export default {
       }
       delete this.resForm.resourcesPointAddDTOS
       delete this.resForm.areaPointUpdateDTOS
-      const pointList = this.$refs.markerForm.list
+      const pointList = this.$refs.markerForm.getList()
       if (pointList.length > 0) {
-        pointList.forEach((c) => {
-          delete c.id
-          c.longitude = parseFloat(c.longitude)
-          c.latitude = parseFloat(c.latitude)
-        })
         if (this.isUpdate) {
           this.resForm.areaPointUpdateDTOS = pointList
         } else this.resForm.resourcesPointAddDTOS = pointList
