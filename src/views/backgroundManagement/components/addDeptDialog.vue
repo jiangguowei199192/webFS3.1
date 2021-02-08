@@ -14,10 +14,22 @@
         :baseMapIndex="2"
         class="map-tool"
       ></gMap>
+
       <div class="add-dept-header">
         <div class="header-icon"></div>
         <div class="header-text">新增机构</div>
       </div>
+
+      <div class="toolBox">
+        <div
+          v-for="(item, index) in toolItems"
+          :key="index"
+          class="toolBtn"
+          :class="[item.className, { toolBtnSelect: item.isSelect }]"
+          @click="clickToolItem(item)"
+        ></div>
+      </div>
+
       <transition name="showUnfoldBtn">
         <div
           class="unfold-btn"
@@ -63,6 +75,8 @@
                     expandTrigger: 'hover',
                     label: 'deptName',
                     value: 'deptCode',
+                    checkStrictly: true,
+                    emitPath: false,
                   }"
                   :show-all-levels="false"
                 ></el-cascader>
@@ -126,11 +140,11 @@
                     popper-class="iconPopover"
                     v-model="showPopover"
                   >
-                    <div class="iconBox">
-                      <span
+                    <div class="iconBox webFsScroll">
+                      <!-- <span
                         class="close"
                         @click.stop="showPopover = false"
-                      ></span>
+                      ></span> -->
                       <span
                         @click.stop="selectIcon(item)"
                         class="icon"
@@ -138,7 +152,7 @@
                         :key="index"
                         :style="{
                           background:
-                            'url(' + serverUrl + item.path + ') no-repeat',
+                            'url(' + serverUrl + item.iconPath + ') no-repeat',
                         }"
                       ></span>
                     </div>
@@ -173,16 +187,7 @@
 import globalApi from '@/utils/globalApi'
 
 export default {
-  props: {
-    isShow: {
-      type: Boolean,
-      required: true
-    },
-    deptTree: {
-      type: Array,
-      required: true
-    }
-  },
+  props: ['isShow', 'deptTree', 'icons'],
   data () {
     return {
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
@@ -217,34 +222,26 @@ export default {
       ],
       showPopover: false,
       serverUrl: globalApi.headImg,
-      icons: [
+      showDeptContent: true,
+      showUnfoldBtn: false,
+      toolItems: [
         {
-          path: '/cloud-oneMap/combatEvent/1608349933941_1608349933941.png'
+          name: 'zoomIn',
+          className: 'zoomIn',
+          isSelect: false
         },
         {
-          path: '/cloud-oneMap/combatEvent/1608350408597_1608350408597.png'
+          name: 'zoomOut',
+          className: 'zoomOut',
+          isSelect: false
         },
         {
-          path: '/cloud-oneMap/combatEvent/1608350573010_1608350573010.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350504537_1608350504537.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350546000_1608350546000.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350378214_1608350378214.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350440076_1608350440076.png'
-        },
-        {
-          path: '/cloud-oneMap/combatEvent/1608350478586_1608350478586.png'
+          name: 'point',
+          className: 'point',
+          isSelect: false
         }
       ],
-      showDeptContent: true,
-      showUnfoldBtn: false
+      bHasInitDrawHelper: false
     }
   },
   methods: {
@@ -259,7 +256,7 @@ export default {
     // 选择图标
     selectIcon (item) {
       this.showPopover = false
-      // this.curIcon = item.path
+      this.deptIconUrl = this.serverUrl + item.iconPath
     },
 
     // 折叠
@@ -272,13 +269,75 @@ export default {
     unfoldClick () {
       this.showDeptContent = true
       this.showUnfoldBtn = false
+    },
+
+    clickToolItem (item) {
+      if (
+        item.name === 'point'
+      ) {
+        this.toolItems.forEach((t) => {
+          if (item !== t) {
+            t.isSelect = false
+          }
+        })
+
+        this.initCoustomDrawHelper()
+        if (item.isSelect) {
+          item.isSelect = false
+          this.$refs.gduMap.map2D.customDrawHelper.stop()
+        } else {
+          item.isSelect = true
+          if (item.name === 'point') {
+            this.$refs.gduMap.map2D.customDrawHelper.drawType = 0
+          }
+        }
+      } else if (item.name === 'zoomIn') {
+        this.$refs.gduMap.map2D.zoomIn()
+      } else if (item.name === 'zoomOut') {
+        this.$refs.gduMap.map2D.zoomOut()
+      }
+    },
+    initCoustomDrawHelper () {
+      if (this.bHasInitDrawHelper) {
+        return
+      }
+      this.bHasInitDrawHelper = true
+      const drawHelper = this.$refs.gduMap.map2D.customDrawHelper
+      // 0:不能修改；1:仅能修改当前类型；2:可修改所有类型。
+      drawHelper.modifyFlag = 2
+      // true:多边形或线段可以添加顶点;false:多边形或线段不可以添加顶点。
+      drawHelper.bCanAddVertex = true
+      // true，显示线段长度；false，不显示线段长度。
+      drawHelper.bShowLineText = true
+      // true，显示面积；false，不显示面积。
+      drawHelper.bShowAreaText = false
+      // 设置长度、面积显示的背景色及文字颜色
+      // drawHelper.setTextStyle('rgba(128,0,88,1)','rgba(33,128,66,0.6)')
+      // true,显示"单击继续,双击结束!"提示；false,不显示。
+      drawHelper.bShowDrawToolTip = true
+      // 限定绘图类型及该类型图案个数
+      drawHelper.limitedType = 0
+      drawHelper.limitedCount = 1
+      // 设置是否自动删除一个图案，继而可以继续绘图。
+      drawHelper.bAutoRemove = true
+      // 注册新绘图或修改图案回调事件
+      drawHelper.addOrMoveEvent.addEventListener(
+        this.addOrModifyEventCB.bind(this)
+      )
+    },
+    /**
+     *  地图操作回调
+     */
+    addOrModifyEventCB (data) {
+      this.addDeptForm.longitude = data.coordinates[0].toFixed(7)
+      this.addDeptForm.latitude = data.coordinates[1].toFixed(7)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .add-dept-dlg.el-dialog__wrapper {
+.add-dept-dlg.el-dialog__wrapper {
   /deep/.el-dialog {
     overflow: hidden;
     .el-dialog__header {
@@ -295,6 +354,36 @@ export default {
     .map-tool {
       width: 100%;
       height: 617px;
+    }
+    .toolBox {
+      position: absolute;
+      top: 77px;
+      left: 15px;
+      width: 36px;
+      .toolBtn {
+        display: block;
+        height: 36px;
+        width: 36px;
+        background-size: 100% 100%;
+        margin-bottom: 12px;
+        background-color: cadetblue;
+        cursor: pointer;
+      }
+      .toolBtn:active {
+        opacity: 0.8;
+      }
+      .toolBtnSelect {
+        opacity: 0.8;
+      }
+      .zoomIn {
+        background-image: url("../../../assets/images/backgroundManagement/zoomIn.png");
+      }
+      .zoomOut {
+        background-image: url("../../../assets/images/backgroundManagement/zoomOut.png");
+      }
+      .point {
+        background-image: url("../../../assets/images/backgroundManagement/pointType.png");
+      }
     }
     .add-dept-header {
       background: -webkit-linear-gradient(

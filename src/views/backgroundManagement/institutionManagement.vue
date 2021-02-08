@@ -174,6 +174,7 @@
     <AddDeptDialog
       :isShow.sync="showAddDept"
       :deptTree="deptTree"
+      :icons="iconList"
       @close="showAddDept = false"
       @confirmClick="addDeptConfirmClick"
       @cancelClick="addDeptCancelClick"
@@ -187,6 +188,7 @@ import DeleteDialog from './components/deleteDialog.vue'
 import PeopleInfoDialog from './components/peopleInfoDialog.vue'
 import AddDeptDialog from './components/addDeptDialog.vue'
 import { backApi } from '@/api/back'
+import { iconLibaryApi } from '@/api/iconLibary'
 import { Notification } from 'element-ui'
 
 export default {
@@ -235,11 +237,13 @@ export default {
       showPeopleInfo: false,
       showAddDept: false,
 
-      showDeleteDeptTip: false
+      showDeleteDeptTip: false,
+      iconList: []
     }
   },
   created () {
     this.getDeptTree()
+    this.getIconList()
   },
   methods: {
     async getDeptTree () {
@@ -249,7 +253,9 @@ export default {
           _this.deptTree = this.handleDeptTree(res.data.data)
           if (_this.deptTree.length > 0) {
             _this.selectedDept = _this.deptTree[0]
-            _this.$refs.insDeptTreeRef.setCurrentKey(_this.deptTree[0].id)
+            if (_this.$refs.insDeptTreeRef) {
+              _this.$refs.insDeptTreeRef.setCurrentKey(_this.deptTree[0].id)
+            }
             _this.getPeoplePage()
           }
         }
@@ -288,6 +294,19 @@ export default {
             _this.pageTotal = res.data.data.total
           }
         })
+    },
+
+    async getIconList () {
+      const params = {
+        pageSize: 1000
+      }
+      const _this = this
+      this.$axios.post(iconLibaryApi.getAllPic, params).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.iconList = res.data.data.data
+          console.log(_this.iconList)
+        }
+      })
     },
 
     // 搜索机构时触发
