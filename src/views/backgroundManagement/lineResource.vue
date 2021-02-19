@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       dlgView: 'LineResDlg',
-      subTitle: '面资源设置',
+      subTitle: '线资源设置',
       resourcesDataType: '1',
       fieldList: [
         { label: '线路名称', value: 'resourcesName' },

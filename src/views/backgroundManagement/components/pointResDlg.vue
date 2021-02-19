@@ -716,7 +716,8 @@ export default {
      *  提交点资源数据
      */
     submitResForm () {
-      if (!this.pointId) {
+      const count = this.$refs.resDlg.getFeatureSize(0)
+      if (count <= 0) {
         this.$notify.closeAll()
         this.$notify.warning({
           title: '提示',

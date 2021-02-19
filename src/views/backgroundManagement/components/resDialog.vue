@@ -298,6 +298,12 @@ export default {
       this.createUser = data.createUser
       this.updateTime = timeFormat(data.updateTime)
       this.updateUser = data.updateUser
+    },
+    /**
+     * 获取绘图个数
+     */
+    getFeatureSize (drawType) {
+      return this.$refs.gduMap.map2D.customDrawHelper.getFeatureSize(drawType)
     }
   }
 }

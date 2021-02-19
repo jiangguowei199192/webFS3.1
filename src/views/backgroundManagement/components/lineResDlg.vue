@@ -452,7 +452,8 @@ export default {
      *  提交点资源数据
      */
     submitResForm () {
-      if (!this.lineId) {
+      const count = this.$refs.resDlg.getFeatureSize(1)
+      if (count <= 0) {
         this.$notify.closeAll()
         this.$notify.warning({
           title: '提示',
