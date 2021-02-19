@@ -51,7 +51,7 @@
         class="right-table"
         :tableInfo="tableInfo"
         :subTitle="subTitle"
-        :query="query"
+        :query="queryParams"
         :api="getChildDictList"
       ></DictPage>
     </div>
@@ -65,7 +65,6 @@
           handelType == 'editParentDict' ? '修改字典' : ''
         }${handelType == 'checkParentDict' ? '查看字典' : ''}`
       "
-      :deptTree="dictTree"
       :dictInfo="dictInfo"
       @confirmClick="confirmClickSubmit"
     ></AddDictDialog>
@@ -105,14 +104,14 @@ export default {
         label: 'typeName',
         value: 'typeCode'
       },
-      selectedDict: '',
-      rightClickDict: '',
       isShow: false,
       treeRightMenuShow: false,
+      showDeleteTip: false,
+      selectedDict: '',
+      rightClickDict: '',
       dictInfo: {},
       handelType: '',
       selectedDictIds: [],
-      showDeleteTip: false,
 
       subTitle: '字典项',
       // 表格项
@@ -129,15 +128,15 @@ export default {
         handle: {
           label: '操作',
           width: '130',
-          btList: [{ label: '修改' }, { label: '查看' }]
+          btList: [
+            { label: '修改', event: 'modify' },
+            { label: '查看', event: 'readonly' }
+          ]
         }
       },
-      pageData: {
-        pageSize: 10,
-        currentPage: 1,
-        total: 0
-      },
-      query: {}
+      queryParams: {
+        parentId: ''
+      }
     }
   },
 
@@ -158,6 +157,7 @@ export default {
       this.selectedDict = node
       this.tableInfo.refresh = Math.random()
       this.dictSearch = ''
+      EventBus.$emit('selectChildId', this.selectedDict.id)
     },
 
     // children为''时置为null
@@ -194,15 +194,13 @@ export default {
     },
 
     // 获取子级字典列表
-    getChildDictList () {
-      const queryParams = {
-        parentId: parseInt(this.selectedDict ? this.selectedDict.id : 0),
-        currentPage: parseInt(this.pageData.currentPage),
-        pageSize: parseInt(this.pageData.pageSize),
-        typeName: ''
+    getChildDictList (params) {
+      const ids = {
+        parentId: parseInt(this.selectedDict ? this.selectedDict.id : 0)
       }
-      // console.log('queryParams:', queryParams)
-      return this.$axios.post(dataDictApi.queryChildDict, queryParams)
+      Object.assign(params, ids)
+      // console.log('queryParams:', params)
+      return this.$axios.post(dataDictApi.queryChildDict, params)
     },
 
     // 搜索字典树
@@ -297,13 +295,10 @@ export default {
             })
             this.getDictTree()
             this.showDeleteTip = false
-            return
           }
-          this.$notify.warning({
-            title: '提示',
-            message: '删除失败!',
-            duration: 3 * 1000
-          })
+        })
+        .catch(err => {
+          console.log('接口错误: ' + err)
         })
     },
 
@@ -345,7 +340,7 @@ export default {
 
     // 关闭菜单
     closeRightMenu () {
-      this.rightClickDict = ''
+      // this.rightClickDict = ''
       this.treeRightMenuShow = false
       document.removeEventListener('click', this.closeRightMenu)
     }

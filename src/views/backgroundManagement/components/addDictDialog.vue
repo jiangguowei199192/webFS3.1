@@ -4,7 +4,7 @@
  * @Author: liangkaiLee
  * @Date: 2021-01-26 09:16:43
  * @LastEditors: liangkaiLee
- * @LastEditTime: 2021-02-08 10:44:43
+ * @LastEditTime: 2021-02-19 16:36:37
 -->
 <template>
   <el-dialog
@@ -29,7 +29,6 @@
         <el-input
           v-model="addDictForm.name"
           :placeholder="placeholder"
-          :readonly="isDisabled"
           :disabled="isDisabled"
         ></el-input>
       </el-form-item>
@@ -37,7 +36,6 @@
         <el-input
           v-model="addDictForm.code"
           :placeholder="placeholder"
-          :readonly="isDisabled"
           :disabled="isDisabled"
         ></el-input>
       </el-form-item>
@@ -60,7 +58,6 @@
         <el-input
           v-model="addDictForm.order"
           :placeholder="placeholder"
-          :readonly="isDisabled"
           :disabled="isDisabled"
         ></el-input>
       </el-form-item>
@@ -102,13 +99,15 @@
           placeholder="请输入"
           type="textarea"
           resize="none"
-          :readonly="isDisabled"
           :disabled="isDisabled"
         ></el-input>
       </el-form-item>
     </el-form>
     <!-- 操作信息log -->
-    <div class="handelNote" v-if="handelType == 'checkParentDict'">
+    <div
+      class="handelNote"
+      v-if="handelType == 'checkParentDict' || handelType == 'checkChildDict'"
+    >
       <div>
         <span>创建时间：{{ addDictForm.createTime }}</span>
         <span>创建人：{{ addDictForm.createUserName }}</span>
@@ -118,7 +117,11 @@
         <span>最后修改人：{{ addDictForm.updateUserName }}</span>
       </div>
     </div>
-    <div v-if="handelType == 'checkParentDict'" class="handelBtns">
+    <!-- 操作按钮 -->
+    <div
+      v-if="handelType == 'checkParentDict' || handelType == 'checkChildDict'"
+      class="handelBtns"
+    >
       <span
         style="margin-right: 190px;"
         @click.stop="cancelClick('addDictForm')"
@@ -196,19 +199,21 @@ export default {
   },
 
   watch: {
-    dictInfo (info) {
-      if (!info) return false
-      else {
-        this.addDictForm.name = info.typeName
-        this.addDictForm.code = info.typeCode
-        this.addDictForm.status = info.status
-        this.addDictForm.order = info.orderNum
-        this.addDictForm.icon = info.icon
-        this.addDictForm.note = info.remark
-        this.addDictForm.createTime = info.createTime
-        this.addDictForm.createUserName = info.createUserName
-        this.addDictForm.updateTime = info.updateTime
-        this.addDictForm.updateUserName = info.updateUserName
+    isShow (val) {
+      if (val) {
+        if (!this.dictInfo) return false
+        else {
+          this.addDictForm.name = this.dictInfo.typeName
+          this.addDictForm.code = this.dictInfo.typeCode
+          this.addDictForm.status = this.dictInfo.status
+          this.addDictForm.order = this.dictInfo.orderNum
+          this.addDictForm.icon = this.dictInfo.icon
+          this.addDictForm.note = this.dictInfo.remark
+          this.addDictForm.createTime = this.dictInfo.createTime
+          this.addDictForm.createUserName = this.dictInfo.createUser
+          this.addDictForm.updateTime = this.dictInfo.updateTime
+          this.addDictForm.updateUserName = this.dictInfo.updateUser
+        }
       }
     }
   },
@@ -216,17 +221,21 @@ export default {
   created () {
     const _this = this
     EventBus.$on('handelType', data => {
+      // console.log(data)
       _this.handelType = data
-      if (_this.handelType === 'checkParentDict') this.isDisabled = true
+      if (
+        _this.handelType === 'checkParentDict' ||
+        _this.handelType === 'checkChildDict'
+      ) {
+        this.isDisabled = true
+      }
     })
   },
 
   methods: {
     confirmClick (formName) {
       this.$refs[formName].validate(valid => {
-        if (!valid) {
-          return
-        }
+        if (!valid) return false
         this.$emit('confirmClick', this.addDictForm)
       })
     },
