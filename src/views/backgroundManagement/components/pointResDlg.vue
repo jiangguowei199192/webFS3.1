@@ -302,7 +302,7 @@
                     v-model="item.fillColor"
                     show-alpha
                     :disabled="disabled"
-                    @change="fillColorChange()"
+                    @change="fillColorChange(item)"
                   ></el-color-picker>
                 </el-form-item>
                 <el-form-item label="备注 :" class="note">
@@ -424,11 +424,11 @@ export default {
     lanChange () {
       let latV = true
       let lonV = true
-      this.$refs.pointForm.validateField('lat', (valid) => {
-        if (valid) latV = false
+      this.$refs.pointForm.validateField('resourcesLatitude', (valid) => {
+        if (!valid) latV = false
       })
-      this.$refs.pointForm.validateField('lon', (valid) => {
-        if (valid) lonV = false
+      this.$refs.pointForm.validateField('resourcesLongitude', (valid) => {
+        if (!valid) lonV = false
       })
       if (latV && lonV) {
         const data = {
@@ -646,6 +646,10 @@ export default {
         this.pointId = data.drawId
         this.resForm.resourcesLongitude = data.coordinates[0].toFixed(7)
         this.resForm.resourcesLatitude = data.coordinates[1].toFixed(7)
+        this.$refs.pointForm.validateField('resourcesLatitude', (valid) => {
+        })
+        this.$refs.pointForm.validateField('resourcesLongitude', (valid) => {
+        })
       } else if (data.drawType === 2) {
         const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {

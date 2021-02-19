@@ -80,14 +80,13 @@
               class="disabled"
             ></el-input>
           </el-form-item>
-          <el-form-item label="所属辖区 :">
+          <el-form-item label="所属辖区 :" prop="belongArea">
             <el-select
               v-show="!disabled"
               v-model="resForm.belongArea"
               :popper-append-to-body="false"
               :placeholder="placeholder2"
               :class="{ active: !disabled }"
-              :disabled="disabled"
             >
               <el-option
                 v-for="item in areas"

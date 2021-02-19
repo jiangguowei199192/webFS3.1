@@ -154,10 +154,9 @@ export default {
         setTimeout(() => {
           this.$refs.gduMap.map2D._map.updateSize()
         }, 200)
-        this.$nextTick(() => {
-          this.$refs.gduMap.map2D.customDrawHelper.clear()
-          this.$refs.gduMap.map2D.customDrawHelper.stop()
-        })
+      } else {
+        this.$refs.gduMap.map2D.customDrawHelper.clear()
+        this.$refs.gduMap.map2D.customDrawHelper.stop()
       }
     },
     isRead (val) {
