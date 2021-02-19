@@ -151,6 +151,9 @@ export default {
         this.toolItems.forEach((t) => {
           t.isSelect = false
         })
+        setTimeout(() => {
+          this.$refs.gduMap.map2D._map.updateSize()
+        }, 200)
         this.$nextTick(() => {
           this.$refs.gduMap.map2D.customDrawHelper.clear()
           this.$refs.gduMap.map2D.customDrawHelper.stop()
