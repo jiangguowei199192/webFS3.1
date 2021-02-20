@@ -82,6 +82,7 @@
               :placeholder="placeholder"
               :disabled="disabled"
               :class="{ active: !disabled }"
+              @change="lanChange(item,index)"
             ></el-input>
           </el-form-item>
           <el-form-item label="纬度 :" prop="latitude">
@@ -90,6 +91,7 @@
               :placeholder="placeholder"
               :disabled="disabled"
               :class="{ active: !disabled }"
+              @change="lanChange(item,index)"
             ></el-input>
           </el-form-item>
           <el-form-item
@@ -250,6 +252,27 @@ export default {
       point.latitude = lat
       this.list.push(point)
     },
+    lanChange (item, index) {
+      let latV = true
+      let lonV = true
+      this.$refs.markerForm[index].validateField('latitude', (valid) => {
+        if (valid) latV = false
+      })
+      this.$refs.markerForm[index].validateField('longitude', (valid) => {
+        if (valid) lonV = false
+      })
+      if (latV && lonV) {
+        const data = {
+          drawId: item.id,
+          drawType: 0,
+          coordinates: [
+            parseFloat(item.longitude),
+            parseFloat(item.latitude)
+          ]
+        }
+        this.$emit('updatePointStyle', data)
+      }
+    },
     /**
      *  选择图标
      */
@@ -265,7 +288,7 @@ export default {
           anchor: [0.5, 0.5],
           anchorXUnits: 'fraction',
           anchorYUnits: 'fraction',
-          src: item.iconPath// 图片url
+          src: item.iconPath // 图片url
         }
       }
       this.$emit('updatePointStyle', data)
@@ -297,7 +320,7 @@ export default {
             anchor: [0.5, 0.5],
             anchorXUnits: 'fraction',
             anchorYUnits: 'fraction',
-            src: this.serverUrl + c.iconUrl// 图片url
+            src: this.serverUrl + c.iconUrl // 图片url
           }
         }
         this.ptStyles.push(point)
@@ -360,6 +383,10 @@ export default {
      *  重置数据
      */
     resetData () {
+      let i = 0
+      for (; i < this.list.length; i++) {
+        this.$refs.markerForm[i].resetFields()
+      }
       this.list = []
       this.ptStyles = []
     }

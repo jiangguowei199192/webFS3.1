@@ -425,10 +425,10 @@ export default {
       let latV = true
       let lonV = true
       this.$refs.pointForm.validateField('resourcesLatitude', (valid) => {
-        if (!valid) latV = false
+        if (valid) latV = false
       })
       this.$refs.pointForm.validateField('resourcesLongitude', (valid) => {
-        if (!valid) lonV = false
+        if (valid) lonV = false
       })
       if (latV && lonV) {
         const data = {
