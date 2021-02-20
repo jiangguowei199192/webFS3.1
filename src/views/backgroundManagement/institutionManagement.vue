@@ -173,12 +173,31 @@
 
     <AddDeptDialog
       :isShow.sync="showAddDept"
+      title="新增机构"
       :deptTree="deptTree"
       :icons="iconList"
       @close="showAddDept = false"
       @confirmClick="addDeptConfirmClick"
-      @cancelClick="addDeptCancelClick"
+      @cancelClick="showAddDept = false"
     ></AddDeptDialog>
+
+    <AddDeptDialog
+      :isShow.sync="showEditDept"
+      title="修改机构"
+      :deptInfo="deptDetail"
+      :deptTree="deptTree"
+      :icons="iconList"
+      @close="showEditDept = false"
+      @confirmClick="editDeptConfirmClick"
+      @cancelClick="showEditDept = false"
+    ></AddDeptDialog>
+
+    <DeptInfoDialog
+      :isShow.sync="showDeptInfo"
+      :deptInfo="deptDetail"
+      @close="showDeptInfo = false"
+      @confirmClick="showDeptInfo = false"
+    ></DeptInfoDialog>
   </div>
 </template>
 
@@ -187,6 +206,7 @@ import AddPeopleDialog from './components/addPeopleDialog.vue'
 import DeleteDialog from './components/deleteDialog.vue'
 import PeopleInfoDialog from './components/peopleInfoDialog.vue'
 import AddDeptDialog from './components/addDeptDialog.vue'
+import DeptInfoDialog from './components/deptInfoDialog.vue'
 import { backApi } from '@/api/back'
 import { iconLibaryApi } from '@/api/iconLibary'
 import { Notification } from 'element-ui'
@@ -196,7 +216,8 @@ export default {
     AddPeopleDialog,
     DeleteDialog,
     PeopleInfoDialog,
-    AddDeptDialog
+    AddDeptDialog,
+    DeptInfoDialog
   },
   watch: {
     institutionSearch (val) {
@@ -236,6 +257,9 @@ export default {
       showDeleteTip: false,
       showPeopleInfo: false,
       showAddDept: false,
+      showDeptInfo: false,
+      deptDetail: '',
+      showEditDept: false,
 
       showDeleteDeptTip: false,
       iconList: []
@@ -304,7 +328,6 @@ export default {
       this.$axios.post(iconLibaryApi.getAllPic, params).then(res => {
         if (res && res.data && res.data.code === 0) {
           _this.iconList = res.data.data.data
-          console.log(_this.iconList)
         }
       })
     },
@@ -344,20 +367,67 @@ export default {
     },
 
     // 编辑机构
-    deptEditClick () {
-      console.log('编辑机构')
+    async deptEditClick () {
+      const param = { id: this.rightClickDept.id }
+      const _this = this
+      this.$axios
+        .post(backApi.deptInfo, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.deptDetail = res.data.data
+            _this.showEditDept = true
+          }
+        })
+    },
+    async editDeptConfirmClick (form, icon) {
+      this.showEditDept = false
+      const param = {
+        id: this.rightClickDept.id,
+        deptName: form.deptName,
+        parentDeptCode: form.fatherDept,
+        deptAddr: form.address,
+        deptIcon: icon,
+        deptLatitude: form.latitude,
+        deptLongitude: form.longitude,
+        deptRemark: form.note,
+        deptShortName: form.shortName,
+        deptStatus: form.status,
+        deptTel: form.phone,
+        orderNum: form.num
+      }
+      const _this = this
+      this.$axios.post(backApi.editDept, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.getDeptTree()
+        }
+      })
     },
 
     // 查看机构
-    deptSeeClick () {
-      console.log('查看机构')
+    async deptSeeClick () {
+      const param = { id: this.rightClickDept.id }
+      const _this = this
+      this.$axios
+        .post(backApi.deptInfo, param, {
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            _this.showDeptInfo = true
+            _this.deptDetail = res.data.data
+          }
+        })
     },
 
     // 删除机构
     deptDeleteClick () {
       this.showDeleteDeptTip = true
     },
-    deleteDeptTipConfirm () {
+    async deleteDeptTipConfirm () {
       this.showDeleteDeptTip = false
 
       const param = { id: this.rightClickDept.id }
@@ -380,13 +450,29 @@ export default {
     },
 
     // 添加机构确定时触发
-    addDeptConfirmClick () {
+    async addDeptConfirmClick (form, icon) {
       this.showAddDept = false
-    },
-
-    // 添加机构取消时触发
-    addDeptCancelClick () {
-      this.showAddDept = false
+      const param = {
+        deptName: form.deptName,
+        parentDeptCode: form.fatherDept,
+        deptAddr: form.address,
+        deptIcon: icon,
+        deptLatitude: form.latitude,
+        deptLongitude: form.longitude,
+        deptRemark: form.note,
+        deptShortName: form.shortName,
+        deptStatus: form.status,
+        deptTel: form.phone,
+        orderNum: form.num
+      }
+      const _this = this
+      this.$axios.post(backApi.addDept, param, {
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' }
+      }).then(res => {
+        if (res && res.data && res.data.code === 0) {
+          _this.getDeptTree()
+        }
+      })
     },
 
     // 搜索人员时触发

@@ -6,5 +6,8 @@ export const backApi = {
   peopleInfo: '/cloud-fms/employee/selectDetail', // 查看人员信息
   deletePeople: '/cloud-fms/employee/del', // 批量删除人员
   editPeople: '/cloud-fms/employee/update', // 编辑人员信息
-  deleteDept: '/cloud-fms/dept/del' // 删除组织
+  deleteDept: '/cloud-fms/dept/del', // 删除组织
+  addDept: '/cloud-fms/dept/add',
+  deptInfo: '/cloud-fms/dept/selectDetail',
+  editDept: '/cloud-fms/dept/update'
 }

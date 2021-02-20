@@ -17,10 +17,10 @@
 
       <div class="add-dept-header">
         <div class="header-icon"></div>
-        <div class="header-text">{{title}}</div>
+        <div class="header-text">新增机构</div>
       </div>
 
-      <div class="toolBox">
+      <!-- <div class="toolBox">
         <div
           v-for="(item, index) in toolItems"
           :key="index"
@@ -28,7 +28,7 @@
           :class="[item.className, { toolBtnSelect: item.isSelect }]"
           @click="clickToolItem(item)"
         ></div>
-      </div>
+      </div> -->
 
       <transition name="showUnfoldBtn">
         <div
@@ -50,125 +50,92 @@
             <el-form
               ref="addDeptRef"
               :model="addDeptForm"
-              :rules="addDeptRules"
               :inline="true"
               label-width="80px"
               class="add-dept-form"
             >
               <el-form-item label="机构名称" prop="deptName">
                 <el-input
-                  v-model="addDeptForm.deptName"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptName"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="机构地址" prop="address">
                 <el-input
-                  v-model="addDeptForm.address"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptAddress"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="上级机构" prop="fatherDept">
-                <el-cascader
-                  v-model="addDeptForm.fatherDept"
-                  :options="deptTree"
-                  :props="{
-                    expandTrigger: 'hover',
-                    label: 'deptName',
-                    value: 'deptCode',
-                    checkStrictly: true,
-                    emitPath: false,
-                  }"
-                  :show-all-levels="false"
-                ></el-cascader>
+                <el-input
+                  v-model="deptInfo.parentDeptCodeName"
+                  placeholder=""
+                  :disabled="true"
+                ></el-input>
               </el-form-item>
               <el-form-item label="机构电话">
                 <el-input
-                  v-model="addDeptForm.phone"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptTel"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="机构编码">
                 <el-input
-                  v-model="addDeptForm.deptCode"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptCode"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="机构简称">
                 <el-input
-                  v-model="addDeptForm.shortName"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptShortName"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="经度">
                 <el-input
-                  v-model="addDeptForm.longitude"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptLatitude"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="纬度">
                 <el-input
-                  v-model="addDeptForm.latitude"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptLongitude"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="机构状态">
-                <el-select
-                  v-model="addDeptForm.status"
-                  :popper-append-to-body="false"
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="item in deptStatusTypes"
-                    :key="item.id"
-                    :label="item.label"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+                <el-input
+                  v-model="deptInfo.deptStatus"
+                  placeholder=""
+                  :disabled="true"
+                ></el-input>
               </el-form-item>
               <el-form-item label="排序" prop="num">
                 <el-input
-                  v-model="addDeptForm.num"
-                  placeholder="请输入"
+                  v-model="deptInfo.orderNum"
+                  placeholder=""
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
               <el-form-item label="图标">
                 <div class="icon-tool">
                   <el-avatar :size="30" :src="deptIconUrl"></el-avatar>
-                  <el-popover
-                    placement="top"
-                    trigger="click"
-                    popper-class="iconPopover"
-                    v-model="showPopover"
-                  >
-                    <div class="iconBox webFsScroll">
-                      <!-- <span
-                        class="close"
-                        @click.stop="showPopover = false"
-                      ></span> -->
-                      <span
-                        @click.stop="selectIcon(item)"
-                        class="icon"
-                        v-for="(item, index) in icons"
-                        :key="index"
-                        :style="{
-                          background:
-                            'url(' + serverUrl + item.iconPath + ') no-repeat',
-                        }"
-                      ></span>
-                    </div>
-                    <div class="choose-icon-btn" slot="reference">
-                      <el-image class="btn-icon" :src="chooseIcon"></el-image>
-                      选择图标
-                    </div>
-                  </el-popover>
                 </div>
               </el-form-item>
               <el-form-item label="备注">
                 <el-input
-                  v-model="addDeptForm.note"
-                  placeholder="请输入"
+                  v-model="deptInfo.deptRemark"
+                  placeholder=""
                   type="textarea"
                   resize="none"
+                  :disabled="true"
                 ></el-input>
               </el-form-item>
             </el-form>
@@ -176,8 +143,7 @@
         </div>
       </transition>
       <div class="confirm-tool">
-        <div class="confirm-btn" @click="confirmClick">确定</div>
-        <div class="cancel-btn" @click="cancelClick">取消</div>
+        <div class="confirm-btn" @click="confirmClick">关闭</div>
       </div>
     </div>
   </el-dialog>
@@ -185,43 +151,18 @@
 
 <script>
 import globalApi from '@/utils/globalApi'
-import { numberValidate } from '@/utils/formRules'
 
 export default {
-  props: ['isShow', 'deptTree', 'icons', 'title', 'deptInfo'],
+  props: ['isShow', 'deptInfo'],
   watch: {
     isShow (newS) {
-      if (newS) {
-        if (this.$refs.addDeptRef) {
-          this.$refs.addDeptRef.resetFields()
-        }
-      }
-    },
-    deptInfo (newD) {
-      if (newD) {
-        console.log(newD)
-        this.addDeptForm.deptName = newD.deptName
-        this.addDeptForm.address = newD.deptAddress
-        this.addDeptForm.fatherDept = newD.parentDeptCode
-        this.addDeptForm.phone = newD.deptTel
-        this.addDeptForm.deptCode = newD.deptCode
-        this.addDeptForm.shortName = newD.deptShortName
-        this.addDeptForm.longitude = newD.deptLongitude
-        this.addDeptForm.latitude = newD.deptLatitude
-        this.addDeptForm.note = newD.deptRemark
-        this.addDeptForm.num = newD.orderNum
-        if (newD.deptStatus === '在用') {
-          this.addDeptForm.status = 0
-        }
-        if (newD.deptStatus === '已注销') {
-          this.addDeptForm.status = 1
-        }
+      if (newS && this.deptInfo.deptIcon) {
+        this.deptIconUrl = this.serverUrl + this.deptInfo.deptIcon
       }
     }
   },
   data () {
     return {
-      chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       deptIconUrl:
         'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
       addDeptForm: {
@@ -237,22 +178,6 @@ export default {
         note: '',
         num: ''
       },
-      addDeptRules: {
-        deptName: [{ required: true, message: '请输入' }],
-        address: [{ required: true, message: '请输入' }],
-        fatherDept: [{ required: true, message: '请选择' }],
-        num: numberValidate('请输入数字')
-      },
-      deptStatusTypes: [
-        {
-          id: 0,
-          label: '在用'
-        },
-        {
-          id: 1,
-          label: '已注销'
-        }
-      ],
       showPopover: false,
       serverUrl: globalApi.headImg,
       showDeptContent: true,
@@ -283,15 +208,8 @@ export default {
         if (!valid) {
           return
         }
-        if (this.deptIconUrl === 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png') {
-          this.deptIconUrl = ''
-        }
         this.$emit('confirmClick', this.addDeptForm, this.deptIconUrl)
       })
-    },
-
-    cancelClick () {
-      this.$emit('cancelClick')
     },
 
     // 选择图标
@@ -549,26 +467,6 @@ export default {
             display: inline-block;
             height: 30px;
             vertical-align: middle;
-            .choose-icon-btn {
-              display: inline-block;
-              width: 86px;
-              height: 24px;
-              border: 1px solid #1ea7f0;
-              color: #fff;
-              font-size: 12px;
-              line-height: 24px;
-              vertical-align: top;
-              margin-left: 8px;
-              margin-top: 3px;
-              cursor: pointer;
-              .btn-icon {
-                width: 12px;
-                height: 12px;
-                margin-left: 10px;
-                margin-top: 6px;
-                vertical-align: top;
-              }
-            }
           }
         }
       }
@@ -587,20 +485,6 @@ export default {
         font-size: 14px;
         text-align: center;
         line-height: 30px;
-        cursor: pointer;
-      }
-      .cancel-btn {
-        float: right;
-        width: 66px;
-        height: 30px;
-        background-color: transparent;
-        border: 1px solid #1eb0fc;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        text-align: center;
-        line-height: 30px;
-        margin-right: 20px;
         cursor: pointer;
       }
     }
