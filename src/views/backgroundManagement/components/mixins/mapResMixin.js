@@ -100,7 +100,7 @@ const mapResMixin = {
     getAreaResources () {
       this.$axios
         .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'area_resources' }
+          params: { typeCode: 'xq_resources' }
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {

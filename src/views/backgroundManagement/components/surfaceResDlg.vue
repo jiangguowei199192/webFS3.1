@@ -265,6 +265,10 @@ export default {
         this.resetData()
         // 设置面资源信息
         copyData(data, this.resForm)
+        // 防止资源类型、所属机构、所属辖区的字典项不存在
+        if (!data.belongAreaName) this.resForm.belongArea = ''
+        if (!data.resourcesTypeName) this.resForm.resourcesType = ''
+        if (!data.deptName) this.resForm.belongOrg = ''
         this.resForm.id = data.id
         this.areaID = data.id
         // 设置标记点信息

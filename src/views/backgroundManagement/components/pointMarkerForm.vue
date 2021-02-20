@@ -271,6 +271,10 @@ export default {
         if (!isUpdate) {
           pt.deptName = c.deptName
           pt.belongAreaName = c.belongAreaName
+        } else {
+          // 防止所属辖区、所属机构的字典项不存在
+          if (!c.belongAreaName) pt.belongArea = ''
+          if (!c.deptName) pt.belongOrg = ''
         }
         this.list.push(pt)
       })

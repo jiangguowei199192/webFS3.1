@@ -492,6 +492,10 @@ export default {
         this.resetData()
         // 设置点资源信息
         copyData(data, this.resForm)
+        // 防止资源类型、所属机构、所属辖区的字典项不存在
+        if (!data.belongAreaName) this.resForm.belongArea = ''
+        if (!data.resourcesTypeName) this.resForm.resourcesType = ''
+        if (!data.deptName) this.resForm.belongOrg = ''
         this.resForm.id = data.id
         this.pointId = data.id
         // 设置管辖范围信息
@@ -499,6 +503,9 @@ export default {
           addDTOS.forEach((c) => {
             var area = JSON.parse(JSON.stringify(this.area))
             copyData(c, area)
+            // 防止管辖范围类型、所属机构的字典项不存在
+            if (!data.pointTypeName) area.pointType = ''
+            if (!data.deptName) area.belongOrg = ''
             this.areaIds.push(c.id)
             this.ctlAreas.push(area)
           })
@@ -576,7 +583,7 @@ export default {
     getControlAreas () {
       this.$axios
         .get(settingApi.queryByTypeCode, {
-          params: { typeCode: 'control_areas' }
+          params: { typeCode: 'gkfw_resources' }
         })
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
