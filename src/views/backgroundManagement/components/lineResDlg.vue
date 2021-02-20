@@ -179,6 +179,7 @@
             :organs="organs"
             :icons="icons"
             @removeFeature="removeMarker"
+            @updatePointStyle="updatePointStyle"
             :disabled="disabled"
           ></PointMarkerForm>
         </div>
@@ -270,6 +271,12 @@ export default {
       this.lineId = ''
     },
     /**
+     *  更新点样式
+     */
+    updatePointStyle (data) {
+      this.$refs.resDlg.addOrUpdateFeature(data)
+    },
+    /**
      *  修改资源
      */
     updateRes (data) {
@@ -319,16 +326,10 @@ export default {
           }
         }
         this.$refs.resDlg.addOrUpdateFeature(d)
-        if (addDTOS && addDTOS.length > 0) {
-          addDTOS.forEach((c) => {
-            const point = {
-              drawId: c.id,
-              drawType: 0,
-              coordinates: [c.longitude, c.latitude]
-            }
-            this.$refs.resDlg.addOrUpdateFeature(point)
-          })
-        }
+        const styles = this.$refs.markerForm.getStyleList()
+        styles.forEach((c) => {
+          this.$refs.resDlg.addOrUpdateFeature(c)
+        })
       }, 100)
     },
     /**

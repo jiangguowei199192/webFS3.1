@@ -449,6 +449,25 @@ export default {
       this.showPopover = false
       this.resForm.resourcesIcon = item.iconPath
       this.$refs.pointForm.validateField('resourcesIcon', (valid) => {})
+      this.updatePointStyle()
+    },
+    /**
+     *  更新点样式
+     */
+    updatePointStyle () {
+      if (this.pointId) {
+        const data = {
+          drawId: this.pointId,
+          drawType: 0,
+          pointStyle: {
+            anchor: [0.5, 0.5],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            src: this.serverUrl + this.resForm.resourcesIcon// 图片url
+          }
+        }
+        this.$refs.resDlg.addOrUpdateFeature(data)
+      }
     },
     /**
      *  添加资源
@@ -556,7 +575,13 @@ export default {
           coordinates: [
             this.resForm.resourcesLongitude,
             this.resForm.resourcesLatitude
-          ]
+          ],
+          pointStyle: {
+            anchor: [0.5, 0.5],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            src: this.serverUrl + this.resForm.resourcesIcon// 图片url
+          }
         }
         this.$refs.resDlg.addOrUpdateFeature(d)
         if (addDTOS && addDTOS.length > 0) {
@@ -657,6 +682,13 @@ export default {
         })
         this.$refs.pointForm.validateField('resourcesLongitude', (valid) => {
         })
+        // 重新画点资源的时候，需要设置样式
+        if (data.bIsAdd) {
+          const me = this
+          setTimeout(() => {
+            me.updatePointStyle()
+          }, 20)
+        }
       } else if (data.drawType === 2) {
         const a = this.ctlAreas.find((c) => c.id === data.drawId)
         if (a !== undefined) {

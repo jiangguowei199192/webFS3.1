@@ -190,6 +190,7 @@ export default {
   },
   data () {
     return {
+      ptStyles: [],
       serverUrl: globalApi.headImg,
       placeholder: '请输入',
       placeholder2: '请选择',
@@ -257,6 +258,17 @@ export default {
       item.iconUrl = icon.iconPath
       item.iconPath = this.serverUrl + icon.iconPath
       this.$refs.markerForm[index].validateField('iconUrl', (valid) => {})
+      const data = {
+        drawId: item.id,
+        drawType: 0,
+        pointStyle: {
+          anchor: [0.5, 0.5],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          src: item.iconPath// 图片url
+        }
+      }
+      this.$emit('updatePointStyle', data)
     },
     /**
      *  添加标记点
@@ -277,7 +289,25 @@ export default {
           if (!c.deptName) pt.belongOrg = ''
         }
         this.list.push(pt)
+        const point = {
+          drawId: c.id,
+          drawType: 0,
+          coordinates: [c.longitude, c.latitude],
+          pointStyle: {
+            anchor: [0.5, 0.5],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            src: this.serverUrl + c.iconUrl// 图片url
+          }
+        }
+        this.ptStyles.push(point)
       })
+    },
+    /**
+     *  获取标记点样式
+     */
+    getStyleList () {
+      return this.ptStyles
     },
     /**
      *  获取标记点列表
@@ -331,6 +361,7 @@ export default {
      */
     resetData () {
       this.list = []
+      this.ptStyles = []
     }
   }
 }

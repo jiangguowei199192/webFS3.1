@@ -22,8 +22,8 @@ const createServerConfig = function (compilation) {
         // baseUrl: 'http://172.16.63.49:8850', // 良良本机地址，联调用
         mqttServer: '111.47.13.103',
         mqttPort: 40027,
-        // headImg: 'http://111.47.13.103:40031'
-        headImg: 'http://122.112.203.178' // 图标请求头临时
+        headImg: 'http://111.47.13.103:40031'
+        // headImg: 'http://122.112.203.178' // 图标请求头临时
 
         // v3.0开发环境
         // baseUrl: 'http://112.74.104.62:8850',
