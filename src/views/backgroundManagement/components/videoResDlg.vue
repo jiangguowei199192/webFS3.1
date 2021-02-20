@@ -73,8 +73,8 @@
             <el-cascader
               v-model="resForm.organ"
               :placeholder="placeholder2"
-              :options="organTree"
-              :props="deptTreeProps"
+              :options="organs"
+              :props="organsProps"
               :show-all-levels="false"
               :disabled="readonly"
               :class="{ active: !readonly }"
@@ -89,10 +89,10 @@
               :disabled="readonly"
             >
               <el-option
-                v-for="item in areaList"
-                :key="item.id"
-                :label="item.label"
-                :value="item.id"
+                v-for="item in areas"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -256,8 +256,9 @@
             <div class="iconTool">
               <el-avatar
                 :size="30"
-                :src="resForm.icon"
+                :src="avatarUrl"
                 style="margin-top: 5px"
+                :key="avatarUrl"
               ></el-avatar>
               <el-popover
                 placement="top"
@@ -266,14 +267,16 @@
                 v-model="showPopover"
                 v-if="!readonly"
               >
-                <div class="iconBox">
-                  <span class="close" @click.stop="showPopover = false"></span>
+                <div class="iconBox webFsScroll">
+                  <!-- <span class="close" @click.stop="showPopover = false"></span> -->
                   <span
+                    @click.stop="selectIcon(item)"
                     class="icon"
                     v-for="(item, index) in icons"
                     :key="index"
                     :style="{
-                      background: 'url(' + serverUrl + item.path + ') no-repeat'
+                      background:
+                        'url(' + serverUrl + item.iconPath + ') no-repeat',
                     }"
                   ></span>
                 </div>
@@ -309,15 +312,17 @@ import {
   latValidate,
   limitMaxLength
 } from '@/utils/formRules'
-import { backApi } from '@/api/back'
 import { settingApi } from '@/api/setting'
 import { Notification } from 'element-ui'
 import { EventBus } from '@/utils/eventBus.js'
+import mapResMixin from './mixins/mapResMixin'
+import globalApi from '@/utils/globalApi'
 export default {
   props: {
   },
   data () {
     return {
+      serverUrl: globalApi.headImg,
       isEdit: false,
       readonly: false,
       placeholder: '请输入',
@@ -327,25 +332,6 @@ export default {
       showPopover: false,
       infoTop: 80,
       infoHeight: 445,
-      organTree: [],
-      deptTreeProps: {
-        expandTrigger: 'hover',
-        children: 'children',
-        label: 'deptName',
-        value: 'deptCode',
-        emitPath: false,
-        checkStrictly: true
-      },
-      areaList: [
-        {
-          label: '洪山区',
-          id: '1'
-        },
-        {
-          label: '江夏区',
-          id: '2'
-        }
-      ],
       resTypes: [
         {
           value: 'WRJ',
@@ -377,7 +363,6 @@ export default {
         }
       ],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
-      icons: [],
       formRules: {
         name: [{ required: true, message: '请输入资源名称' }],
         type: [{ required: true, message: '请选择资源类型' }],
@@ -414,47 +399,38 @@ export default {
         icon: '',
         note: ''
       },
+      avatarUrl: '',
       pointData: null
+    }
+  },
+  mixins: [mapResMixin],
+  computed: {
+    iconUrl () {
+      return this.resForm.icon
     }
   },
   watch: {
     readonly (val) {
       this.placeholder = val ? '' : '请输入'
       this.placeholder2 = val ? '' : '请选择'
+    },
+    iconUrl (val) {
+      if (val) {
+        this.avatarUrl = this.serverUrl + val
+      } else this.avatarUrl = ''
     }
   },
   created () {
-    this.getDeptTree()
+    this.organsProps.checkStrictly = true
+    this.getOrgans()
+    this.getIconList()
+    this.getAreaResources()
   },
   components: {
     ResDialog
   },
   methods: {
     limitMaxLength,
-    /**
-     * 获取机构树
-     */
-    async getDeptTree () {
-      var _this = this
-      this.$axios.post(backApi.getDeptTree).then((res) => {
-        if (res && res.data && res.data.code === 0) {
-          _this.organTree = this.handleDeptTree(res.data.data)
-        }
-      })
-    },
-    // children为" "时置为null
-    handleDeptTree (tree) {
-      tree.forEach((item) => {
-        if (item.children) {
-          if (item.children.length <= 0) {
-            item.children = null
-          } else {
-            this.handleDeptTree(item.children)
-          }
-        }
-      })
-      return tree
-    },
     /**
      * 设置表单数据
      */
@@ -716,6 +692,14 @@ export default {
     },
     devTypeChange (event) {
       this.updateDlgSize(event)
+    },
+    /**
+     *  选择图标
+     */
+    selectIcon (item) {
+      this.showPopover = false
+      this.resForm.icon = item.iconPath
+      this.$refs.formCtrl.validateField('icon', (valid) => {})
     }
   }
 }
