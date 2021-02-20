@@ -9,6 +9,7 @@ const mapResMixin = {
       resTypes: [], // 资源类型
       organs: [], // 所属机构
       icons: [], // 图标
+      modelList: [], // 设备类型
       organsProps: {
         expandTrigger: 'hover',
         children: 'children',
@@ -105,6 +106,23 @@ const mapResMixin = {
         .then((res) => {
           if (res && res.data && res.data.code === 0) {
             this.areas = res.data.data
+          }
+        })
+        .catch((err) => {
+          console.log('settingApi.queryByTypeCode Err : ' + err)
+        })
+    },
+    /**
+     * 获取设备型号
+     */
+    getDeviceModels () {
+      this.$axios
+        .get(settingApi.queryByTypeCode, {
+          params: { typeCode: 'DEV_MODEL' }
+        })
+        .then((res) => {
+          if (res && res.data && res.data.code === 0) {
+            this.modelList = res.data.data
           }
         })
         .catch((err) => {

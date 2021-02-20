@@ -131,9 +131,9 @@
             >
               <el-option
                 v-for="item in modelList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                :key="item.typeCode"
+                :label="item.typeName"
+                :value="item.typeCode"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -352,16 +352,6 @@ export default {
           label: '不启用'
         }
       ],
-      modelList: [
-        {
-          value: 'mId1',
-          label: 'GTX001'
-        },
-        {
-          value: 'mId2',
-          label: 'GDU088'
-        }
-      ],
       chooseIcon: require('../../../assets/images/backgroundManagement/chooseIcon.png'),
       formRules: {
         name: [{ required: true, message: '请输入资源名称' }],
@@ -425,6 +415,7 @@ export default {
     this.getOrgans()
     this.getIconList()
     this.getAreaResources()
+    this.getDeviceModels()
   },
   components: {
     ResDialog
@@ -466,7 +457,9 @@ export default {
         this.resForm.height = data.deviceHeight
         this.resForm.baseOrientation = data.deviceSeatAz
         this.resForm.sort = data.orderNum
-        this.resForm.icon = data.iconUrl
+        if (data.iconUrl) {
+          this.resForm.icon = this.serverUrl + data.iconUrl
+        } else this.resForm.icon = ''
         this.resForm.note = data.remark
       } else {
         this.resForm = {
@@ -616,7 +609,7 @@ export default {
           deviceStatus: tmpDevStatus,
           iconUrl: this.resForm.icon,
           deviceBrand: this.resForm.brand, // 品牌
-          deviceDistrict: this.resForm.area,
+          deptDistrictCode: this.resForm.area,
           deviceHeight: this.resForm.height,
           deviceLatitude: this.resForm.latitude,
           deviceLongitude: this.resForm.longitude,
